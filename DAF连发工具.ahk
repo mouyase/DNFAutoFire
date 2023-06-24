@@ -321,7 +321,7 @@ Gui Add, Button, gDeletePreset x150 y460 w120 h30, 删除配置
 Gui Add, Button, gStartAutoFire x744 y294 w200 h200, 启动连发
 Gui Add, Edit, vPresetName x150 y350 w120 h22
 
-Gui Show, w950 h510, DNF连发工具 - DNF:DNF Normative Fire - v0.0.1
+Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.1
 
 LoadPresetGUI()
 LoadDefaultPreset()
