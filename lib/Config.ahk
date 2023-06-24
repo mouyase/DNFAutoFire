@@ -1,13 +1,4 @@
-﻿SaveConfig(type, key, value) {
-	IniWrite, %value%, config.ini, %type%, %key%
-}
-
-LoadConfig(type, key) {
-	IniRead, value, config.ini, %type%, %key%
-	return value
-}
-
-SavePresetConfig(presetsName, keys){
+﻿SavePresetConfig(presetsName, keys){
 	keysString := ""
 	for k,v in keys
 	{
