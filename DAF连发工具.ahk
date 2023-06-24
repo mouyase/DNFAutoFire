@@ -1,20 +1,16 @@
-﻿;DNF连发: v0.0.1
-;作者：某亚瑟
+﻿#NoEnv
 
-
-#NoEnv
-
-#SingleInstance,Force
+#SingleInstance, Ignore
 #MaxHotkeysPerInterval 9999
 #InstallKeybdHook
 #Include <MultipleThread>
 #Include <AutoFire>
 #Include <Config>
-SetWorkingDir %A_ScriptDir%
+SetWorkingDir, %A_ScriptDir%
 SetBatchLines,-1
-ListLines Off
-SendMode,Event
-SetKeyDelay,0,-1
+ListLines, Off
+SendMode, Event
+SetKeyDelay, 0, -1
 CoordMode, ToolTip, Screen
 
 full_command_line := DllCall("GetCommandLine", "str")
@@ -31,18 +27,25 @@ if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)"))
 	ExitApp
 }
 
-Menu, Tray, Icon, icon.ico
-Menu,Tray,NoStandard
-Menu,Tray,DeleteAll
-Menu,Tray,Add,设置连发,ShowGUI
-Menu,Tray,Add,关闭连发,Exit
+try
+{
+	Menu, Tray, Icon, %A_ScriptFullPath%, 1
+}
+Menu, Tray, NoStandard
+Menu, Tray, DeleteAll
+Menu, Tray, MainWindow
+Menu, Tray, Tip, DAF连发工具
+Menu, Tray , Add, 设置连发, ShowGUI
+Menu, Tray , default, 设置连发
+Menu, Tray , Add
+Menu, Tray, Add, 关闭连发,Exit
 
 Exit(){
 	ExitApp
 }
 
 ShowGUI(){
-    Gui, Show
+	Gui, Show
 }
 
 global _ThreadArray := []
@@ -143,11 +146,14 @@ LoadPreset(){
 	global Preset
 	global EnableKeys
 	global PresetName
+	global _ThreadArray
 	Gui, Submit, NoHide
 	GuiControl, , PresetName, %Preset%
 	ClearAllKeys()
 	EnableKeys := LoadPresetConfig(Preset)
 	SetAllKeys(EnableKeys)
+	_ThreadArray := []
+	ToolTip, , , , 1
 }
 
 DeletePreset(){
@@ -173,7 +179,8 @@ StartAutoFire(){
 	{
 		_ThreadArray.Insert(new Thread(key))
 	}
-	ToolTip, 连发开启, 0, 0
+	SoundPlay *10
+	ToolTip, 连发开启, 0, 0, 1
 }
 
 LoadDefaultPreset(){
@@ -321,7 +328,7 @@ Gui Add, Button, gDeletePreset x150 y460 w120 h30, 删除配置
 Gui Add, Button, gStartAutoFire x744 y294 w200 h200, 启动连发
 Gui Add, Edit, vPresetName x150 y350 w120 h22
 
-Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.2
+Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.3
 
 LoadPresetGUI()
 LoadDefaultPreset()

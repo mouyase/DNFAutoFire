@@ -166,6 +166,9 @@ LShift(){
 Z(){
 	_autofire("Z")
 }
+X(){
+	_autofire("X")
+}
 C(){
 	_autofire("C")
 }
