@@ -301,7 +301,6 @@ NumStar(){
 NumSlash(){
 	_autofire("NumpadDiv")
 }
-
 _autofire(key){
 	base := "vkFFsc"
 	sc := GetKeySC(key)
@@ -309,11 +308,11 @@ _autofire(key){
 	loop {
 		if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe"))
 		{
-			if (GetKeyState(key,"P"))
+			if (GetKeyState(key) && GetKeyState(key, "P"))
 			{
-				Send,{Blind}{%keycode% down}{%keycode% up}
+				Send, {Blind}{%keycode% down}{%keycode% up}
 			}
 		}
-Sleep,1
+		Sleep, 10
 }
 }

@@ -2,43 +2,27 @@
 
 #SingleInstance, Ignore
 #MaxHotkeysPerInterval 9999
-#InstallKeybdHook
+#Include <RunWithAdministrator>
 #Include <MultipleThread>
 #Include <AutoFire>
 #Include <Config>
 SetWorkingDir, %A_ScriptDir%
-SetBatchLines,-1
+SetBatchLines, -1
 ListLines, Off
-SendMode, Event
-SetKeyDelay, 0, -1
-CoordMode, ToolTip, Screen
-
-full_command_line := DllCall("GetCommandLine", "str")
-
-if not (A_IsAdmin or RegExMatch(full_command_line, " /restart(?!\S)"))
-{
-	try
-	{
-		if A_IsCompiled
-			Run *RunAs "%A_ScriptFullPath%" /restart
-		else
-			Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
-	}
-	ExitApp
-}
+SendMode, Input
 
 try
 {
 	Menu, Tray, Icon, %A_ScriptFullPath%, 1
 }
-Menu, Tray, NoStandard
-Menu, Tray, DeleteAll
+; Menu, Tray, NoStandard
+; Menu, Tray, DeleteAll
 Menu, Tray, MainWindow
 Menu, Tray, Tip, DAF连发工具
 Menu, Tray , Add, 设置连发, ShowGUI
 Menu, Tray , default, 设置连发
 Menu, Tray , Add
-Menu, Tray, Add, 关闭连发,Exit
+Menu, Tray, Add, 退出连发,Exit
 
 Exit(){
 	ExitApp
@@ -49,11 +33,11 @@ ShowGUI(){
 }
 
 global _ThreadArray := []
-global EnableKeys := []
+global _EnableKeys := []
 
 isKeyEnable(key){
-	global EnableKeys
-	for _, element in EnableKeys
+	global _EnableKeys
+	for _, element in _EnableKeys
 	{
 		if(element == key){
 		return true
@@ -63,21 +47,21 @@ return false
 }
 
 setKeyEnable(key){
-	global EnableKeys
+	global _EnableKeys
 	if(isKeyEnable(key)){
 	needDeleteIndex := 0
-	for index, element in EnableKeys
+	for index, element in _EnableKeys
 	{
 		if(element == key){
 		needDeleteIndex := index
 	}
 }
-EnableKeys.Delete(needDeleteIndex)
+_EnableKeys.Delete(needDeleteIndex)
 SetGUIKeyEnable(key, false)
 }
 else
 {
-	EnableKeys.Push(key)
+	_EnableKeys.Push(key)
 	SetGUIKeyEnable(key, true)
 }
 
@@ -88,21 +72,21 @@ KeyClick() {
 }
 
 ClearAllKeys(){
-	global EnableKeys
-	for _, key in EnableKeys
+	global _EnableKeys
+	for _, key in _EnableKeys
 	{
 		SetGUIKeyEnable(key, false)
 	}
-	EnableKeys := []
+	_EnableKeys := []
 }
 
 SetAllKeys(keys){
-	global EnableKeys
+	global _EnableKeys
 	for _, key in keys
 	{
 		SetGUIKeyEnable(key, true)
 	}
-	EnableKeys := keys
+	_EnableKeys := keys
 }
 
 SetGUIKeyEnable(key, status){
@@ -128,11 +112,11 @@ GuiControl, Font, %key%
 
 SavePreset(){
 	global PresetName
-	global EnableKeys
+	global _EnableKeys
 	Gui, Submit, NoHide
 	if(PresetName != "")
 	{
-		SavePresetConfig(PresetName, EnableKeys)
+		SavePresetConfig(PresetName, _EnableKeys)
 	}
 else
 {
@@ -144,16 +128,15 @@ GuiControl, ChooseString, Preset, |%PresetName%
 
 LoadPreset(){
 	global Preset
-	global EnableKeys
+	global _EnableKeys
 	global PresetName
 	global _ThreadArray
 	Gui, Submit, NoHide
 	GuiControl, , PresetName, %Preset%
 	ClearAllKeys()
-	EnableKeys := LoadPresetConfig(Preset)
-	SetAllKeys(EnableKeys)
+	_EnableKeys := LoadPresetConfig(Preset)
+	SetAllKeys(_EnableKeys)
 	_ThreadArray := []
-	ToolTip, , , , 1
 }
 
 DeletePreset(){
@@ -172,23 +155,24 @@ LoadPresetGUI(){
 }
 
 StartAutoFire(){
-	global EnableKeys
+	global _EnableKeys
 	global _ThreadArray
 	_ThreadArray := []
-	for _, key in EnableKeys
+	for _, key in _EnableKeys
 	{
 		_ThreadArray.Insert(new Thread(key))
+		Sleep, 10
 	}
-	SoundPlay *10
-	ToolTip, 连发开启, 0, 0, 1
+	SoundPlay *16
+	Gui, Submit
 }
 
 LoadDefaultPreset(){
 	presetName := GetDefaultPresetName()
 	GuiControl, , PresetName, %presetName%
 	ClearAllKeys()
-	EnableKeys := LoadPresetConfig(presetName)
-	SetAllKeys(EnableKeys)
+	_EnableKeys := LoadPresetConfig(presetName)
+	SetAllKeys(_EnableKeys)
 	GuiControl, Choose, Preset, 1
 }
 
@@ -303,7 +287,6 @@ Gui Add, Text, vNum6 gKeyClick x860 y160 w36 h36 +0x200 +0x400000 +Center, Num6
 Gui Add, Text, vNum7 gKeyClick x780 y120 w36 h36 +0x200 +0x400000 +Center, Num7
 Gui Add, Text, vNum8 gKeyClick x820 y120 w36 h36 +0x200 +0x400000 +Center, Num8
 Gui Add, Text, vNum9 gKeyClick x860 y120 w36 h36 +0x200 +0x400000 +Center, Num9
-
 Gui Font
 
 Gui Font, s7 cBlue
@@ -328,10 +311,28 @@ Gui Add, Button, gDeletePreset x150 y460 w120 h30, 删除配置
 Gui Add, Button, gStartAutoFire x744 y294 w200 h200, 启动连发
 Gui Add, Edit, vPresetName x150 y350 w120 h22
 
-Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.3
+Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.4
 
 LoadPresetGUI()
 LoadDefaultPreset()
+
+Gui ChangePreset:-MinimizeBox -MaximizeBox -SysMenu +AlwaysOnTop -Theme +0x800000
+Gui ChangePreset:Font, s16
+Gui ChangePreset:Add, ListBox, vPreset x10 y5 w200 h172, 111|222|333|444|555
+Gui ChangePreset:Font
+Gui ChangePreset:Add, Button, gEu x10 y185 w200 h86 +Default, 启动连发
+
+; Gui ChangePreset:Show, w225 h314, 切换配置
+return
+
+Eu(){
+	SoundPlay *16
+	LoadPresetGUI()
+	LoadDefaultPreset()
+}
+
+!`::
+Gui ChangePreset:Show
 return
 
 GuiEscape:

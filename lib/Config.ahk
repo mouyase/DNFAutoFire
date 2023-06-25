@@ -1,4 +1,5 @@
 ﻿SavePresetConfig(presetsName, keys){
+	presetsName := StrReplace(presetsName, "`|")
 	keysString := ""
 	for k,v in keys
 	{
@@ -9,6 +10,7 @@
 }
 
 LoadPresetConfig(presetsName){
+	presetsName := StrReplace(presetsName, "`|")
 	IniRead, config, config.ini, Preset, %presetsName%
 	keys := []
 	loop, Parse, config, `|
@@ -19,6 +21,7 @@ LoadPresetConfig(presetsName){
 }
 
 DeletePresetConfig(presetsName){
+	presetsName := StrReplace(presetsName, "`|")
 	IniDelete,config.ini, Preset, %presetsName%
 }
 
