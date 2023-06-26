@@ -309,7 +309,7 @@ _autofire(key){
 	loop {
 		if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe"))
 		{
-			if (GetKeyState(key) && GetKeyState(key, "P"))
+			if (GetKeyState(key, "P"))
 			{
 				Send, {Blind}{%keycode% down}{%keycode% up}
 			}
