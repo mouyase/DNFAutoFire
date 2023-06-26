@@ -2,21 +2,26 @@
 
 #SingleInstance, Ignore
 #MaxHotkeysPerInterval 9999
+#InstallKeybdHook
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
 #Include <AutoFire>
 #Include <Config>
+
+#If WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")
+
 SetWorkingDir, %A_ScriptDir%
 SetBatchLines, -1
 ListLines, Off
-SendMode, Input
+SendMode, Event
+SetKeyDelay, -1, -1
 
 try
 {
 	Menu, Tray, Icon, %A_ScriptFullPath%, 1
 }
-; Menu, Tray, NoStandard
-; Menu, Tray, DeleteAll
+Menu, Tray, NoStandard
+Menu, Tray, DeleteAll
 Menu, Tray, MainWindow
 Menu, Tray, Tip, DAF连发工具
 Menu, Tray , Add, 设置连发, ShowGUI
@@ -75,9 +80,14 @@ ClearAllKeys(){
 	global _EnableKeys
 	for _, key in _EnableKeys
 	{
+		setOriginalDirect(key)
 		SetGUIKeyEnable(key, false)
 	}
 	_EnableKeys := []
+	try
+	{
+		Menu, Tray, Icon, %A_ScriptFullPath%, 1
+	}
 }
 
 SetAllKeys(keys){
@@ -160,10 +170,15 @@ StartAutoFire(){
 	_ThreadArray := []
 	for _, key in _EnableKeys
 	{
+		setOriginalBlocking(key)
 		_ThreadArray.Insert(new Thread(key))
 		Sleep, 10
 	}
 	SoundPlay *16
+	try
+	{
+		Menu, Tray, Icon, %A_ScriptFullPath%, 3
+	}
 	Gui, Submit
 }
 
@@ -175,6 +190,97 @@ LoadDefaultPreset(){
 	SetAllKeys(_EnableKeys)
 	GuiControl, Choose, Preset, 1
 }
+
+OriginalBlocking(key){
+	Send, {Blind}{%key% down}
+	KeyWait, %key%
+	Send, {Blind}{%key% up}
+}
+
+setOriginalBlocking(key){
+	if(key != "LShift" || key != "RShift" || key != "LCtrl" || key != "RCtrl" || key != "LAlt" || key != "RAlt"){
+	fn := Func("OriginalBlocking").Bind(Format("{:L}", key))
+	keyName := key
+	switch key
+	{
+		Case "Sub":
+		keyName := "-"
+		Case "Add":
+		keyName := "="
+		Case "Tilde":
+		keyName := "``"
+		Case "LeftBracket":
+		keyName := "["
+		Case "RightBracket":
+		keyName := "]"
+		Case "Backslash":
+		keyName := "\"
+		Case "Semicolon":
+		keyName := ";"
+		Case "Caps":
+		keyName := "CapsLock"
+		Case "QuotationMark":
+		keyName := "'"
+		Case "Comma":
+		keyName := ","
+		Case "Period":
+		keyName := "."
+		Case "Slash":
+		keyName := "/"
+		Case "PrtSc":
+		keyName := "PrintScreen"
+		Case "ScrLk":
+		keyName := "ScrollLock"
+		Case "Ins":
+		keyName := "Insert"
+		Case "Del":
+		keyName := "Delete"
+		Case "Num1":
+		keyName := "Numpad1"
+		Case "Num2":
+		keyName := "Numpad2"
+		Case "Num3":
+		keyName := "Numpad3"
+		Case "Num4":
+		keyName := "Numpad4"
+		Case "Num5":
+		keyName := "Numpad5"
+		Case "Num6":
+		keyName := "Numpad6"
+		Case "Num7":
+		keyName := "Numpad7"
+		Case "Num8":
+		keyName := "Numpad8"
+		Case "Num8":
+		keyName := "Numpad8"
+		Case "Num9":
+		keyName := "Numpad9"
+		Case "NumPeriod":
+		keyName := "NumpadDot"
+		Case "NumLk":
+		keyName := "NumLock"
+		Case "NumEnter":
+		keyName := "NumpadEnter"
+		Case "NumAdd":
+		keyName := "NumpadAdd"
+		Case "NumSub":
+		keyName := "NumpadSub"
+		Case "NumStar":
+		keyName := "NumpadMult"
+		Case "NumSlash":
+		keyName := "NumpadDiv"
+	}
+	Hotkey, $%keyName%, %fn%
+	Hotkey, $%keyName%, On
+}
+}
+
+setOriginalDirect(key){
+	try{
+		Hotkey, $%key%, , Off
+}
+}
+
 
 Gui -MinimizeBox -MaximizeBox -Theme
 Gui Add, GroupBox, x8 y8 w936 h276, 按键设置 - [ 红色为启用连发 蓝色为关闭连发 ]
@@ -253,7 +359,7 @@ Gui Add, Text, vLCtrl gKeyClick x16 y240 w48 h36 +0x200 +0x400000 +Center, Ctrl
 Gui Add, Text, x70 y240 w48 h36 +0x200 +0x400000 +Center  +Disabled, Win
 Gui Add, Text, vLAlt gKeyClick x124 y240 w48 h36 +0x200 +0x400000 +Center, Alt
 Gui Add, Text, vSpace gKeyClick x178 y240 w224 h36 +0x200 +0x400000 +Center, Space
-Gui Add, Text, vAlt gKeyClick x408 y240 w48 h36 +0x200 +0x400000 +Center, Alt
+Gui Add, Text, vRAlt gKeyClick x408 y240 w48 h36 +0x200 +0x400000 +Center, Alt
 Gui Add, Text, x462 y240 w48 h36 +0x200 +0x400000 +Center +Disabled, Fn
 Gui Add, Text, x516 y240 w48 h36 +0x200 +0x400000 +Center +Disabled, List
 Gui Add, Text, vRCtrl gKeyClick x568 y240 w48 h36 +0x200 +0x400000 +Center, Ctrl
@@ -315,24 +421,21 @@ Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.4
 
 LoadPresetGUI()
 LoadDefaultPreset()
-
-Gui ChangePreset:-MinimizeBox -MaximizeBox -SysMenu +AlwaysOnTop -Theme +0x800000
-Gui ChangePreset:Font, s16
-Gui ChangePreset:Add, ListBox, vPreset x10 y5 w200 h172, 111|222|333|444|555
-Gui ChangePreset:Font
-Gui ChangePreset:Add, Button, gEu x10 y185 w200 h86 +Default, 启动连发
-
-; Gui ChangePreset:Show, w225 h314, 切换配置
 return
 
-Eu(){
-	SoundPlay *16
-	LoadPresetGUI()
-	LoadDefaultPreset()
-}
-
-!`::
-Gui ChangePreset:Show
+<+F24::
+>+F24::
+<^F24::
+>^F24::
+<!F24::
+>!F24::
+return
+$LShift::
+$RShift::
+$LAlt::
+$RAlt::
+$LCtrl::
+$RCtrl::
 return
 
 GuiEscape:

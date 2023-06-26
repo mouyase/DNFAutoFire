@@ -289,7 +289,7 @@ NumLk(){
 NumEnter(){
 	_autofire("NumpadEnter")
 }
-umAdd(){
+NumAdd(){
 	_autofire("NumpadAdd")
 }
 NumSub(){
@@ -301,6 +301,7 @@ NumStar(){
 NumSlash(){
 	_autofire("NumpadDiv")
 }
+
 _autofire(key){
 	base := "vkFFsc"
 	sc := GetKeySC(key)
@@ -313,6 +314,6 @@ _autofire(key){
 				Send, {Blind}{%keycode% down}{%keycode% up}
 			}
 		}
-		Sleep, 10
+		Sleep, 1
 }
 }
