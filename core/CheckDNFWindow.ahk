@@ -1,0 +1,1 @@
+﻿#If WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")

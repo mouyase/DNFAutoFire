@@ -1,7 +1,7 @@
-; 设置按键连发
-SetAutoFireKey(key){
+; 切换按键连发状态
+ChangeKeyAutoFireState(key){
     global _AutoFireEnableKeys
-    if(IsKeyAutoFireEnable(key)){
+    if(IsKeyAutoFire(key)){
         needDeleteIndex := 0
         for index, element in _AutoFireEnableKeys
         {
@@ -10,17 +10,17 @@ SetAutoFireKey(key){
             }
         }
         _AutoFireEnableKeys.Delete(needDeleteIndex)
-        SetGuiKeyState(key, false)
+        MainSetKeyState(key, false)
         SetOriginalDirect(key)
     } else {
         _AutoFireEnableKeys.Push(key)
-        SetGuiKeyState(key, true)
+        MainSetKeyState(key, true)
         SetOriginalBlocking(key)
     }
 }
 
 ; 判断按键是否启用了连发
-IsKeyAutoFireEnable(key){
+IsKeyAutoFire(key){
     global _AutoFireEnableKeys
     for _, element in _AutoFireEnableKeys
     {
@@ -134,20 +134,57 @@ SetOriginalDirect(key){
     }
 }
 
+SetTrayRunningIcon(state){
+    if(A_IsCompiled){
+        if(state){
+            Menu, Tray, Icon, %A_ScriptFullPath%, 3
+        }else{
+            Menu, Tray, Icon, %A_ScriptFullPath%, 1
+        }
+    }
+}
+
 ; 启动连发功能
 StartAutoFire(){
     global _AutoFireEnableKeys
     global _AutoFireThreads
     _AutoFireThreads := []
-    for _, key in _AutoFireEnableKeys
-    {
+    for _, key in _AutoFireEnableKeys {
+        SetOriginalBlocking(key)
         _AutoFireThreads.Insert(new Thread(key))
         Sleep, 10
     }
-    SoundPlay *16
-    try
-    {
-        Menu, Tray, Icon, %A_ScriptFullPath%, 3
-    }
-    Gui, Submit
+    SoundPlay *64
+    SetTrayRunningIcon(true)
 }
+
+; 停止连发功能
+StopAutoFire(){
+    global _AutoFireThreads
+    if(_AutoFireThreads.Count() != 0){
+        for _, key in _AutoFireEnableKeys {
+            SetOriginalDirect(key)
+        }
+        _AutoFireThreads := []
+        SoundPlay *16
+        SetTrayRunningIcon(false)
+    }
+}
+
+; 设置所有按键连发模式
+SetAllKeysAutoFire(keys){
+    global _AutoFireEnableKeys
+    _AutoFireEnableKeys := []
+    for _, key in keys {
+        MainSetKeyState(key, true)
+        _AutoFireEnableKeys.Push(key)
+    }
+}
+
+; ; 读取上次的配置
+; LoadLastPreset(){
+;     global _NowSelectPreset
+;     ConfigKeys := LoadPresetKeys(_NowSelectPreset)
+;     SetAllKeysAutoFire(ConfigKeys)
+;     StopAutoFire()
+; }
