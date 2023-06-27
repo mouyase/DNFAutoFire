@@ -1,0 +1,303 @@
+﻿Esc(){
+    AutoFire("Esc")
+}
+F1(){
+    AutoFire("F1")
+}
+F2(){
+    AutoFire("F2")
+}
+F3(){
+    AutoFire("F3")
+}
+F4(){
+    AutoFire("F4")
+}
+F5(){
+    AutoFire("F5")
+}
+F6(){
+    AutoFire("F6")
+}
+F7(){
+    AutoFire("F7")
+}
+F8(){
+    AutoFire("F8")
+}
+F9(){
+    AutoFire("F9")
+}
+F10(){
+    AutoFire("F10")
+}
+F11(){
+    AutoFire("F11")
+}
+F12(){
+    AutoFire("F12")
+}
+Tilde(){
+    AutoFire("``")
+}
+1(){
+    AutoFire("1")
+}
+2(){
+    AutoFire("2")
+}
+3(){
+    AutoFire("3")
+}
+4(){
+    AutoFire("4")
+}
+5(){
+    AutoFire("5")
+}
+6(){
+    AutoFire("6")
+}
+7(){
+    AutoFire("7")
+}
+8(){
+    AutoFire("8")
+}
+9(){
+    AutoFire("9")
+}
+0(){
+    AutoFire("0")
+}
+Sub(){
+    AutoFire("-")
+}
+Add(){
+    AutoFire("+")
+}
+Backspace(){
+    AutoFire("BackSpace")
+}
+Tab(){
+    AutoFire("Tab")
+}
+Q(){
+    AutoFire("Q")
+}
+W(){
+    AutoFire("W")
+}
+E(){
+    AutoFire("E")
+}
+R(){
+    AutoFire("R")
+}
+T(){
+    AutoFire("T")
+}
+Y(){
+    AutoFire("Y")
+}
+U(){
+    AutoFire("U")
+}
+I(){
+    AutoFire("I")
+}
+O(){
+    AutoFire("O")
+}
+P(){
+    AutoFire("P")
+}
+LeftBracket(){
+    AutoFire("[")
+}
+RightBracket(){
+    AutoFire("]")
+}
+Backslash(){
+    AutoFire("\")
+}
+Caps(){
+    AutoFire("CapsLock")
+}
+A(){
+    AutoFire("A")
+}
+S(){
+    AutoFire("S")
+}
+D(){
+    AutoFire("D")
+}
+F(){
+    AutoFire("F")
+}
+G(){
+    AutoFire("G")
+}
+H(){
+    AutoFire("H")
+}
+J(){
+    AutoFire("J")
+}
+K(){
+    AutoFire("K")
+}
+L(){
+    AutoFire("L")
+}
+Semicolon(){
+    AutoFire(";")
+}
+QuotationMark(){
+    AutoFire("'")
+}
+Enter(){
+    AutoFire("Enter")
+}
+LShift(){
+    AutoFire("LShift")
+}
+Z(){
+    AutoFire("Z")
+}
+X(){
+    AutoFire("X")
+}
+C(){
+    AutoFire("C")
+}
+V(){
+    AutoFire("V")
+}
+B(){
+    AutoFire("B")
+}
+N(){
+    AutoFire("N")
+}
+M(){
+    AutoFire("M")
+}
+Comma(){
+    AutoFire(",")
+}
+Period(){
+    AutoFire(".")
+}
+Slash(){
+    AutoFire("/")
+}
+RShift(){
+    AutoFire("RShift")
+}
+LCtrl(){
+    AutoFire("LCtrl")
+}
+LAlt(){
+    AutoFire("LAlt")
+}
+Space(){
+    AutoFire("Space")
+}
+RAlt(){
+    AutoFire("RAlt")
+}
+RCtrl(){
+    AutoFire("RCtrl")
+}
+PrtSc(){
+    AutoFire("PrintScreen")
+}
+ScrLk(){
+    AutoFire("ScrollLock")
+}
+Pause(){
+    AutoFire("Pause")
+}
+Ins(){
+    AutoFire("Insert")
+}
+Home(){
+    AutoFire("Home")
+}
+PgUp(){
+    AutoFire("PgUp")
+}
+Del(){
+    AutoFire("Delete")
+}
+End(){
+    AutoFire("End")
+}
+PgDn(){
+    AutoFire("PgDn")
+}
+Up(){
+    AutoFire("Up")
+}
+Down(){
+    AutoFire("Down")
+}
+Left(){
+    AutoFire("Left")
+}
+Right(){
+    AutoFire("Right")
+}
+Num1(){
+    AutoFire("Numpad1")
+}
+Num2(){
+    AutoFire("Numpad2")
+}
+Num3(){
+    AutoFire("Numpad3")
+}
+Num4(){
+    AutoFire("Numpad4")
+}
+Num5(){
+    AutoFire("Numpad5")
+}
+Num6(){
+    AutoFire("Numpad6")
+}
+Num7(){
+    AutoFire("Numpad7")
+}
+Num8(){
+    AutoFire("Numpad8")
+}
+Num9(){
+    AutoFire("Numpad9")
+}
+Num0(){
+    AutoFire("Numpad0")
+}
+NumPeriod(){
+    AutoFire("NumpadDot")
+}
+NumLk(){
+    AutoFire("NumLock")
+}
+NumEnter(){
+    AutoFire("NumpadEnter")
+}
+NumAdd(){
+    AutoFire("NumpadAdd")
+}
+NumSub(){
+    AutoFire("NumpadSub")
+}
+NumStar(){
+    AutoFire("NumpadMult")
+}
+NumSlash(){
+    AutoFire("NumpadDiv")
+}
