@@ -7,6 +7,7 @@
 #Include <MultipleThread>
 #Include <AutoFire>
 #Include <Config>
+#Include <Log>
 
 #If WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")
 
@@ -20,8 +21,8 @@ try
 {
 	Menu, Tray, Icon, %A_ScriptFullPath%, 1
 }
-Menu, Tray, NoStandard
-Menu, Tray, DeleteAll
+; Menu, Tray, NoStandard
+; Menu, Tray, DeleteAll
 Menu, Tray, MainWindow
 Menu, Tray, Tip, DAF连发工具
 Menu, Tray , Add, 设置连发, ShowGUI
@@ -40,7 +41,7 @@ ShowGUI(){
 global _ThreadArray := []
 global _EnableKeys := []
 
-isKeyEnable(key){
+IsKeyEnable(key){
 	global _EnableKeys
 	for _, element in _EnableKeys
 	{
@@ -51,9 +52,9 @@ isKeyEnable(key){
 return false
 }
 
-setKeyEnable(key){
+SetKeyState(key){
 	global _EnableKeys
-	if(isKeyEnable(key)){
+	if(IsKeyEnable(key)){
 	needDeleteIndex := 0
 	for index, element in _EnableKeys
 	{
@@ -63,24 +64,25 @@ setKeyEnable(key){
 }
 _EnableKeys.Delete(needDeleteIndex)
 SetGUIKeyEnable(key, false)
+SetOriginalDirect(key)
 }
 else
 {
 	_EnableKeys.Push(key)
 	SetGUIKeyEnable(key, true)
+	SetOriginalBlocking(key)
 }
-
 }
 
 KeyClick() {
-	setKeyEnable(A_GuiControl)
+	SetKeyState(A_GuiControl)
 }
 
 ClearAllKeys(){
 	global _EnableKeys
 	for _, key in _EnableKeys
 	{
-		setOriginalDirect(key)
+		SetOriginalDirect(key)
 		SetGUIKeyEnable(key, false)
 	}
 	_EnableKeys := []
@@ -91,12 +93,11 @@ ClearAllKeys(){
 }
 
 SetAllKeys(keys){
-	global _EnableKeys
 	for _, key in keys
 	{
 		SetGUIKeyEnable(key, true)
+		SetKeyState(key)
 	}
-	_EnableKeys := keys
 }
 
 SetGUIKeyEnable(key, status){
@@ -138,14 +139,13 @@ GuiControl, ChooseString, Preset, |%PresetName%
 
 LoadPreset(){
 	global Preset
-	global _EnableKeys
 	global PresetName
 	global _ThreadArray
 	Gui, Submit, NoHide
 	GuiControl, , PresetName, %Preset%
 	ClearAllKeys()
-	_EnableKeys := LoadPresetConfig(Preset)
-	SetAllKeys(_EnableKeys)
+	ConfigKeys := LoadPresetConfig(Preset)
+	SetAllKeys(ConfigKeys)
 	_ThreadArray := []
 }
 
@@ -170,7 +170,6 @@ StartAutoFire(){
 	_ThreadArray := []
 	for _, key in _EnableKeys
 	{
-		setOriginalBlocking(key)
 		_ThreadArray.Insert(new Thread(key))
 		Sleep, 10
 	}
@@ -186,21 +185,12 @@ LoadDefaultPreset(){
 	presetName := GetDefaultPresetName()
 	GuiControl, , PresetName, %presetName%
 	ClearAllKeys()
-	_EnableKeys := LoadPresetConfig(presetName)
-	SetAllKeys(_EnableKeys)
+	ConfigKeys := LoadPresetConfig(presetName)
+	SetAllKeys(ConfigKeys)
 	GuiControl, Choose, Preset, 1
 }
 
-OriginalBlocking(key){
-	Send, {Blind}{%key% down}
-	KeyWait, %key%
-	Send, {Blind}{%key% up}
-}
-
-setOriginalBlocking(key){
-	if(key != "LShift" || key != "RShift" || key != "LCtrl" || key != "RCtrl" || key != "LAlt" || key != "RAlt"){
-	fn := Func("OriginalBlocking").Bind(Format("{:L}", key))
-	keyName := key
+GetOriginKeyName(key){
 	switch key
 	{
 		Case "Sub":
@@ -255,6 +245,8 @@ setOriginalBlocking(key){
 		keyName := "Numpad8"
 		Case "Num9":
 		keyName := "Numpad9"
+		Case "Num0":
+		keyName := "Numpad0"
 		Case "NumPeriod":
 		keyName := "NumpadDot"
 		Case "NumLk":
@@ -269,16 +261,32 @@ setOriginalBlocking(key){
 		keyName := "NumpadMult"
 		Case "NumSlash":
 		keyName := "NumpadDiv"
+		Default:
+		keyName := key
 	}
+	return keyName
+}
+
+SetOriginalBlocking(key){
+	if(key != "LShift" || key != "RShift" || key != "LCtrl" || key != "RCtrl" || key != "LAlt" || key != "RAlt"){
+	keyName := GetOriginKeyName(key)
+	fn := Func("OriginalBlocking").Bind(Format("{:L}", keyName))
 	Hotkey, $%keyName%, %fn%
 	Hotkey, $%keyName%, On
 }
 }
 
-setOriginalDirect(key){
+SetOriginalDirect(key){
+	keyName := GetOriginKeyName(key)
 	try{
-		Hotkey, $%key%, , Off
+		Hotkey, $%keyName%, , Off
 }
+}
+
+OriginalBlocking(key){
+	Send, {Blind}{%key% down}
+	KeyWait, %key%
+	Send, {Blind}{%key% up}
 }
 
 
@@ -417,10 +425,11 @@ Gui Add, Button, gDeletePreset x150 y460 w120 h30, 删除配置
 Gui Add, Button, gStartAutoFire x744 y294 w200 h200, 启动连发
 Gui Add, Edit, vPresetName x150 y350 w120 h22
 
-Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.4
+Gui Show, w950 h510, DAF连发工具 - DNF AutoFire - v0.0.6
 
 LoadPresetGUI()
 LoadDefaultPreset()
+
 return
 
 <+F24::
