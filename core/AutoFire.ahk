@@ -1,15 +1,17 @@
 ﻿AutoFire(key){
-    base := "vkFFsc"
-    sc := GetKeySC(key)
-    keycode := Format("{1}{2:02X}", base, sc)
+    SetKeyDelay, 1
+    Process, Priority,, High
+    keycode := Key2NoVkSC(key)
+    lastTimeCounter := GetNewCounterTime()
     loop {
-        if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe"))
-        {
-            if (GetKeyState(key, "P"))
-            {
-                Send, {Blind}{%keycode% down}{%keycode% up}
+        if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+            if (GetKeyState(key, "P")) {
+                SendEvent, {Blind}{%keycode% DownTemp}{%keycode% up}
+            } else {
+                Sleep, 1
             }
+        } else {
+            Sleep, 1
         }
-        Sleep, 1
     }
 }

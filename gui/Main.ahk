@@ -1,4 +1,4 @@
-﻿Gui -MinimizeBox -MaximizeBox -Theme
+﻿Gui -MinimizeBox -MaximizeBox -Theme +OwnDialogs
 Gui Add, GroupBox, x8 y8 w926 h276, 按键设置 - [ 红色为启用连发 蓝色为关闭连发 ]
 Gui Font, s12 cBlue
 Gui Add, Text, vEsc gMainKeyClick x16 y30 w36 h36 +0x200 +0x400000 +Center , Esc
@@ -127,12 +127,14 @@ Gui Font
 Gui Add, GroupBox, x8 y300 w275 h200, 配置设置
 
 Gui Add, ListBox, vPreset x16 y320 w120 h180
+Gui Add, Edit, vPresetName x150 y350 w120 h22
 Gui Add, Text, x150 y320 w120 h24 +0x200, 配置名称
 Gui Add, Button, gMainLoadPreset x150 y380 w120 h30, 读取配置
 Gui Add, Button, gMainSavePreset x150 y420 w120 h30, 保存配置
 Gui Add, Button, gMainDeletePreset x150 y460 w120 h30, 删除配置
-Gui Add, Button, gMainStart x744 y294 w200 h200, 启动连发
-Gui Add, Edit, vPresetName x150 y350 w120 h22
+
+Gui Add, Button, gMainCheckUpdate x526 y294 w200 h200, 检查更新
+Gui Add, Button, gMainStart x734 y294 w200 h200, 启动连发
 
 ShowGuiMain(){
     Gui Show, w940 h510, DAF连发工具 - DNF AutoFire - v%__Version%
@@ -141,6 +143,10 @@ ShowGuiMain(){
 
 HideGuiMain(){
     Gui Hide
+}
+
+DisableGuiMain(){
+    Gui +Disabled
 }
 
 ; 设置Gui内按钮的样式
@@ -260,4 +266,9 @@ MainLoadAllPreset(){
     } catch {
         GuiControl, Choose, Preset, |1
     }
+}
+
+; 主界面点击检查更新
+MainCheckUpdate(){
+    GetUpdateInfo()
 }

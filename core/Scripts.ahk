@@ -111,9 +111,10 @@ GetOriginKeyName(key){
 
 ; 用于屏蔽按键原始功能
 OriginalBlocking(key){
-    Send, {Blind}{%key% down}
+    keycode := Key2VkNoSC(key)
+    Send, {Blind}{%keycode% down}
     KeyWait, %key%
-    Send, {Blind}{%key% up}
+    Send, {Blind}{%keycode% up}
 }
 
 ; 屏蔽按键原始功能
@@ -156,6 +157,7 @@ StartAutoFire(){
     }
     SoundPlay *64
     SetTrayRunningIcon(true)
+    UnlockSystemTimeLimit()
 }
 
 ; 停止连发功能
@@ -169,6 +171,7 @@ StopAutoFire(){
         SoundPlay *16
         SetTrayRunningIcon(false)
     }
+    RestoreSystemTimeLimit()
 }
 
 ; 设置所有按键连发模式
