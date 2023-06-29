@@ -142,6 +142,7 @@ Gui Main:Add, Button, gMainStart x734 y450 w200 h50, 启动连发
 Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
 
 Gui Main:Add, CheckBox, vLvRen gMainLvRen x298 y320 h20, 旅人自动流星
+Gui Main:Add, CheckBox, vZhanFa gMainZhanFa x298 y340 h20, 战法自动炫纹
 
 ShowGuiMain(){
     Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire - v%__Version%
@@ -266,16 +267,23 @@ MainCheckUpdate(){
 ; 主界面额外保存
 MainSaveEx(){
     global LvRen
+    global ZhanFa
     Gui Main:Submit, NoHide
     SavePreset(GetNowSelectPreset(),"LvRenState", LvRen)
+    SavePreset(GetNowSelectPreset(),"ZhanFaState", ZhanFa)
 }
 
 ; 主界面额外读取
 MainLoadEx(){
     global LvRen
+    global ZhanFa
     LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState") || 0
     if(LvRen==true || LvRen==false){
         GuiControl Main:, LvRen, %LvRen%
+    }
+    ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState") || 0
+    if(ZhanFa==true || ZhanFa==false){
+        GuiControl Main:, ZhanFa, %ZhanFa%
     }
 }
 
@@ -285,6 +293,15 @@ MainLvRen(){
     Gui Main:Submit, NoHide
     if(LvRen){
         ShowGuiLvRen()
+    }
+}
+
+; 主界面选择战法功能
+MainZhanFa(){
+    global ZhanFa
+    Gui Main:Submit, NoHide
+    if(ZhanFa){
+        ShowGuiZhanFa()
     }
 }
 

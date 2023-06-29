@@ -79,7 +79,6 @@ LvRenSaveConfig(){
         keysString := keysString . v . "|"
     }
     keysString := SubStr(keysString, 1, StrLen(keysString) - 1)
-    SavePreset(GetNowSelectPreset(),"LvRenState", true)
     SavePreset(GetNowSelectPreset(),"LvRenSkillKeys", keysString)
     SavePreset(GetNowSelectPreset(),"LvRenShotKey", LvRenShotKey)
 }

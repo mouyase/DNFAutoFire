@@ -164,8 +164,12 @@ StartAutoFire(){
 StartEx(){
     global _AutoFireThreads
     global LvRen
+    global ZhanFa
     if(LvRen){
         _AutoFireThreads.Push(new Thread("ExLvRen"))
+    }
+    if(ZhanFa){
+        _AutoFireThreads.Push(new Thread("ExZhanFa"))
     }
 }
 

@@ -24,6 +24,8 @@ ListLines, Off
 #Include ./gui/UpdateProgress.ahk
 #Include ./gui/LvRen.ahk
 #Include ./ex/ExLvRen.ahk
+#Include ./gui/ZhanFa.ahk
+#Include ./ex/ExZhanFa.ahk
 
 try
 {
