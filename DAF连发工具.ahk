@@ -54,7 +54,7 @@ ShowGui(){
     ShowGuiMain()
 }
 
-global __Version := "0.0.9"
+global __Version := "0.0.10"
 
 global _AutoFireThreads := []
 global _AutoFireEnableKeys := []
