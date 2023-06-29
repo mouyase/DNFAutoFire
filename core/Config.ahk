@@ -50,7 +50,7 @@ LoadPresetKeys(presetsName){
     keys := []
     loop, Parse, config, `|
     {
-        keys.Insert(A_LoopField)
+        keys.Push(A_LoopField)
     }
     return keys
 }

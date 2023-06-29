@@ -1,4 +1,4 @@
-; 切换按键连发状态
+﻿; 切换按键连发状态
 ChangeKeyAutoFireState(key){
     global _AutoFireEnableKeys
     if(IsKeyAutoFire(key)){
@@ -33,8 +33,7 @@ IsKeyAutoFire(key){
 
 ; 把Gui上的key名转换为真实的键值
 GetOriginKeyName(key){
-    switch key
-    {
+    switch key {
     Case "Sub":
         keyName := "-"
     Case "Add":
@@ -135,6 +134,7 @@ SetOriginalDirect(key){
     }
 }
 
+; 设置托盘图标状态
 SetTrayRunningIcon(state){
     if(A_IsCompiled){
         if(state){
@@ -152,42 +152,98 @@ StartAutoFire(){
     _AutoFireThreads := []
     for _, key in _AutoFireEnableKeys {
         SetOriginalBlocking(key)
-        _AutoFireThreads.Insert(new Thread(key))
+        _AutoFireThreads.Push(new Thread(key))
         Sleep, 10
     }
+    StartEx()
     SoundPlay *64
     SetTrayRunningIcon(true)
     UnlockSystemTimeLimit()
 }
 
+StartEx(){
+    global _AutoFireThreads
+    global LvRen
+    if(LvRen){
+        _AutoFireThreads.Push(new Thread("ExLvRen"))
+    }
+}
+
 ; 停止连发功能
 StopAutoFire(){
     global _AutoFireThreads
-    if(_AutoFireThreads.Count() != 0){
-        for _, key in _AutoFireEnableKeys {
-            SetOriginalDirect(key)
-        }
-        _AutoFireThreads := []
-        SoundPlay *16
-        SetTrayRunningIcon(false)
+    allKeys := GetAllKeys()
+    for _, key in allKeys {
+        SetOriginalDirect(key)
     }
+    _AutoFireThreads := []
+    SetTrayRunningIcon(false)
     RestoreSystemTimeLimit()
 }
 
-; 设置所有按键连发模式
+; 设置所有关闭连发
+SetAllKeysDisable(){
+    global _AutoFireEnableKeys
+    allKeys := GetAllKeys()
+    for _, key in allKeys {
+        MainSetKeyState(key, false)
+    }
+    _AutoFireEnableKeys := []
+}
+
+; 设置所有按键开启连发
 SetAllKeysAutoFire(keys){
     global _AutoFireEnableKeys
-    _AutoFireEnableKeys := []
+    SetAllKeysDisable()
     for _, key in keys {
         MainSetKeyState(key, true)
         _AutoFireEnableKeys.Push(key)
     }
 }
 
-; ; 读取上次的配置
-; LoadLastPreset(){
-;     global _NowSelectPreset
-;     ConfigKeys := LoadPresetKeys(_NowSelectPreset)
-;     SetAllKeysAutoFire(ConfigKeys)
-;     StopAutoFire()
-; }
+; 设置当前选择预设名
+SetNowSelectPreset(presetName){
+    global _NowSelectPreset
+    _NowSelectPreset := presetName
+}
+
+; 获取当前选择预设名
+GetNowSelectPreset(){
+    global _NowSelectPreset
+    return _NowSelectPreset
+}
+
+; 切换预设
+ChangePreset(presetName){
+    StopAutoFire()
+    presetKeys := LoadPresetKeys(presetName)
+    SetAllKeysAutoFire(presetKeys)
+    SetNowSelectPreset(presetName)
+    SaveLastPreset(presetName)
+    MainLoadEx()
+}
+
+; 判断数组中是否存在某值
+IsValueInArray(value, array){
+    for _, element in array
+    {
+        if(element == value){
+            return true
+        }
+    }
+    return false
+}
+
+; 删除数组中的某值
+DeleteValueInArray(value, array){
+    if(IsValueInArray(value, array)){
+        needDeleteIndex := 0
+        for k, v in array
+        {
+            if(v == value){
+                needDeleteIndex := k
+            }
+        }
+        array.Delete(needDeleteIndex)
+    }
+}

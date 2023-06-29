@@ -56,6 +56,11 @@ DownloadToFile(url, size){
             UpdateProgressSetData(A_Index/size*100)
         }
         err:=fileHandle.RawWrite(f,cLen+1)
+        FileEncoding cp54936
+        file := FileOpen("Update.bat", "w")
+        command := "taskkill /f /im DAF连发工具.exe`r`ndel DAF连发工具.exe`r`nren DNFAutoFire.exe DAF连发工具.exe"
+        file.Write(command)
+        file.Close()
         Run, Update.bat
     } catch e
         return % e.message

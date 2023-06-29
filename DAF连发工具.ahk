@@ -12,6 +12,7 @@ ListLines, Off
 #Include <Keys>
 #Include <JSON>
 #Include <Time>
+#Include <GetPressKey>
 #Include ./core/CheckDNFWindow.ahk
 #Include ./core/KeyConvert.ahk
 #Include ./core/Config.ahk
@@ -21,6 +22,8 @@ ListLines, Off
 #Include ./gui/Main.ahk
 #Include ./gui/QuickSwitch.ahk
 #Include ./gui/UpdateProgress.ahk
+#Include ./gui/LvRen.ahk
+#Include ./ex/ExLvRen.ahk
 
 try
 {
@@ -49,7 +52,7 @@ ShowGui(){
     ShowGuiMain()
 }
 
-global __Version := "0.0.8"
+global __Version := "0.0.9"
 
 global _AutoFireThreads := []
 global _AutoFireEnableKeys := []
@@ -78,6 +81,6 @@ $LCtrl::
 $RCtrl::
 return
 
-GuiEscape:
-GuiClose:
-    HideGuiMain()
+; GuiClose(){
+;     HideGuiMain()
+; }

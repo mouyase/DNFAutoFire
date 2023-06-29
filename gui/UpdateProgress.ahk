@@ -1,4 +1,4 @@
-Gui UpdateProgress:-MinimizeBox -MaximizeBox -SysMenu -Caption +Owner%A_DefaultGui% +0x800000
+﻿Gui UpdateProgress:-MinimizeBox -MaximizeBox -SysMenu -Caption +Owner%A_DefaultGui% +0x800000
 Gui UpdateProgress:Add, Progress, w200 h20 vUpdateProgress, 0
 
 ShowGuiUpdateProgress(){

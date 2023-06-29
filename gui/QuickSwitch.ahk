@@ -7,12 +7,9 @@ Gui QuickSwitch:Add, Button, gQuickSwitchStop x150 y304 w100 h48, 停止连发
 
 QuickSwitchStart(){
     global QuickSwitchList
-    global _NowSelectPreset
     Gui QuickSwitch:Submit
     presetName := QuickSwitchList
-    _NowSelectPreset := presetName
-    ConfigKeys := LoadPresetKeys(presetName)
-    SetAllKeysAutoFire(ConfigKeys)
+    ChangePreset(presetName)
     StartAutoFire()
 }
 
@@ -22,13 +19,14 @@ QuickSwitchStop(){
 }
 
 ShowGuiQuickSwitch(){
-    global _NowSelectPreset
+    ; HideGuiMain()
     Gui QuickSwitch:Show, w256 h360, 快速切换
+    nowSelectPreset := GetNowSelectPreset()
     presetList := LoadAllPresetString()
     GuiControl QuickSwitch:, QuickSwitchList, |%presetList%
     GuiControl QuickSwitch:Focus, QuickSwitchList
     try{
-        GuiControl QuickSwitch:ChooseString, QuickSwitchList, %_NowSelectPreset%
+        GuiControl QuickSwitch:ChooseString, QuickSwitchList, %nowSelectPreset%
     }catch{
         GuiControl QuickSwitch:Choose, QuickSwitchList, |1
     }
