@@ -19,7 +19,7 @@ QuickSwitchStop(){
 }
 
 ShowGuiQuickSwitch(){
-    ; HideGuiMain()
+    HideGuiMain()
     Gui QuickSwitch:Show, w256 h360, 快速切换
     nowSelectPreset := GetNowSelectPreset()
     presetList := LoadAllPresetString()
