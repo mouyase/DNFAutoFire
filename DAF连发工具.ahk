@@ -6,6 +6,7 @@
 SetWorkingDir, %A_ScriptDir%
 SetBatchLines, -1
 ListLines, Off
+SetKeyDelay, 1
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
@@ -26,6 +27,8 @@ ListLines, Off
 #Include ./ex/ExLvRen.ahk
 #Include ./gui/ZhanFa.ahk
 #Include ./ex/ExZhanFa.ahk
+#Include ./gui/JianZong.ahk
+#Include ./ex/ExJianZong.ahk
 
 try
 {
@@ -82,7 +85,3 @@ $RAlt::
 $LCtrl::
 $RCtrl::
 return
-
-; GuiClose(){
-;     HideGuiMain()
-; }

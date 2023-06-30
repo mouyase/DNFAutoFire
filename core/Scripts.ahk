@@ -110,10 +110,9 @@ GetOriginKeyName(key){
 
 ; 用于屏蔽按键原始功能
 OriginalBlocking(key){
-    keycode := Key2VkNoSC(key)
-    Send, {Blind}{%keycode% down}
+    SendEvent, {Blind}{%key% down}
     KeyWait, %key%
-    Send, {Blind}{%keycode% up}
+    SendEvent, {Blind}{%key% up}
 }
 
 ; 屏蔽按键原始功能
@@ -165,11 +164,17 @@ StartEx(){
     global _AutoFireThreads
     global LvRen
     global ZhanFa
+    global JianZong
     if(LvRen){
         _AutoFireThreads.Push(new Thread("ExLvRen"))
     }
     if(ZhanFa){
         _AutoFireThreads.Push(new Thread("ExZhanFa"))
+    }
+    if(JianZong){
+        skillKey := LoadPreset(GetNowSelectPreset(), "JianZongSkillKey")
+        SetOriginalBlocking(skillKey)
+        _AutoFireThreads.Push(new Thread("ExJianZong"))
     }
 }
 

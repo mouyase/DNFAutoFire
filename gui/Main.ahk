@@ -143,6 +143,7 @@ Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
 
 Gui Main:Add, CheckBox, vLvRen gMainLvRen x298 y320 h20, 旅人自动流星
 Gui Main:Add, CheckBox, vZhanFa gMainZhanFa x298 y340 h20, 战法自动炫纹
+Gui Main:Add, CheckBox, vJianZong gMainJianZong x298 y360 h20, 太宗帝剑延迟
 
 ShowGuiMain(){
     Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire - v%__Version%
@@ -268,23 +269,24 @@ MainCheckUpdate(){
 MainSaveEx(){
     global LvRen
     global ZhanFa
+    global JianZong
     Gui Main:Submit, NoHide
     SavePreset(GetNowSelectPreset(),"LvRenState", LvRen)
     SavePreset(GetNowSelectPreset(),"ZhanFaState", ZhanFa)
+    SavePreset(GetNowSelectPreset(),"JianZongState", JianZong)
 }
 
 ; 主界面额外读取
 MainLoadEx(){
     global LvRen
     global ZhanFa
+    global JianZong
     LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState") || 0
-    if(LvRen==true || LvRen==false){
-        GuiControl Main:, LvRen, %LvRen%
-    }
+    GuiControl Main:, LvRen, %LvRen%
     ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState") || 0
-    if(ZhanFa==true || ZhanFa==false){
-        GuiControl Main:, ZhanFa, %ZhanFa%
-    }
+    GuiControl Main:, ZhanFa, %ZhanFa%
+    JianZong:= LoadPreset(GetNowSelectPreset(),"JianZongState") || 0
+    GuiControl Main:, JianZong, %JianZong%
 }
 
 ; 主界面选择旅人功能
@@ -302,6 +304,15 @@ MainZhanFa(){
     Gui Main:Submit, NoHide
     if(ZhanFa){
         ShowGuiZhanFa()
+    }
+}
+
+; 主界面选择剑宗功能
+MainJianZong(){
+    global JianZong
+    Gui Main:Submit, NoHide
+    if(JianZong){
+        ShowGuiJianZong()
     }
 }
 

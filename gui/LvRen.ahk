@@ -1,6 +1,6 @@
 ﻿Gui LvRen:-MinimizeBox -MaximizeBox -SysMenu -Theme +Owner%A_DefaultGui%
 Gui LvRen:Add, ListBox, vLvRenKeysListBox x8 y32 w80 h172
-Gui LvRen:Add, Edit, vLvRenShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA, Z
+Gui LvRen:Add, Edit, vLvRenShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA
 Gui LvRen:Add, Button, gLvRenAddKey x96 y40 w80 h22, 添加技能键
 Gui LvRen:Add, Button, gLvRenDeleteKey x96 y70 w80 h22, 删除技能键
 Gui LvRen:Add, Button, gLvRenSetShotKey x96 y148 w80 h22, 设置发射键

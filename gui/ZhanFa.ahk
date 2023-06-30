@@ -1,6 +1,6 @@
 ﻿Gui ZhanFa:-MinimizeBox -MaximizeBox -SysMenu -Theme +Owner%A_DefaultGui%
 Gui ZhanFa:Add, ListBox, vZhanFaKeysListBox x8 y32 w80 h172
-Gui ZhanFa:Add, Edit, vZhanFaShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA, Z
+Gui ZhanFa:Add, Edit, vZhanFaShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA
 Gui ZhanFa:Add, Button, gZhanFaAddKey x96 y40 w80 h22, 添加技能键
 Gui ZhanFa:Add, Button, gZhanFaDeleteKey x96 y70 w80 h22, 删除技能键
 Gui ZhanFa:Add, Button, gZhanFaSetShotKey x96 y148 w80 h22, 设置发射键
