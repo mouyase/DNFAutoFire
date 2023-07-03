@@ -5,7 +5,19 @@ Key2NoVkSC(key){
 }
 
 ; 按键转换为只有虚拟码
-Key2VkNoSC(key){
+Key2VKNoSC(key){
     vk := GetKeyVK(key)
     return Format("vk{1:02X}scFF", vk)
+}
+
+; 按键转换扫描码
+Key2SC(key){
+    sc := GetKeySC(key)
+    return Format("sc{1:02X}", sc)
+}
+
+; 按键转换为虚拟码
+Key2Vk(key){
+    vk := GetKeyVK(key)
+    return Format("vk{1:02X}", vk)
 }

@@ -58,10 +58,14 @@ DownloadToFile(url, size){
         err:=fileHandle.RawWrite(f,cLen+1)
         FileEncoding cp54936
         file := FileOpen("Update.bat", "w")
-        command := "taskkill /f /im DAF连发工具.exe`r`ndel DAF连发工具.exe`r`nren DNFAutoFire.exe DAF连发工具.exe"
+        command := "@echo off`r`ntaskkill /f /im DAF连发工具.exe`r`ntimeout /t 3 /nobreak > NUL`r`ndel DAF连发工具.exe`r`ntimeout /t 3 /nobreak > NUL`r`nren DNFAutoFire.exe DAF连发工具.exe`r`ntimeout /t 1 /nobreak > NUL`r`nstart DAF连发工具.exe"
         file.Write(command)
         file.Close()
         Run, Update.bat
     } catch e
         return % e.message
+}
+
+try{
+    FileDelete, Update.bat
 }

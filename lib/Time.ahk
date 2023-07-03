@@ -22,5 +22,8 @@ SuperSleep(delay){
 
 ; 获取一个新的计时器时间
 GetNewCounterTime(){
-    return DllCall("Winmm\timeGetTime")
+    DllCall("Winmm\timeBeginPeriod", "UInt", 1)
+    time := DllCall("Winmm\timeGetTime")
+    DllCall("Winmm\timeEndPeriod", "UInt", 1)
+    return time
 }

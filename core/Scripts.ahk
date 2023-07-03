@@ -110,38 +110,38 @@ GetOriginKeyName(key){
 
 ; 用于屏蔽按键原始功能
 OriginalBlocking(key){
-    SendEvent, {Blind}{%key% down}
+    SendEvent, {Blind}{%key% Down}
     KeyWait, %key%
-    SendEvent, {Blind}{%key% up}
+    SendEvent, {Blind}{%key% Up}
 }
 
 ; 屏蔽按键原始功能
 SetOriginalBlocking(key){
-    if(key != "LShift" || key != "RShift" || key != "LCtrl" || key != "RCtrl" || key != "LAlt" || key != "RAlt"){
-        keyName := GetOriginKeyName(key)
-        fn := Func("OriginalBlocking").Bind(Format("{:L}", keyName))
-        Hotkey, $%keyName%, %fn%
-        Hotkey, $%keyName%, On
-    }
+    keyName := GetOriginKeyName(key)
+    keyName := Key2SC(keyName)
+    fn := Func("OriginalBlocking").Bind(Format("{:L}", keyName))
+    Hotkey, $*%keyName%, %fn%
+    Hotkey, $*%keyName%, On
 }
 
 ; 恢复按键原始功能
 SetOriginalDirect(key){
     keyName := GetOriginKeyName(key)
+    keyName := Key2SC(keyName)
     try{
-        Hotkey, $%keyName%, , Off
+        Hotkey, $*%keyName%, Off
     }
 }
 
 ; 设置托盘图标状态
 SetTrayRunningIcon(state){
-    if(A_IsCompiled){
+    /*@Ahk2Exe-Keep
         if(state){
             Menu, Tray, Icon, %A_ScriptFullPath%, 3
         }else{
             Menu, Tray, Icon, %A_ScriptFullPath%, 1
         }
-    }
+    */
 }
 
 ; 启动连发功能
@@ -152,12 +152,14 @@ StartAutoFire(){
     for _, key in _AutoFireEnableKeys {
         SetOriginalBlocking(key)
         _AutoFireThreads.Push(new Thread(key))
-        Sleep, 10
     }
+    Sleep, 10
+    _AutoFireThreads.Push(new Thread("ReleaseKeys"))
     StartEx()
     SoundPlay *64
     SetTrayRunningIcon(true)
-    UnlockSystemTimeLimit()
+    nowSelectPreset := GetNowSelectPreset()
+    ShowTip("连发已启动 - " . nowSelectPreset)
 }
 
 StartEx(){
@@ -172,6 +174,7 @@ StartEx(){
         _AutoFireThreads.Push(new Thread("ExZhanFa"))
     }
     if(JianZong){
+        UnlockSystemTimeLimit()
         skillKey := LoadPreset(GetNowSelectPreset(), "JianZongSkillKey")
         SetOriginalBlocking(skillKey)
         _AutoFireThreads.Push(new Thread("ExJianZong"))
@@ -255,4 +258,13 @@ DeleteValueInArray(value, array){
         }
         array.Delete(needDeleteIndex)
     }
+}
+
+ShowTip(text){
+    ToolTip, %text%
+    SetTimer, CloseTip, -3000
+}
+
+CloseTip(){
+    ToolTip,
 }

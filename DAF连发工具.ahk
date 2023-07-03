@@ -1,12 +1,23 @@
-﻿#NoEnv
+﻿;@Ahk2Exe-SetMainIcon icon_main.ico
+;@Ahk2Exe-AddResource icon_alert.ico, 160
+;@Ahk2Exe-AddResource icon_green.ico, 206
+;@Ahk2Exe-AddResource icon_red.ico, 207
 
+#NoEnv
+
+#Persistent
+#MenuMaskKey, vkFF
 #SingleInstance, Ignore
 #MaxHotkeysPerInterval, 9999
 #InstallKeybdHook
+#MaxThreadsBuffer, Off
 SetWorkingDir, %A_ScriptDir%
 SetBatchLines, -1
 ListLines, Off
+SetStoreCapslockMode, Off
 SetKeyDelay, 1
+
+global __Version := "0.0.11"
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
@@ -20,6 +31,7 @@ SetKeyDelay, 1
 #Include ./core/AutoFire.ahk
 #Include ./core/Scripts.ahk
 #Include ./core/Http.ahk
+#Include ./core/ReleaseKeys.ahk
 #Include ./gui/Main.ahk
 #Include ./gui/QuickSwitch.ahk
 #Include ./gui/UpdateProgress.ahk
@@ -30,17 +42,16 @@ SetKeyDelay, 1
 #Include ./gui/JianZong.ahk
 #Include ./ex/ExJianZong.ahk
 
-try
-{
-    if(A_IsCompiled){
-        Menu, Tray, Icon, %A_ScriptFullPath%, 1
-        Menu, Tray, NoStandard
-        Menu, Tray, DeleteAll
-    } else{
-        #Include <Log>
-        Log()
-    }
-}
+;@Ahk2Exe-IgnoreBegin
+#Include <Log>
+Log()
+;@Ahk2Exe-IgnoreEnd
+
+/*@Ahk2Exe-Keep
+    Menu, Tray, Icon, %A_ScriptFullPath%, 1
+    Menu, Tray, NoStandard
+    Menu, Tray, DeleteAll
+*/
 
 Menu, Tray, MainWindow
 Menu, Tray, Tip, DAF连发工具
@@ -57,8 +68,6 @@ ShowGui(){
     ShowGuiMain()
 }
 
-global __Version := "0.0.10"
-
 global _AutoFireThreads := []
 global _AutoFireEnableKeys := []
 global _NowSelectPreset := LoadLastPreset()
@@ -70,18 +79,6 @@ return
     ShowGuiQuickSwitch()
 return
 
-; 以下内容为对修饰键的单独处理，可以降低修饰键触发延迟
-<+F24::
->+F24::
-<^F24::
->^F24::
-<!F24::
->!F24::
-return
-$LShift::
-$RShift::
-$LAlt::
-$RAlt::
-$LCtrl::
-$RCtrl::
+$LWin::
+$RWin::
 return

@@ -122,10 +122,12 @@ Gui Main:Add, Text, vNumLk gMainKeyClick x770 y80 w36 h36 +0x200 +0x400000 +Cent
 Gui Main:Font
 
 Gui Main:Font, s9
+Gui Main:Add, Text, x770 y34, 当前版本：v%__Version%
+Gui Main:Add, Link, x770 y54, <a href="https://bbs.colg.cn/thread-8894989-1-1.html">Colg</a> <a href="https://github.com/mouyase/DNFAutoFire">Github</a>
 Gui Main:Add, Button, gMainClear x890 y30 w36 h36 +0x200 +Center, 清空
 Gui Main:Font
 
-Gui Main:Add, GroupBox, x8 y300 w274 h200, 配置设置
+Gui Main:Add, GroupBox, x8 y300 w274 h200, 配置设置 - [ 游戏中按 Alt+~ 打开快速切换 ]
 
 Gui Main:Add, ListBox, vPreset x16 y320 w120 h180
 Gui Main:Add, Edit, vPresetNameEdit x150 y350 w120 h22
@@ -137,7 +139,7 @@ Gui Main:Add, Button, gMainDeletePreset x150 y460 w120 h30, 删除配置
 Gui Main:Add, Button, gMainHelp x734 y334 w96 h50, 帮助
 Gui Main:Add, Button, gMainAbout x838 y334 w96 h50, 关于
 Gui Main:Add, Button, gMainCheckUpdate x734 y392 w200 h50, 检查更新
-Gui Main:Add, Button, gMainStart x734 y450 w200 h50, 启动连发
+Gui Main:Add, Button, gMainStart x734 y450 w200 h50 +Default, 启动连发
 
 Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
 
@@ -146,7 +148,7 @@ Gui Main:Add, CheckBox, vZhanFa gMainZhanFa x298 y340 h20, 战法自动炫纹
 Gui Main:Add, CheckBox, vJianZong gMainJianZong x298 y360 h20, 太宗帝剑延迟
 
 ShowGuiMain(){
-    Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire - v%__Version%
+    Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire
     MainLoadAllPreset()
 }
 
@@ -321,5 +323,5 @@ MainAbout(){
 }
 
 MainHelp(){
-    MsgBox 0x2020, 如何使用DAF连发工具, 1、点击窗口中的键盘，将想启动连发的键位变成红色`n2、输入配置名称，保存配置`n3、点击启动连发，即可使用`n`nPS：在游戏中按下 Alt + `（键盘1左边，Tab上边的那个），可以打开快速切换窗口，使用上下键和回车可以快速切换已经保存的配置
+    MsgBox 0x2020, 如何使用DAF连发工具, 1、点击窗口中的键盘，将想启动连发的键位变成红色`n2、输入配置名称，保存配置`n3、点击启动连发，即可使用`n`nPS：在游戏中按下 Alt + ~（键盘1左边，Tab上边的那个），可以打开快速切换窗口，使用上下键和回车可以快速切换已经保存的配置
 }
