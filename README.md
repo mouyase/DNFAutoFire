@@ -11,7 +11,7 @@
 ## 贡献人员
 | | |
 |-|-|
-|![](https://avatars.githubusercontent.com/u/7844572?v=4#pic_center=50%x50%)|![](https://avatars.githubusercontent.com/u/28993260?v=4)|
+|![](https://avatars.githubusercontent.com/u/7844572?v=4 =100x100)|![](https://avatars.githubusercontent.com/u/28993260?v=4)|
 |某亚瑟|Ousumu|
 |所有者|图标设计|
 
