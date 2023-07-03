@@ -3,6 +3,14 @@
 ;@Ahk2Exe-AddResource icon_green.ico, 206
 ;@Ahk2Exe-AddResource icon_red.ico, 207
 
+;@Ahk2Exe-SetDescription DAF连发工具
+;@Ahk2Exe-SetCopyright 某亚瑟
+;@Ahk2Exe-SetLanguage 0x0804
+;@Ahk2Exe-SetProductName DAF连发工具
+;@Ahk2Exe-SetProductVersion 0.1.0
+;@Ahk2Exe-SetVersion 0.1.0
+
+
 #NoEnv
 
 #Persistent
