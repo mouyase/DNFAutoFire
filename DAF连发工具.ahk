@@ -48,7 +48,7 @@ Log()
 ;@Ahk2Exe-IgnoreEnd
 
 /*@Ahk2Exe-Keep
-    Menu, Tray, Icon, %A_ScriptFullPath%, 1
+    Menu, Tray, Icon, %A_ScriptFullPath%, 4
     Menu, Tray, NoStandard
     Menu, Tray, DeleteAll
 */

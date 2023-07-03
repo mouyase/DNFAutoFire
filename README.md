@@ -7,6 +7,14 @@
  - 自动使用管理员模式启动
  - 效能媲美Wegame内置连发(基于个人测试)
 
+
+## 贡献人员
+| | |
+|-|-|
+|![](https://avatars.githubusercontent.com/u/7844572?v=4)|![](https://avatars.githubusercontent.com/u/28993260?v=4)|
+|某亚瑟|Ousumu|
+|所有者|图标设计|
+
 ## 更新日志
 ### 2023-6-29 v0.0.10
  - [修复]修复了配置保存时的逻辑问题

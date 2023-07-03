@@ -139,7 +139,7 @@ SetTrayRunningIcon(state){
         if(state){
             Menu, Tray, Icon, %A_ScriptFullPath%, 3
         }else{
-            Menu, Tray, Icon, %A_ScriptFullPath%, 1
+            Menu, Tray, Icon, %A_ScriptFullPath%, 4
         }
     */
 }
