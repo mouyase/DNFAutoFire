@@ -127,12 +127,12 @@ Gui Main:Add, Link, x770 y54, <a href="https://bbs.colg.cn/thread-8894989-1-1.ht
 Gui Main:Add, Button, gMainClear x890 y30 w36 h36 +0x200 +Center, 清空
 Gui Main:Font
 
-Gui Main:Add, GroupBox, x8 y300 w274 h200, 配置设置 - [ 游戏中按 Alt+~ 打开快速切换 ]
+Gui Main:Add, GroupBox, x8 y300 w274 h200, 配置设置 - [ 双击读取配置 ]
 
-Gui Main:Add, ListBox, vPreset x16 y320 w120 h180
+Gui Main:Add, ListBox, vPreset gMainChangeListPreset x16 y320 w120 h180
 Gui Main:Add, Edit, vPresetNameEdit x150 y350 w120 h22
 Gui Main:Add, Text, x150 y320 h24 +0x200, 配置名称
-Gui Main:Add, Button, gMainLoadPreset x150 y380 w120 h30, 读取配置
+Gui Main:Add, Button, x150 y380 w120 h30, 读取配置
 Gui Main:Add, Button, gMainSavePreset x150 y420 w120 h30, 保存配置
 Gui Main:Add, Button, gMainDeletePreset x150 y460 w120 h30, 删除配置
 
@@ -143,9 +143,12 @@ Gui Main:Add, Button, gMainStart x734 y450 w200 h50 +Default, 启动连发
 
 Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
 
-Gui Main:Add, CheckBox, vLvRen gMainLvRen x298 y320 h20, 旅人自动流星
-Gui Main:Add, CheckBox, vZhanFa gMainZhanFa x298 y340 h20, 战法自动炫纹
-Gui Main:Add, CheckBox, vJianZong gMainJianZong x298 y360 h20, 太宗帝剑延迟
+Gui Main:Add, CheckBox, vLvRen x298 y320 h20 w20
+Gui Main:Add, Link, gMainLvRen x316 y323 h20, <a>旅人自动流星</a>
+Gui Main:Add, CheckBox, vZhanFa x298 y340 h20 w20
+Gui Main:Add, Link, gMainZhanFa x316 y343 h20, <a>战法自动炫纹</a>
+Gui Main:Add, CheckBox, vJianZong x298 y360 h20 w20
+Gui Main:Add, Link, gMainJianZong x316 y363 h20, <a>太宗帝剑延迟</a>
 
 ShowGuiMain(){
     Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire
@@ -222,15 +225,6 @@ MainSavePreset(){
 
 }
 
-; 主界面读取配置点击事件
-MainLoadPreset(){
-    global Preset
-    Gui, Submit, NoHide
-    presetName := Preset
-    GuiControl Main:, PresetNameEdit, %presetName%
-    ChangePreset(presetName)
-}
-
 ; 主界面删除配置点击事件
 MainDeletePreset(){
     global Preset
@@ -293,29 +287,17 @@ MainLoadEx(){
 
 ; 主界面选择旅人功能
 MainLvRen(){
-    global LvRen
-    Gui Main:Submit, NoHide
-    if(LvRen){
-        ShowGuiLvRen()
-    }
+    ShowGuiLvRen()
 }
 
 ; 主界面选择战法功能
 MainZhanFa(){
-    global ZhanFa
-    Gui Main:Submit, NoHide
-    if(ZhanFa){
-        ShowGuiZhanFa()
-    }
+    ShowGuiZhanFa()
 }
 
 ; 主界面选择剑宗功能
 MainJianZong(){
-    global JianZong
-    Gui Main:Submit, NoHide
-    if(JianZong){
-        ShowGuiJianZong()
-    }
+    ShowGuiJianZong()
 }
 
 MainAbout(){
@@ -325,3 +307,14 @@ MainAbout(){
 MainHelp(){
     MsgBox 0x2020, 如何使用DAF连发工具, 1、点击窗口中的键盘，将想启动连发的键位变成红色`n2、输入配置名称，保存配置`n3、点击启动连发，即可使用`n`nPS：在游戏中按下 Alt + ~（键盘1左边，Tab上边的那个），可以打开快速切换窗口，使用上下键和回车可以快速切换已经保存的配置
 }
+
+; 主界面配置列表点击事件
+MainChangeListPreset(){
+    if(A_GuiEvent == "DoubleClick"){
+        Gui, Submit, NoHide
+        presetName := Preset
+        GuiControl Main:, PresetNameEdit, %presetName%
+        ChangePreset(presetName)
+    }
+}
+

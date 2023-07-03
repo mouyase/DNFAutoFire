@@ -1,4 +1,4 @@
-﻿Gui ZhanFa:-MinimizeBox -MaximizeBox -SysMenu -Theme +Owner%A_DefaultGui%
+﻿Gui ZhanFa:+ToolWindow +Owner%A_DefaultGui%
 Gui ZhanFa:Add, ListBox, vZhanFaKeysListBox x8 y32 w80 h172
 Gui ZhanFa:Add, Edit, vZhanFaShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA
 Gui ZhanFa:Add, Button, gZhanFaAddKey x96 y40 w80 h22, 添加技能键
@@ -18,6 +18,14 @@ ShowGuiZhanFa(){
 HideGuiZhanFa(){
     Gui ZhanFa:Hide
     EnableGuiMain()
+}
+
+ZhanFaGuiEscape(){
+    HideGuiZhanFa()
+}
+
+ZhanFaGuiClose(){
+    HideGuiZhanFa()
 }
 
 ZhanFaHelp(){
