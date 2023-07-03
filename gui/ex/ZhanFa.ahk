@@ -4,8 +4,8 @@ Gui ZhanFa:Add, Edit, vZhanFaShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA
 Gui ZhanFa:Add, Button, gZhanFaAddKey x96 y40 w80 h22, 添加技能键
 Gui ZhanFa:Add, Button, gZhanFaDeleteKey x96 y70 w80 h22, 删除技能键
 Gui ZhanFa:Add, Button, gZhanFaSetShotKey x96 y148 w80 h22, 设置发射键
-Gui ZhanFa:Add, Text, x8 y8 w80 h20 +0x200, 已添加键
-Gui ZhanFa:Add, Text, x96 y100 w80 h20 +0x200, 发射键
+Gui ZhanFa:Add, Text, x8 y8 w80 h20 +0x200, 已添加技能键
+Gui ZhanFa:Add, Text, x96 y100 w80 h20 +0x200, 炫纹发射键
 Gui ZhanFa:Add, Button, gZhanFaSave x96 y178 w80 h27, 保存
 Gui ZhanFa:Add, Button, gZhanFaHelp x158 y8 w18 h18, ?
 

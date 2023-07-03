@@ -5,6 +5,14 @@ Gui QuickSwitch:Font
 Gui QuickSwitch:Add, Button, gQuickSwitchStart x8 y304 w100 h48 +Default, 切换并启动连发
 Gui QuickSwitch:Add, Button, gQuickSwitchStop x150 y304 w100 h48, 停止连发
 
+QuickSwitchGuiEscape(){
+    Gui QuickSwitch:Submit
+}
+
+QuickSwitchGuiClose(){
+    Gui QuickSwitch:Submit
+}
+
 QuickSwitchStart(){
     global QuickSwitchList
     Gui QuickSwitch:Submit

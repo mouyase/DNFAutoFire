@@ -129,34 +129,47 @@ Gui Main:Font
 
 Gui Main:Add, GroupBox, x8 y300 w274 h200, 配置设置 - [ 双击读取配置 ]
 
-Gui Main:Add, ListBox, vPreset gMainChangeListPreset x16 y320 w120 h180
-Gui Main:Add, Edit, vPresetNameEdit x150 y350 w120 h22
-Gui Main:Add, Text, x150 y320 h24 +0x200, 配置名称
-Gui Main:Add, Button, x150 y380 w120 h30, 读取配置
-Gui Main:Add, Button, gMainSavePreset x150 y420 w120 h30, 保存配置
-Gui Main:Add, Button, gMainDeletePreset x150 y460 w120 h30, 删除配置
+Gui Main:Add, ListBox, vPreset gMainChangeListPreset x16 y320 w126 h180
+Gui Main:Add, Text, x150 y320 w72 h24 +0x200, 当前配置名称
+Gui Main:Add, Edit, vPresetNameEdit x150 y344 w120 h22
+Gui Main:Add, Button, gMainLoadPreset x150 y370 w58 h30, 读取配置
+Gui Main:Add, Button, gMainSavePreset x212 y370 w58 h30, 保存配置
+Gui Main:Add, Button, gMainClonePreset x150 y404 w58 h30, 克隆配置
+Gui Main:Add, Button, gMainDeletePreset x212 y404 w58 h30, 删除配置
 
-Gui Main:Add, Button, gMainHelp x734 y334 w96 h50, 帮助
-Gui Main:Add, Button, gMainAbout x838 y334 w96 h50, 关于
+Gui Main:Add, Text, x150 y450 w72 h24 +0x200, 快速切换热键
+Gui Main:Add, Hotkey, vQuickChangeHotKey gMainSaveQuickChangeHotKey x150 y474 w120 h20, !~
+
+Gui Main:Add, Button, gMainHelp x734 y305 w96 h80, 帮助
+Gui Main:Add, Button, gMainAbout x838 y305 w96 h80, 关于
 Gui Main:Add, Button, gMainCheckUpdate x734 y392 w200 h50, 检查更新
-Gui Main:Add, Button, gMainStart x734 y450 w200 h50 +Default, 启动连发
+Gui Main:Add, Button, gMainStart x734 y450 w200 h50, 启动连发
 
 Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
 
-Gui Main:Add, CheckBox, vLvRen x298 y320 h20 w20
+Gui Main:Add, CheckBox, vLvRen x298 y320 h20 w16
 Gui Main:Add, Link, gMainLvRen x316 y323 h20, <a>旅人自动流星</a>
-Gui Main:Add, CheckBox, vZhanFa x298 y340 h20 w20
+Gui Main:Add, CheckBox, vZhanFa x298 y340 h20 w16
 Gui Main:Add, Link, gMainZhanFa x316 y343 h20, <a>战法自动炫纹</a>
-Gui Main:Add, CheckBox, vJianZong x298 y360 h20 w20
+Gui Main:Add, CheckBox, vJianZong x298 y360 h20 w16
 Gui Main:Add, Link, gMainJianZong x316 y363 h20, <a>太宗帝剑延迟</a>
 
 ShowGuiMain(){
     Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire
     MainLoadAllPreset()
+    MainLoatQuickChangeHotKey()
 }
 
 HideGuiMain(){
     Gui Main:Hide
+}
+
+MainGuiEscape(){
+    HideGuiMain()
+}
+
+MainGuiClose(){
+    HideGuiMain()
 }
 
 DisableGuiMain(){
@@ -211,7 +224,7 @@ MainClear(){
 MainSavePreset(){
     global PresetNameEdit
     global _AutoFireEnableKeys
-    Gui, Submit, NoHide
+    Gui Main:Submit, NoHide
     presetName := PresetNameEdit
     if(presetName != "")
     {
@@ -222,13 +235,38 @@ MainSavePreset(){
     } else {
         MsgBox 0x2010, , 请输入配置名称
     }
+}
 
+; 主界面读取配置点击事件
+MainLoadPreset(){
+    global Preset
+    Gui Main:Submit, NoHide
+    presetName := Preset
+    GuiControl Main:, PresetNameEdit, %presetName%
+    ChangePreset(presetName)
+}
+
+; 主界面克隆配置点击事件
+MainClonePreset(){
+    global PresetNameEdit
+    global _AutoFireEnableKeys
+    Gui Main:Submit, NoHide
+    presetName := PresetNameEdit . "-克隆"
+    if(PresetNameEdit != "")
+    {
+        SavePresetKeys(presetName, _AutoFireEnableKeys)
+        MainSaveEx()
+        SetNowSelectPreset(presetName)
+        MainLoadAllPreset()
+    } else {
+        MsgBox 0x2010, , 请选择有效的配置
+    }
 }
 
 ; 主界面删除配置点击事件
 MainDeletePreset(){
     global Preset
-    Gui, Submit, NoHide
+    Gui Main:Submit, NoHide
     presetName := Preset
     DeletePreset(presetName)
     MainLoadAllPreset()
@@ -301,7 +339,7 @@ MainJianZong(){
 }
 
 MainAbout(){
-    MsgBox 0x2040, 关于DAF连发, 作者： 某亚瑟`n`n源码：https://github.com/mouyase/DNFAutoFire
+    MsgBox 0x2040, 关于DAF连发, 作者： 某亚瑟`n图标： Ousumu`n`n源码：https://github.com/mouyase/DNFAutoFire
 }
 
 MainHelp(){
@@ -310,11 +348,28 @@ MainHelp(){
 
 ; 主界面配置列表点击事件
 MainChangeListPreset(){
+    global Preset
     if(A_GuiEvent == "DoubleClick"){
-        Gui, Submit, NoHide
+        Gui Main:Submit, NoHide
         presetName := Preset
         GuiControl Main:, PresetNameEdit, %presetName%
         ChangePreset(presetName)
     }
 }
 
+; 主界面热键更改
+MainSaveQuickChangeHotKey(){
+    global QuickChangeHotKey
+    Gui Main:Submit, NoHide
+    SaveConfig("QuickChangeHotKey", QuickChangeHotKey)
+    fn := Func("ShowGuiQuickSwitch")
+    Hotkey, ~$%QuickChangeHotKey%, %fn%
+}
+
+; 主界面读取热键
+MainLoatQuickChangeHotKey(){
+    quickChangeHotKey := LoadConfig("QuickChangeHotKey")
+    fn := Func("ShowGuiQuickSwitch")
+    Hotkey, ~$%QuickChangeHotKey%, %fn%
+    GuiControl Main:, QuickChangeHotKey, %quickChangeHotKey%
+}

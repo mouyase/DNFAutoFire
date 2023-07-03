@@ -4,8 +4,8 @@ Gui LvRen:Add, Edit, vLvRenShotKey x96 y120 w80 h20 +ReadOnly -WantCtrlA
 Gui LvRen:Add, Button, gLvRenAddKey x96 y40 w80 h22, 添加技能键
 Gui LvRen:Add, Button, gLvRenDeleteKey x96 y70 w80 h22, 删除技能键
 Gui LvRen:Add, Button, gLvRenSetShotKey x96 y148 w80 h22, 设置发射键
-Gui LvRen:Add, Text, x8 y8 w80 h20 +0x200, 已添加键
-Gui LvRen:Add, Text, x96 y100 w80 h20 +0x200, 发射键
+Gui LvRen:Add, Text, x8 y8 w80 h20 +0x200, 已添加技能键
+Gui LvRen:Add, Text, x96 y100 w80 h20 +0x200, 流星发射键
 Gui LvRen:Add, Button, gLvRenSave x96 y178 w80 h27, 保存
 Gui LvRen:Add, Button, gLvRenHelp x158 y8 w18 h18, ?
 

@@ -17,7 +17,7 @@ ListLines, Off
 SetStoreCapslockMode, Off
 SetKeyDelay, 1
 
-global __Version := "0.0.11"
+global __Version := "0.1.0"
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
@@ -35,11 +35,11 @@ global __Version := "0.0.11"
 #Include ./gui/Main.ahk
 #Include ./gui/QuickSwitch.ahk
 #Include ./gui/UpdateProgress.ahk
-#Include ./gui/LvRen.ahk
+#Include ./gui/ex/LvRen.ahk
 #Include ./ex/ExLvRen.ahk
-#Include ./gui/ZhanFa.ahk
+#Include ./gui/ex/ZhanFa.ahk
 #Include ./ex/ExZhanFa.ahk
-#Include ./gui/JianZong.ahk
+#Include ./gui/ex/JianZong.ahk
 #Include ./ex/ExJianZong.ahk
 
 ;@Ahk2Exe-IgnoreBegin
@@ -75,10 +75,6 @@ global _NowSelectPreset := LoadLastPreset()
 ShowGui()
 return
 
-!`::
-    ShowGuiQuickSwitch()
-return
-
-$LWin::
-$RWin::
-return
+; $LWin::
+; $RWin::
+; return
