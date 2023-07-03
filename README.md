@@ -12,7 +12,7 @@
 | | |
 |-|-|
 |<img src="https://avatars.githubusercontent.com/u/7844572?v=4" width="128">|<img src="https://avatars.githubusercontent.com/u/28993260?v=4" width="128">|
-|某亚瑟|Ousumu|
+|[某亚瑟](https://github.com/mouyase)|[Ousumu](https://github.com/1208041822)|
 |所有者|图标设计|
 
 ## 更新日志
