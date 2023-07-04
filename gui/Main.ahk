@@ -138,7 +138,7 @@ Gui Main:Add, Button, gMainClonePreset x150 y404 w58 h30, 克隆配置
 Gui Main:Add, Button, gMainDeletePreset x212 y404 w58 h30, 删除配置
 
 Gui Main:Add, Text, x150 y450 w72 h24 +0x200, 快速切换热键
-Gui Main:Add, Hotkey, vQuickChangeHotKey gMainSaveQuickChangeHotKey x150 y474 w120 h20, !~
+Gui Main:Add, Hotkey, vQuickChangeHotKey gMainSaveQuickChangeHotKey x150 y474 w120 h20
 
 Gui Main:Add, Button, gMainHelp x734 y305 w96 h80, 帮助
 Gui Main:Add, Button, gMainAbout x838 y305 w96 h80, 关于
@@ -369,6 +369,9 @@ MainSaveQuickChangeHotKey(){
 ; 主界面读取热键
 MainLoatQuickChangeHotKey(){
     quickChangeHotKey := LoadConfig("QuickChangeHotKey")
+    if(quickChangeHotKey == ""){
+        quickChangeHotKey := "!``"
+    }
     fn := Func("ShowGuiQuickSwitch")
     Hotkey, ~$%QuickChangeHotKey%, %fn%
     GuiControl Main:, QuickChangeHotKey, %quickChangeHotKey%
