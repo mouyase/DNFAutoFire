@@ -1,8 +1,7 @@
 ﻿ExZhanFa(){
+    Process, Priority,, High
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"ZhanFaState")){
-        SetKeyDelay, -1, 1
-        Process, Priority,, High
         ShotKey := LoadPreset(LoadLastPreset(), "ZhanFaShotKey")
         SkillKeys := ZhanFaLoadKeys(LoadLastPreset())
         keycode := Key2NoVkSC(ShotKey)
@@ -16,7 +15,7 @@
                     }
                 }
                 if (isNeedSend) {
-                    SendEvent, {Blind}{%keycode%}
+                    SendIP(keycode)
                 }
             }
             Sleep, 1

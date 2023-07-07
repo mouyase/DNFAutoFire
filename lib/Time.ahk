@@ -9,7 +9,7 @@ RestoreSystemTimeLimit(){
 }
 
 ; 休眠，解除限制后休眠时间可以小于10ms
-Sleep(delay){
+GrandSleep(delay){
     DllCall("Sleep", "UInt", delay)
 }
 

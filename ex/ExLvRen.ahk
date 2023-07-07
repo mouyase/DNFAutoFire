@@ -1,8 +1,7 @@
 ﻿ExLvRen(){
+    Process, Priority,, High
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"LvRenState")){
-        SetKeyDelay, -1, 1
-        Process, Priority,, High
         ShotKey := LoadPreset(LoadLastPreset(), "LvRenShotKey")
         SkillKeys := LvRenLoadKeys(LoadLastPreset())
         keycode := Key2NoVkSC(ShotKey)
@@ -17,7 +16,7 @@
                 }
                 if (isNeedSend) {
                     Sleep, 1
-                    SendEvent, {Blind}{%keycode%}
+                    SendIP(keycode)
                 }
             }
             Sleep, 1

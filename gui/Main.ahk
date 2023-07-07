@@ -361,9 +361,15 @@ MainChangeListPreset(){
 MainSaveQuickChangeHotKey(){
     global QuickChangeHotKey
     Gui Main:Submit, NoHide
+    quickChangeHotKeyConfig := LoadConfig("QuickChangeHotKey")
+    if(quickChangeHotKeyConfig == ""){
+        quickChangeHotKeyConfig := "!``"
+    }
+    Hotkey, ~$%quickChangeHotKeyConfig%, Off
     SaveConfig("QuickChangeHotKey", QuickChangeHotKey)
     fn := Func("ShowGuiQuickSwitch")
     Hotkey, ~$%QuickChangeHotKey%, %fn%
+    Hotkey, ~$%QuickChangeHotKey%, On
 }
 
 ; 主界面读取热键
@@ -374,5 +380,6 @@ MainLoatQuickChangeHotKey(){
     }
     fn := Func("ShowGuiQuickSwitch")
     Hotkey, ~$%QuickChangeHotKey%, %fn%
+    Hotkey, ~$%QuickChangeHotKey%, On
     GuiControl Main:, QuickChangeHotKey, %quickChangeHotKey%
 }

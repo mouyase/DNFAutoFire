@@ -33,6 +33,7 @@ global __Version := "0.1.0"
 #Include <JSON>
 #Include <Time>
 #Include <GetPressKey>
+#Include ./core/SendIP.ahk
 #Include ./core/CheckDNFWindow.ahk
 #Include ./core/KeyConvert.ahk
 #Include ./core/Config.ahk
