@@ -98,13 +98,11 @@ ExYuanDiAttackGetDelayTime(){
     global _YuanDiAttackSettingToolThread
     global YuanDiAttackSkillKey
     global YuanDiAttackLeftKey
-    global YuanDiAttackDelay1
-    global YuanDiAttackDelay2
     Gui YuanDiAttack:Submit, NoHide
     skillKey := GetOriginKeyName(YuanDiAttackSkillKey)
     _YuanDiAttackSettingToolThread := new Thread(skillKey)
     isNeedGetAttackDown := true
-    isNeedGetLeftDown := true
+    isNeedGetLeftDown := false
     isNeedGetLeftUp := false
     ShowTip("开始检测平X方向延迟")
     loop{
@@ -113,6 +111,7 @@ ExYuanDiAttackGetDelayTime(){
                 if(isNeedGetAttackDown){
                     time1 := A_TickCount
                     isNeedGetAttackDown := false
+                    isNeedGetLeftDown := true
                 }
                 if(GetKeyState(YuanDiAttackLeftKey, "P")){
                     if(isNeedGetLeftDown){
@@ -127,11 +126,14 @@ ExYuanDiAttackGetDelayTime(){
                     }
                 }
             }
-            if(time2 > time1 && time3 > time2 ){
+            if(time1 > 0 && time2 > 0 && time3 > 0){
                 break
             }
         }
         Sleep, 1
+        if (GetKeyState("``", "P")){
+            break
+        }
     }
     delay1 := Floor((time2 - time1)/10)*10
     delay2 := Floor((time3 - time1)/10)*10
@@ -162,11 +164,14 @@ ExYuanDiAttackGetLoopTime(){
                 time2 := A_TickCount
                 isNeedGetAttackUp := false
             }
-            if(time2 > time1){
+            if(time1 > 0 && time2 > 0){
                 break
             }
         }
         Sleep, 1
+        if (GetKeyState("``", "P")){
+            break
+        }
     }
     delay3 := Ceil((Ceil((time2 - time1) / 3))/10)*10
     GuiControl YuanDiAttack:, YuanDiAttackDelay3, %delay3%
