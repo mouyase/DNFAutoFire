@@ -147,12 +147,14 @@ Gui Main:Add, Button, gMainStart x734 y450 w200 h50, 启动连发
 
 Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
 
-Gui Main:Add, CheckBox, vLvRen x298 y320 h20 w16
-Gui Main:Add, Link, gMainLvRen x316 y323 h20, <a>旅人自动流星</a>
-Gui Main:Add, CheckBox, vZhanFa x298 y340 h20 w16
-Gui Main:Add, Link, gMainZhanFa x316 y343 h20, <a>战法自动炫纹</a>
-Gui Main:Add, CheckBox, vJianZong x298 y360 h20 w16
-Gui Main:Add, Link, gMainJianZong x316 y363 h20, <a>太宗帝剑延迟</a>
+Gui Main:Add, CheckBox, vYuanDiAttack x298 y320 h20 w16
+Gui Main:Add, Link, gMainYuanDiAttack x316 y323 h20, <a>原地平X(Beta)</a>
+Gui Main:Add, CheckBox, vLvRen x298 y340 h20 w16
+Gui Main:Add, Link, gMainLvRen x316 y343 h20, <a>旅人自动流星</a>
+Gui Main:Add, CheckBox, vZhanFa x298 y360 h20 w16
+Gui Main:Add, Link, gMainZhanFa x316 y363 h20, <a>战法自动炫纹</a>
+Gui Main:Add, CheckBox, vJianZong x298 y380 h20 w16
+Gui Main:Add, Link, gMainJianZong x316 y383 h20, <a>太宗帝剑延迟</a>
 
 ShowGuiMain(){
     Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire
@@ -301,10 +303,12 @@ MainCheckUpdate(){
 
 ; 主界面额外保存
 MainSaveEx(){
+    global YuanDiAttack
     global LvRen
     global ZhanFa
     global JianZong
     Gui Main:Submit, NoHide
+    SavePreset(GetNowSelectPreset(),"YuanDiAttackState", YuanDiAttack)
     SavePreset(GetNowSelectPreset(),"LvRenState", LvRen)
     SavePreset(GetNowSelectPreset(),"ZhanFaState", ZhanFa)
     SavePreset(GetNowSelectPreset(),"JianZongState", JianZong)
@@ -312,9 +316,12 @@ MainSaveEx(){
 
 ; 主界面额外读取
 MainLoadEx(){
+    global YuanDiAttack
     global LvRen
     global ZhanFa
     global JianZong
+    YuanDiAttack := LoadPreset(GetNowSelectPreset(),"YuanDiAttackState") || 0
+    GuiControl Main:, YuanDiAttack, %YuanDiAttack%
     LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState") || 0
     GuiControl Main:, LvRen, %LvRen%
     ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState") || 0
@@ -336,6 +343,11 @@ MainZhanFa(){
 ; 主界面选择剑宗功能
 MainJianZong(){
     ShowGuiJianZong()
+}
+
+; 主界面选择原地平X功能
+MainYuanDiAttack(){
+    ShowGuiYuanDiAttack()
 }
 
 MainAbout(){

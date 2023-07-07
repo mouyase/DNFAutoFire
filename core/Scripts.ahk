@@ -164,9 +164,15 @@ StartAutoFire(){
 
 StartEx(){
     global _AutoFireThreads
+    global YuanDiAttack
     global LvRen
     global ZhanFa
     global JianZong
+    if(YuanDiAttack){
+        skillKey := LoadPreset(GetNowSelectPreset(), "YuanDiAttackSkillKey")
+        SetOriginalBlocking(skillKey)
+        _AutoFireThreads.Push(new Thread("ExYuanDiAttack"))
+    }
     if(LvRen){
         _AutoFireThreads.Push(new Thread("ExLvRen"))
     }
@@ -174,7 +180,6 @@ StartEx(){
         _AutoFireThreads.Push(new Thread("ExZhanFa"))
     }
     if(JianZong){
-        UnlockSystemTimeLimit()
         skillKey := LoadPreset(GetNowSelectPreset(), "JianZongSkillKey")
         SetOriginalBlocking(skillKey)
         _AutoFireThreads.Push(new Thread("ExJianZong"))
@@ -190,7 +195,6 @@ StopAutoFire(){
     }
     _AutoFireThreads := []
     SetTrayRunningIcon(false)
-    RestoreSystemTimeLimit()
 }
 
 ; 设置所有关闭连发

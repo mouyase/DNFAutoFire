@@ -25,7 +25,7 @@ ListLines, Off
 SetStoreCapslockMode, Off
 SetKeyDelay, 1
 
-global __Version := "0.1.0"
+global __Version := "0.1.1"
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
@@ -50,6 +50,8 @@ global __Version := "0.1.0"
 #Include ./ex/ExZhanFa.ahk
 #Include ./gui/ex/JianZong.ahk
 #Include ./ex/ExJianZong.ahk
+#Include ./gui/ex/YuanDiAttack.ahk
+#Include ./ex/ExYuanDiAttack.ahk
 
 ;@Ahk2Exe-IgnoreBegin
 #Include <Log>
