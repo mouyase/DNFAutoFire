@@ -110,9 +110,9 @@ GetOriginKeyName(key){
 
 ; 用于屏蔽按键原始功能
 OriginalBlocking(key){
-    SendEvent, {Blind}{%key% Down}
+    SendInput, {Blind}{%key% Down}
     KeyWait, %key%
-    SendEvent, {Blind}{%key% Up}
+    SendInput, {Blind}{%key% Up}
 }
 
 ; 屏蔽按键原始功能

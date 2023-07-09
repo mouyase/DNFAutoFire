@@ -1,6 +1,7 @@
 ﻿GetUpdateInfo(){
+    GuiControl Main:Disabled, MainCheckUpdate
     req := ComObjCreate("Msxml2.XMLHTTP")
-    req.open("GET", "https://api.github.com/repos/mouyase/DNFAutoFire/releases/latest", true)
+    req.open("GET", "https://gh.yojigen.tech/https://api.github.com/repos/mouyase/DNFAutoFire/releases/latest", true)
     req.onreadystatechange := Func("OnGetUpdateInfo").Bind(req)
     req.send()
 }
@@ -15,13 +16,13 @@ OnGetUpdateInfo(req){
         json := JSON2Object(body)
         version := json["name"]
         info:= json["body"]
-        downloadUrl := json["assets"][1]["browser_download_url"]
+        downloadUrl := "https://gh.yojigen.tech/" . json["assets"][1]["browser_download_url"]
         size := json["assets"][1]["size"]
         info := RegExReplace(info, "\s\r\nMD5.+")
         if("v" . __Version != version){
-            MsgBox 0x2044, 检查更新, 当前版本 v%__Version%`n最新版本 %version%`n`n版本说明`n%info%`n是否立即更新并重启？
+            MsgBox 0x2044, 检查更新, 当前版本 v%__Version%`n最新版本 %version%`n`n版本说明`n%info%`n`n是否立即更新并重启？
             IfMsgBox Yes, {
-                DownloadToFile(downloadUrl,size)
+                DownloadToFile(downloadUrl, size)
             }
         }else{
             MsgBox 0x2040, , 已经是最新版本
@@ -29,6 +30,7 @@ OnGetUpdateInfo(req){
     } else {
         MsgBox 0x10, , 版本检查出错，请稍后重试
     }
+    GuiControl Main:Enable, MainCheckUpdate
 }
 
 DownloadToFile(url, size){

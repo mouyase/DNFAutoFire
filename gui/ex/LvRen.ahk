@@ -95,7 +95,7 @@ LvRenSaveConfig(){
 LvRenLoadConfig(){
     global __LvRenSkillKeys
     nowSelectPreset := GetNowSelectPreset()
-    shotKey := LoadPreset(GetNowSelectPreset(), "LvRenShotKey")
+    shotKey := LoadPreset(GetNowSelectPreset(), "LvRenShotKey", "Z")
     __LvRenSkillKeys := LvRenLoadKeys(GetNowSelectPreset())
     LvRenChangeListGui(__LvRenSkillKeys)
     GuiControl LvRen:, LvRenShotKey, %shotKey%

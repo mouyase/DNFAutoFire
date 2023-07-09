@@ -142,7 +142,7 @@ Gui Main:Add, Hotkey, vQuickChangeHotKey gMainSaveQuickChangeHotKey x150 y474 w1
 
 Gui Main:Add, Button, gMainHelp x734 y305 w96 h80, 帮助
 Gui Main:Add, Button, gMainAbout x838 y305 w96 h80, 关于
-Gui Main:Add, Button, gMainCheckUpdate x734 y392 w200 h50, 检查更新
+Gui Main:Add, Button, vMainCheckUpdate gMainCheckUpdate x734 y392 w200 h50, 检查更新
 Gui Main:Add, Button, gMainStart x734 y450 w200 h50, 启动连发
 
 Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
@@ -228,8 +228,7 @@ MainSavePreset(){
     global _AutoFireEnableKeys
     Gui Main:Submit, NoHide
     presetName := PresetNameEdit
-    if(presetName != "")
-    {
+    if(presetName != "") {
         SavePresetKeys(presetName, _AutoFireEnableKeys)
         MainSaveEx()
         SetNowSelectPreset(presetName)
@@ -303,15 +302,17 @@ MainCheckUpdate(){
 
 ; 主界面额外保存
 MainSaveEx(){
+    global PresetNameEdit
     global YuanDiAttack
     global LvRen
     global ZhanFa
     global JianZong
     Gui Main:Submit, NoHide
-    SavePreset(GetNowSelectPreset(),"YuanDiAttackState", YuanDiAttack)
-    SavePreset(GetNowSelectPreset(),"LvRenState", LvRen)
-    SavePreset(GetNowSelectPreset(),"ZhanFaState", ZhanFa)
-    SavePreset(GetNowSelectPreset(),"JianZongState", JianZong)
+    presetName := PresetNameEdit
+    SavePreset(presetName,"YuanDiAttackState", YuanDiAttack)
+    SavePreset(presetName,"LvRenState", LvRen)
+    SavePreset(presetName,"ZhanFaState", ZhanFa)
+    SavePreset(presetName,"JianZongState", JianZong)
 }
 
 ; 主界面额外读取
@@ -320,13 +321,13 @@ MainLoadEx(){
     global LvRen
     global ZhanFa
     global JianZong
-    YuanDiAttack := LoadPreset(GetNowSelectPreset(),"YuanDiAttackState") || 0
+    YuanDiAttack := LoadPreset(GetNowSelectPreset(),"YuanDiAttackState" , 0)
     GuiControl Main:, YuanDiAttack, %YuanDiAttack%
-    LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState") || 0
+    LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState" , 0)
     GuiControl Main:, LvRen, %LvRen%
-    ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState") || 0
+    ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState" , 0)
     GuiControl Main:, ZhanFa, %ZhanFa%
-    JianZong:= LoadPreset(GetNowSelectPreset(),"JianZongState") || 0
+    JianZong:= LoadPreset(GetNowSelectPreset(),"JianZongState" , 0)
     GuiControl Main:, JianZong, %JianZong%
 }
 

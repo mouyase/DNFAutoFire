@@ -4,8 +4,11 @@ SaveConfig(type, value){
 }
 
 ; 读取软件设置
-LoadConfig(type){
-    IniRead, value, config.ini, 设置, %type%, %A_Space%
+LoadConfig(type, default := ""){
+    if(default == ""){
+        default := A_Space
+    }
+    IniRead, value, config.ini, 设置, %type%, %default%
     return value
 }
 
@@ -21,9 +24,12 @@ SavePreset(presetsName, type, value){
 }
 
 ; 读取预设
-LoadPreset(presetsName, type){
+LoadPreset(presetsName, type, default := ""){
+    if(default == ""){
+        default := A_Space
+    }
     presetsName := StrReplace(presetsName, "`|")
-    IniRead, value, config.ini, 预设:%presetsName%, %type%, %A_Space%
+    IniRead, value, config.ini, 预设:%presetsName%, %type%, %default%
     return value
 }
 
@@ -61,7 +67,7 @@ LoadAllPreset(){
     presetList := []
     loop, Parse, config, `n, `r
     {
-        if(A_LoopField != "设置"){
+        if(A_LoopField != "设置" && A_LoopField != "预设:"){
             presetName := StrReplace(A_LoopField, "预设:")
             presetList.Push(presetName)
         }

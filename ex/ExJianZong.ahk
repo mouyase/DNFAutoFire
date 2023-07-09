@@ -10,8 +10,9 @@
         loop {
             if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
                 while, GetKeyState(skillKey, "P"){
+                    counterTime := A_TickCount - time
                     if(counterTime > delay){
-                        SendIP(keycode)
+                        log(counterTime)
                     }
                 }
                 counterTime := 0

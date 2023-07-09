@@ -53,8 +53,8 @@ JianZongSaveConfig(){
 ; 剑宗功能模块读取配置
 JianZongLoadConfig(){
     nowSelectPreset := GetNowSelectPreset()
-    skillKey := LoadPreset(GetNowSelectPreset(), "JianZongSkillKey")
+    skillKey := LoadPreset(GetNowSelectPreset(), "JianZongSkillKey" , "A")
     GuiControl JianZong:, JianZongSkillKey, %skillKey%
-    delay := LoadPreset(GetNowSelectPreset(), "JianZongDelay")
+    delay := LoadPreset(GetNowSelectPreset(), "JianZongDelay", "200")
     GuiControl JianZong:, JianZongDelay, %delay%
 }

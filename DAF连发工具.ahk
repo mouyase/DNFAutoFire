@@ -23,9 +23,8 @@ SetWorkingDir, %A_ScriptDir%
 SetBatchLines, -1
 ListLines, Off
 SetStoreCapslockMode, Off
-SetKeyDelay, 1
 
-global __Version := "0.1.1"
+global __Version := "0.1.2"
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>

@@ -95,7 +95,7 @@ ZhanFaSaveConfig(){
 ZhanFaLoadConfig(){
     global __ZhanFaSkillKeys
     nowSelectPreset := GetNowSelectPreset()
-    shotKey := LoadPreset(GetNowSelectPreset(), "ZhanFaShotKey")
+    shotKey := LoadPreset(GetNowSelectPreset(), "ZhanFaShotKey", "Space")
     __ZhanFaSkillKeys := ZhanFaLoadKeys(GetNowSelectPreset())
     ZhanFaChangeListGui(__ZhanFaSkillKeys)
     GuiControl ZhanFa:, ZhanFaShotKey, %shotKey%
