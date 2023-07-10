@@ -19,9 +19,9 @@ SettingGuiClose(){
 }
 
 ShowGuiSetting(){
+    SettingLoad()
     DisableGuiMain()
     Gui Setting:Show, w400 h300, 软件设置
-    SettingLoad()
 }
 
 HideGuiSetting(){
