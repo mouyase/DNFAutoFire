@@ -10,7 +10,6 @@
 ;@Ahk2Exe-SetProductVersion 0.1.0
 ;@Ahk2Exe-SetVersion 0.1.0
 
-
 #NoEnv
 
 #Persistent
@@ -43,6 +42,7 @@ global __Version := "0.1.2"
 #Include ./gui/Main.ahk
 #Include ./gui/QuickSwitch.ahk
 #Include ./gui/UpdateProgress.ahk
+#Include ./gui/Setting.ahk
 #Include ./gui/ex/LvRen.ahk
 #Include ./ex/ExLvRen.ahk
 #Include ./gui/ex/ZhanFa.ahk
@@ -65,8 +65,9 @@ Log()
 
 Menu, Tray, MainWindow
 Menu, Tray, Tip, DAF连发工具
-Menu, Tray , Add, 设置连发, ShowGui
-Menu, Tray , Default, 设置连发
+Menu, Tray , Add, 连发设置, ShowGuiMain
+Menu, Tray , Add, 软件设置, ShowGuiSetting
+Menu, Tray , Default, 连发设置
 Menu, Tray , Add
 Menu, Tray, Add, 退出连发,Exit
 
@@ -74,17 +75,19 @@ Exit(){
     ExitApp
 }
 
-ShowGui(){
-    ShowGuiMain()
-}
-
 global _AutoFireThreads := []
 global _AutoFireEnableKeys := []
 global _NowSelectPreset := LoadLastPreset()
 
-ShowGui()
+ShowGuiMain()
+if(_AutoStart){
+    Gui Main:Hide
+    StartAutoFire()
+}
 return
 
-; $LWin::
-; $RWin::
-; return
+#If _BlockWin && WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")
+    $LWin::
+    $RWin::
+    return
+#If

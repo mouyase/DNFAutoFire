@@ -140,12 +140,11 @@ Gui Main:Add, Button, gMainDeletePreset x212 y404 w58 h30, 删除配置
 Gui Main:Add, Text, x150 y450 w72 h24 +0x200, 快速切换热键
 Gui Main:Add, Hotkey, vQuickChangeHotKey gMainSaveQuickChangeHotKey x150 y474 w120 h20
 
-Gui Main:Add, Button, gMainHelp x734 y305 w96 h80, 帮助
-Gui Main:Add, Button, gMainAbout x838 y305 w96 h80, 关于
-Gui Main:Add, Button, vMainCheckUpdate gMainCheckUpdate x734 y392 w200 h50, 检查更新
-Gui Main:Add, Button, gMainStart x734 y450 w200 h50, 启动连发
+Gui Main:Add, Button, gMainSetting x838 y305 w96 h60, 软件设置
+Gui Main:Add, Button, vMainCheckUpdate gMainCheckUpdate x838 y372 w96 h60, 检查更新
+Gui Main:Add, Button, gMainStart x838 y440 w96 h60, 启动连发
 
-Gui Main:Add, GroupBox, x290 y300 w438 h200, 其他功能
+Gui Main:Add, GroupBox, x290 y300 w538 h200, 其他功能
 
 Gui Main:Add, CheckBox, vYuanDiAttack x298 y320 h20 w16
 Gui Main:Add, Link, gMainYuanDiAttack x316 y323 h20, <a>原地平X(Beta)</a>
@@ -213,7 +212,7 @@ MainKeyClick() {
 
 ; 主界面启动按钮事件，启动连发
 MainStart(){
-    Gui Main:Submit
+    Gui Main:Hide
     StartAutoFire()
 }
 
@@ -296,6 +295,11 @@ MainLoadAllPreset(){
 }
 
 ; 主界面点击检查更新
+MainSetting(){
+    ShowGuiSetting()
+}
+
+; 主界面点击检查更新
 MainCheckUpdate(){
     GetUpdateInfo()
 }
@@ -349,14 +353,6 @@ MainJianZong(){
 ; 主界面选择原地平X功能
 MainYuanDiAttack(){
     ShowGuiYuanDiAttack()
-}
-
-MainAbout(){
-    MsgBox 0x2040, 关于DAF连发, 作者： 某亚瑟`n图标： Ousumu`n`n源码：https://github.com/mouyase/DNFAutoFire
-}
-
-MainHelp(){
-    MsgBox 0x2020, 如何使用DAF连发工具, 1、点击窗口中的键盘，将想启动连发的键位变成红色`n2、输入配置名称，保存配置`n3、点击启动连发，即可使用`n`nPS：在游戏中可以打开快速切换窗口，使用上下键和回车可以快速切换已经保存的配置，记得设置快捷键哦，默认快捷键 Alt + `` （键盘1左边，Tab上边的那个）
 }
 
 ; 主界面配置列表点击事件

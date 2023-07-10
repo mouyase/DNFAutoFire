@@ -88,10 +88,10 @@ LoadAllPresetString(){
 
 ; 保存上次的预设
 SaveLastPreset(presetName){
-    SaveConfig("上次的预设", presetName)
+    SaveConfig("LastPreset", presetName)
 }
 
 ; 读取上次的预设
 LoadLastPreset(){
-    return LoadConfig("上次的预设")
+    return LoadConfig("LastPreset")
 }

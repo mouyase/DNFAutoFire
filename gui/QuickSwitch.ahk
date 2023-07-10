@@ -16,15 +16,17 @@ QuickSwitchGuiClose(){
 
 QuickSwitchStart(){
     global QuickSwitchList
-    Gui QuickSwitch:Submit
+    Gui QuickSwitch:Submit, NoHide
     presetName := QuickSwitchList
     ChangePreset(presetName)
     StartAutoFire()
+    HideGuiQuickSwitch()
 }
 
 QuickSwitchStop(){
-    Gui QuickSwitch:Submit
+    Gui QuickSwitch:Submit, NoHide
     StopAutoFire()
+    HideGuiQuickSwitch()
 }
 
 ShowGuiQuickSwitch(){
