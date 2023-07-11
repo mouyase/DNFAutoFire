@@ -23,7 +23,7 @@ SetBatchLines, -1
 ListLines, Off
 SetStoreCapslockMode, Off
 
-global __Version := "0.1.2"
+global __Version := "0.1.2Fix1"
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
@@ -84,10 +84,5 @@ if(_AutoStart){
     Gui Main:Hide
     StartAutoFire()
 }
-return
 
-#If _BlockWin && WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")
-    $LWin::
-    $RWin::
-    return
-#If
+return

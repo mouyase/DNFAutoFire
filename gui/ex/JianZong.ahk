@@ -18,7 +18,6 @@ HideGuiJianZong(){
     EnableGuiMain()
 }
 
-
 JianZongGuiEscape(){
     HideGuiJianZong()
 }

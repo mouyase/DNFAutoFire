@@ -4,19 +4,20 @@
     if(LoadPreset(LoadLastPreset(),"LvRenState")){
         ShotKey := LoadPreset(LoadLastPreset(), "LvRenShotKey")
         SkillKeys := LvRenLoadKeys(LoadLastPreset())
-        keycode := Key2NoVkSC(ShotKey)
+        keyCode := Key2NoVkSC(ShotKey)
+        keySC := Key2SC(ShotKey)
         loop {
             if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
                 isNeedSend := false
                 for _, key in SkillKeys{
-                    if (GetKeyState(key, "P")) {
+                    if (GetKeyState(keySC, "P")) {
                         isNeedSend := true
                         break
                     }
                 }
                 if (isNeedSend) {
                     Sleep, 1
-                    SendIP(keycode)
+                    SendIP(keyCode)
                 }
             }
             Sleep, 1

@@ -110,7 +110,8 @@ GetOriginKeyName(key){
 
 ; 用于屏蔽按键原始功能
 OriginalBlocking(key){
-    SendInput, {Blind}{%key% Down}
+    SendInput, {Blind}{%key% DownTemp}
+    Sleep, 1
     KeyWait, %key%
     SendInput, {Blind}{%key% Up}
 }
@@ -118,10 +119,11 @@ OriginalBlocking(key){
 ; 屏蔽按键原始功能
 SetOriginalBlocking(key){
     keyName := GetOriginKeyName(key)
-    keyName := Key2SC(keyName)
-    fn := Func("OriginalBlocking").Bind(Format("{:L}", keyName))
-    Hotkey, $*%keyName%, %fn%
-    Hotkey, $*%keyName%, On
+    keySC := Key2SC(keyName)
+    fn := Func("OriginalBlocking").Bind(Format("{:L}", keySC))
+    try{
+        Hotkey, $*%keySC%, %fn%, On
+    }
 }
 
 ; 恢复按键原始功能

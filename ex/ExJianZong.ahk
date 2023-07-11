@@ -4,15 +4,16 @@
     if(LoadPreset(LoadLastPreset(),"JianZongState")){
         skillKey := LoadPreset(LoadLastPreset(), "JianZongSkillKey")
         delay := LoadPreset(LoadLastPreset(), "JianZongDelay")
-        keycode := Key2NoVkSC(skillKey)
+        keyCode := Key2NoVkSC(skillKey)
+        keySC := Key2NoVkSC(skillKey)
         counterTime := 0
         time := A_TickCount
         loop {
             if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
-                while, GetKeyState(skillKey, "P"){
+                while, GetKeyState(keySC, "P"){
                     counterTime := A_TickCount - time
                     if(counterTime > delay){
-                        log(counterTime)
+                        SendIP(keyCode)
                     }
                 }
                 counterTime := 0

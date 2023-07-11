@@ -80,11 +80,11 @@ ExYuanDiAttackSettingTool(){
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"YuanDiAttackState")){
         skillKey := LoadPreset(LoadLastPreset(), "YuanDiAttackSkillKey")
-        keycode := Key2NoVkSC(skillKey)
+        keyCode := Key2NoVkSC(skillKey)
         loop {
             if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
                 while, GetKeyState(skillKey, "P") {
-                    SendIP(keycode)
+                    SendIP(keyCode)
                 }
             }
             Sleep, 1

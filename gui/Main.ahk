@@ -122,7 +122,7 @@ Gui Main:Add, Text, vNumLk gMainKeyClick x770 y80 w36 h36 +0x200 +0x400000 +Cent
 Gui Main:Font
 
 Gui Main:Font, s9
-Gui Main:Add, Text, x770 y34, 当前版本：v%__Version%
+Gui Main:Add, Text, x770 y34, 当前版本: v%__Version%
 Gui Main:Add, Link, x770 y54, <a href="https://bbs.colg.cn/thread-8894989-1-1.html">Colg</a> <a href="https://github.com/mouyase/DNFAutoFire">Github</a>
 Gui Main:Add, Button, gMainClear x890 y30 w36 h36 +0x200 +Center, 清空
 Gui Main:Font
@@ -325,13 +325,13 @@ MainLoadEx(){
     global LvRen
     global ZhanFa
     global JianZong
-    YuanDiAttack := LoadPreset(GetNowSelectPreset(),"YuanDiAttackState" , 0)
+    YuanDiAttack := LoadPreset(GetNowSelectPreset(),"YuanDiAttackState", false)
     GuiControl Main:, YuanDiAttack, %YuanDiAttack%
-    LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState" , 0)
+    LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState", false)
     GuiControl Main:, LvRen, %LvRen%
-    ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState" , 0)
+    ZhanFa:= LoadPreset(GetNowSelectPreset(),"ZhanFaState", false)
     GuiControl Main:, ZhanFa, %ZhanFa%
-    JianZong:= LoadPreset(GetNowSelectPreset(),"JianZongState" , 0)
+    JianZong:= LoadPreset(GetNowSelectPreset(),"JianZongState", false)
     GuiControl Main:, JianZong, %JianZong%
 }
 
@@ -377,8 +377,7 @@ MainSaveQuickChangeHotKey(){
     Hotkey, ~$%quickChangeHotKeyConfig%, Off
     SaveConfig("QuickChangeHotKey", QuickChangeHotKey)
     fn := Func("ShowGuiQuickSwitch")
-    Hotkey, ~$%QuickChangeHotKey%, %fn%
-    Hotkey, ~$%QuickChangeHotKey%, On
+    Hotkey, ~$%QuickChangeHotKey%, %fn%, On
 }
 
 ; 主界面读取热键
@@ -388,7 +387,6 @@ MainLoatQuickChangeHotKey(){
         quickChangeHotKey := "!``"
     }
     fn := Func("ShowGuiQuickSwitch")
-    Hotkey, ~$%QuickChangeHotKey%, %fn%
-    Hotkey, ~$%QuickChangeHotKey%, On
+    Hotkey, ~$%QuickChangeHotKey%, %fn%, On
     GuiControl Main:, QuickChangeHotKey, %quickChangeHotKey%
 }

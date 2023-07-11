@@ -1,6 +1,6 @@
-SendIP(keycode){
-    SendInput, {Blind}{%keycode% DownTemp}
+SendIP(keyCode){
+    SendInput, {Blind}{%keyCode% DownTemp}
     Sleep, 1
-    SendInput, {Blind}{%keycode% Up}
+    SendInput, {Blind}{%keyCode% Up}
     Sleep, 1
 }

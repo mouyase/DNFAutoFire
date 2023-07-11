@@ -102,9 +102,7 @@ YuanDiAttackGetTime(){
     global YuanDiAttackSkillKey
     Gui YuanDiAttack:Submit, NoHide
     fn1 := Func("ExYuanDiAttackGetDelayTime")
-    Hotkey, $1, %fn1%
-    Hotkey, $1, On
+    Hotkey, $1, %fn1%, On
     fn2 := Func("ExYuanDiAttackGetLoopTime")
-    Hotkey, $2, %fn2%
-    Hotkey, $2, On
+    Hotkey, $2, %fn2%, On
 }
