@@ -1,7 +1,7 @@
 ﻿GetUpdateInfo(){
     GuiControl Main:Disabled, MainCheckUpdate
     req := ComObjCreate("Msxml2.XMLHTTP")
-    req.open("GET", "https://gh.yojigen.tech/https://api.github.com/repos/mouyase/DNFAutoFire/releases/latest", true)
+    req.open("GET", "https://daf.yojigen.tech/api", true)
     req.onreadystatechange := Func("OnGetUpdateInfo").Bind(req)
     req.send()
 }
@@ -16,7 +16,7 @@ OnGetUpdateInfo(req){
         json := JSON2Object(body)
         version := json["name"]
         info:= json["body"]
-        downloadUrl := "https://gh.yojigen.tech/" . json["assets"][1]["browser_download_url"]
+        downloadUrl := "https://ghproxy.com/" . json["assets"][1]["browser_download_url"]
         size := json["assets"][1]["size"]
         info := RegExReplace(info, "\s\r\nMD5.+")
         if("v" . __Version != version){
@@ -63,6 +63,7 @@ DownloadToFile(url, size){
         command := "@echo off`r`ntaskkill /f /im DAF连发工具.exe`r`ntimeout /t 3 /nobreak > NUL`r`ndel DAF连发工具.exe`r`ntimeout /t 3 /nobreak > NUL`r`nren DNFAutoFire.exe DAF连发工具.exe`r`ntimeout /t 1 /nobreak > NUL`r`nstart DAF连发工具.exe"
         file.Write(command)
         file.Close()
+        Sleep, 1000
         Run, Update.bat
     } catch e
         return % e.message
