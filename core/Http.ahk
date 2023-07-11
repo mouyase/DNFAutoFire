@@ -14,7 +14,7 @@ OnGetUpdateInfo(req){
     if (req.status == 200){
         body := req.ResponseText
         json := JSON2Object(body)
-        version := json["name"]
+        version := json["tag_name"]
         info:= json["body"]
         downloadUrl := "https://ghproxy.com/" . json["assets"][1]["browser_download_url"]
         size := json["assets"][1]["size"]
