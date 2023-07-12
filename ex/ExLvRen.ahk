@@ -7,7 +7,7 @@
         keyCode := Key2NoVkSC(ShotKey)
         keySCs := []
         for _, key in SkillKeys{
-            keySCs.Push(Key2SC(ShotKey))
+            keySCs.Push(Key2SC(key))
         }
         loop {
             if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {

@@ -5,7 +5,7 @@
         skillKey := LoadPreset(LoadLastPreset(), "JianZongSkillKey")
         delay := LoadPreset(LoadLastPreset(), "JianZongDelay")
         keyCode := Key2NoVkSC(skillKey)
-        keySC := Key2NoVkSC(skillKey)
+        keySC := Key2SC(skillKey)
         counterTime := 0
         time := A_TickCount
         loop {

@@ -5,11 +5,14 @@
         ShotKey := LoadPreset(LoadLastPreset(), "ZhanFaShotKey")
         SkillKeys := ZhanFaLoadKeys(LoadLastPreset())
         keyCode := Key2NoVkSC(ShotKey)
-        keySC := Key2SC(ShotKey)
+        keySCs := []
+        for _, key in SkillKeys{
+            keySCs.Push(Key2SC(key))
+        }
         loop {
             if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
                 isNeedSend := false
-                for _, key in SkillKeys{
+                for _, keySC in keySCs{
                     if (GetKeyState(keySC, "P")) {
                         isNeedSend := true
                         break
