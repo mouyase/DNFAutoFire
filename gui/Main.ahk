@@ -251,11 +251,10 @@ MainClonePreset(){
     global PresetNameEdit
     global _AutoFireEnableKeys
     Gui Main:Submit, NoHide
-    presetName := PresetNameEdit . "-克隆"
     if(PresetNameEdit != "")
     {
-        SavePresetKeys(presetName, _AutoFireEnableKeys)
-        MainSaveEx()
+        ClonePreset(PresetNameEdit)
+        presetName := PresetNameEdit . "-克隆"
         SetNowSelectPreset(presetName)
         MainLoadAllPreset()
     } else {

@@ -95,3 +95,9 @@ SaveLastPreset(presetName){
 LoadLastPreset(){
     return LoadConfig("LastPreset")
 }
+
+; 克隆配置
+ClonePreset(presetName){
+    IniRead, config, config.ini, 预设:%presetName%
+    IniWrite, %config%, config.ini, 预设:%presetName%-克隆
+}

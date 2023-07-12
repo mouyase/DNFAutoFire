@@ -23,7 +23,7 @@ SetBatchLines, -1
 ListLines, Off
 SetStoreCapslockMode, Off
 
-global __Version := "0.1.2Fix1"
+global __Version := "0.1.2Fix2"
 
 #Include <RunWithAdministrator>
 #Include <MultipleThread>
