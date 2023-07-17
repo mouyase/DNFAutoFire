@@ -16,7 +16,7 @@
         rightKeycode := Key2NoVkSC(rightKey)
         direction := "无"
         loop {
-            if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+            if(WinActive("ahk_group DNF")) {
                 while, GetKeyState(skillKey, "P"){
                     if(GetKeyState(leftKey, "P")){
                         direction := "面向左"
@@ -82,7 +82,7 @@ ExYuanDiAttackSettingTool(){
         skillKey := LoadPreset(LoadLastPreset(), "YuanDiAttackSkillKey")
         keyCode := Key2NoVkSC(skillKey)
         loop {
-            if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+            if(WinActive("ahk_group DNF")) {
                 while, GetKeyState(skillKey, "P") {
                     SendIP(keyCode)
                 }
@@ -106,7 +106,7 @@ ExYuanDiAttackGetDelayTime(){
     isNeedGetLeftUp := false
     ShowTip("开始检测平X方向延迟")
     loop{
-        if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+        if(WinActive("ahk_group DNF")) {
             while, GetKeyState(YuanDiAttackSkillKey, "P") {
                 if(isNeedGetAttackDown){
                     time1 := A_TickCount
@@ -152,7 +152,7 @@ ExYuanDiAttackGetLoopTime(){
     isNeedGetAttackUp := false
     ShowTip("开始检测平X每轮时间")
     loop{
-        if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+        if(WinActive("ahk_group DNF")) {
             while, GetKeyState(YuanDiAttackSkillKey, "P") {
                 if(isNeedGetAttackDown){
                     time1 := A_TickCount

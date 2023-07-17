@@ -9,7 +9,7 @@
         counterTime := 0
         time := A_TickCount
         loop {
-            if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+            if(WinActive("ahk_group DNF")) {
                 while, GetKeyState(keySC, "P"){
                     counterTime := A_TickCount - time
                     if(counterTime > delay){

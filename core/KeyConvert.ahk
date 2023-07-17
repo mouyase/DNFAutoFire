@@ -17,7 +17,7 @@ Key2SC(key){
 }
 
 ; 按键转换为虚拟码
-Key2Vk(key){
+Key2VK(key){
     vk := GetKeyVK(key)
     return Format("vk{1:02X}", vk)
 }

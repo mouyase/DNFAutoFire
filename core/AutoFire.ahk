@@ -1,9 +1,9 @@
 ﻿AutoFire(key){
     Process, Priority,, High
     keyCode := Key2NoVkSC(key)
-    keySC := Key2Sc(key)
+    keySC := Key2SC(key)
     loop {
-        if(WinActive("ahk_class 地下城与勇士") or WinActive("ahk_exe DNF.exe")) {
+        if(WinActive("ahk_group DNF")) {
             while, GetKeyState(keySC, "P") {
                 SendIP(keyCode)
             }

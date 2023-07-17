@@ -212,7 +212,7 @@ MainKeyClick() {
 
 ; 主界面启动按钮事件，启动连发
 MainStart(){
-    Gui Main:Hide
+    HideGuiMain()
     StartAutoFire()
 }
 

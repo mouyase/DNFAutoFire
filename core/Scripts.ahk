@@ -269,6 +269,7 @@ DeleteValueInArray(value, array){
 ShowTip(text){
     ToolTip, %text%
     SetTimer, CloseTip, -3000
+    WinActivate, ahk_group DNF
 }
 
 CloseTip(){

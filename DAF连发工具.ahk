@@ -18,6 +18,7 @@
 #MaxHotkeysPerInterval, 9999
 #InstallKeybdHook
 #MaxThreadsBuffer, Off
+#WinActivateForce
 SetWorkingDir, %A_ScriptDir%
 SetBatchLines, -1
 ListLines, Off
