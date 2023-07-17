@@ -81,6 +81,7 @@ global _AutoFireEnableKeys := []
 global _NowSelectPreset := LoadLastPreset()
 
 ShowGuiMain()
+SetDNFWindowClass()
 if(_AutoStart){
     Gui Main:Hide
     StartAutoFire()

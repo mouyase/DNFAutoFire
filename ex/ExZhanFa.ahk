@@ -1,5 +1,6 @@
 ﻿ExZhanFa(){
     Process, Priority,, High
+    SetDNFWindowClass()
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"ZhanFaState")){
         ShotKey := LoadPreset(LoadLastPreset(), "ZhanFaShotKey")

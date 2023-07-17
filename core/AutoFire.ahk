@@ -1,5 +1,6 @@
 ﻿AutoFire(key){
     Process, Priority,, High
+    SetDNFWindowClass()
     keyCode := Key2NoVkSC(key)
     keySC := Key2SC(key)
     loop {

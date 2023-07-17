@@ -1,5 +1,6 @@
 ﻿ExJianZong(){
     Process, Priority,, High
+    SetDNFWindowClass()
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"JianZongState")){
         skillKey := LoadPreset(LoadLastPreset(), "JianZongSkillKey")

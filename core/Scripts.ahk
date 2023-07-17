@@ -269,9 +269,14 @@ DeleteValueInArray(value, array){
 ShowTip(text){
     ToolTip, %text%
     SetTimer, CloseTip, -3000
-    WinActivate, ahk_group DNF
+    WinActivate, ahk_class 地下城与勇士
 }
 
 CloseTip(){
     ToolTip,
+}
+
+SetDNFWindowClass(){
+    GroupAdd, DNF, ahk_class 地下城与勇士
+    GroupAdd, DNF, ahk_class Dungeon & Fighter
 }

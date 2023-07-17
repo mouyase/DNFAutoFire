@@ -1,5 +1,6 @@
 ﻿ExYuanDiAttack(){
     Process, Priority,, High
+    SetDNFWindowClass()
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"YuanDiAttackState")){
         skillKey := LoadPreset(presetName, "YuanDiAttackSkillKey")
@@ -76,7 +77,6 @@
 
 ExYuanDiAttackSettingTool(){
     Process, Priority,, High
-    log("啊？")
     presetName := LoadLastPreset()
     if(LoadPreset(LoadLastPreset(),"YuanDiAttackState")){
         skillKey := LoadPreset(LoadLastPreset(), "YuanDiAttackSkillKey")
