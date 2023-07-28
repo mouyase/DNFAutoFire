@@ -15,7 +15,6 @@ OnGetUpdateInfo(req){
         body := req.ResponseText
         json := JSON2Object(body)
         version := json["tag_name"]
-        log(version)
         info:= json["body"]
         downloadUrl := "https://ghproxy.com/https://github.com/mouyase/DNFAutoFire/releases/download/" . version . "/DNFAutoFire.exe"
         size := json["assets"][1]["size"]
