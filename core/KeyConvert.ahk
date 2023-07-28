@@ -21,3 +21,12 @@ Key2VK(key){
     vk := GetKeyVK(key)
     return Format("vk{1:02X}", vk)
 }
+
+; 按键转换为检测按下的物理按键
+Key2PressKey(key){
+    newKey := Key2SC(key)
+    if (InStr(key, "Num")){
+        newKey := key
+    }
+    return newKey
+}

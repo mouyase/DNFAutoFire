@@ -119,17 +119,21 @@ OriginalBlocking(key){
 ; 屏蔽按键原始功能
 SetOriginalBlocking(key){
     keyName := GetOriginKeyName(key)
-    keySC := Key2SC(keyName)
-    fn := Func("OriginalBlocking").Bind(Format("{:L}", keySC))
+    if (!InStr(keyName, "Num")){
+        keyName := Key2SC(keyName)
+    }
+    fn := Func("OriginalBlocking").Bind(Format("{:L}", keyName))
     try{
-        Hotkey, $*%keySC%, %fn%, On
+        Hotkey, $*%keyName%, %fn%, On
     }
 }
 
 ; 恢复按键原始功能
 SetOriginalDirect(key){
     keyName := GetOriginKeyName(key)
-    keyName := Key2SC(keyName)
+    if (!InStr(keyName, "Num")){
+        keyName := Key2SC(keyName)
+    }
     try{
         Hotkey, $*%keyName%, Off
     }

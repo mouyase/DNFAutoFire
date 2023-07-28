@@ -15,14 +15,17 @@
         skillKeycode := Key2NoVkSC(skillKey)
         leftKeycode := Key2NoVkSC(leftKey)
         rightKeycode := Key2NoVkSC(rightKey)
+        skillPressKey := Key2PressKey(skillKey)
+        leftPressKey := Key2PressKey(leftKey)
+        rightPressKey := Key2PressKey(rightKey)
         direction := "无"
         loop {
             if(WinActive("ahk_group DNF")) {
-                while, GetKeyState(skillKey, "P"){
-                    if(GetKeyState(leftKey, "P")){
+                while, GetKeyState(skillPressKey, "P"){
+                    if(GetKeyState(leftPressKey, "P")){
                         direction := "面向左"
                     }
-                    if(GetKeyState(rightKey, "P")){
+                    if(GetKeyState(rightPressKey, "P")){
                         direction := "面向右"
                     }
                     if(direction != "无"){
@@ -31,7 +34,7 @@
                         while, counterTime < counterTime1{
                             SendIP(skillKeycode)
                             counterTime := A_TickCount - time
-                            if(!GetKeyState(skillKey)){
+                            if(!GetKeyState(skillPressKey)){
                                 SendInput, {Blind}{%rightKeycode% Up}
                                 SendInput, {Blind}{%leftKeycode% Up}
                                 break, 2
@@ -48,7 +51,7 @@
                         while, counterTime < counterTime2{
                             SendIP(skillKeycode)
                             counterTime := A_TickCount - time
-                            if(!GetKeyState(skillKey)){
+                            if(!GetKeyState(skillPressKey)){
                                 SendInput, {Blind}{%rightKeycode% Up}
                                 SendInput, {Blind}{%leftKeycode% Up}
                                 break, 2
@@ -60,7 +63,7 @@
                         if(direction == "面向右"){
                             SendInput, {Blind}{%leftKeycode% Up}
                         }
-                        if(!GetKeyState(skillKey)){
+                        if(!GetKeyState(skillPressKey)){
                             break
                         }
                         Sleep, counterTime3

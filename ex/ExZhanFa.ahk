@@ -6,15 +6,15 @@
         ShotKey := LoadPreset(LoadLastPreset(), "ZhanFaShotKey")
         SkillKeys := ZhanFaLoadKeys(LoadLastPreset())
         keyCode := Key2NoVkSC(ShotKey)
-        keySCs := []
+        pressKeys := []
         for _, key in SkillKeys{
-            keySCs.Push(Key2SC(key))
+            pressKeys.Push(Key2PressKey(key))
         }
         loop {
             if(WinActive("ahk_group DNF")) {
                 isNeedSend := false
-                for _, keySC in keySCs{
-                    if (GetKeyState(keySC, "P")) {
+                for _, pressKey in pressKeys{
+                    if (GetKeyState(pressKey, "P")) {
                         isNeedSend := true
                         break
                     }

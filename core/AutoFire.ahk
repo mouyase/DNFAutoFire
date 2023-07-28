@@ -2,10 +2,10 @@
     Process, Priority,, High
     SetDNFWindowClass()
     keyCode := Key2NoVkSC(key)
-    keySC := Key2SC(key)
+    pressKey := Key2PressKey(key)
     loop {
         if(WinActive("ahk_group DNF")) {
-            while, GetKeyState(keySC, "P") {
+            while, GetKeyState(pressKey, "P") {
                 SendIP(keyCode)
             }
         }
