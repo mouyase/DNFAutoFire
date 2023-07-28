@@ -17,8 +17,7 @@ OnGetUpdateInfo(req){
         version := json["tag_name"]
         log(version)
         info:= json["body"]
-        ; downloadUrl := "https://ghproxy.com/" . json["assets"][1]["browser_download_url"]
-        downloadUrl := "https://ghproxy.com/https://github.com/mouyase/DNFAutoFire/releases/download/" . version . "/DNFAutoFire." . version . ".zip"
+        downloadUrl := "https://ghproxy.com/https://github.com/mouyase/DNFAutoFire/releases/download/" . version . "/DNFAutoFire." . version . ".exe"
         size := json["assets"][1]["size"]
         info := RegExReplace(info, "\s\r\nMD5.+")
         if("v" . __Version != version){
