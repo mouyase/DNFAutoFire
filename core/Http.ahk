@@ -1,7 +1,7 @@
 ﻿GetUpdateInfo(){
     GuiControl Main:Disabled, MainCheckUpdate
     req := ComObjCreate("Msxml2.XMLHTTP")
-    req.open("GET", "https://daf.yojigen.tech/api", true)
+    req.open("GET", "https://ghproxy.com/https://raw.githubusercontent.com/mouyase/DNFAutoFire/main/Version", true)
     req.onreadystatechange := Func("OnGetUpdateInfo").Bind(req)
     req.send()
 }
@@ -15,6 +15,7 @@ OnGetUpdateInfo(req){
         body := req.ResponseText
         json := JSON2Object(body)
         version := json["tag_name"]
+        log(version)
         info:= json["body"]
         ; downloadUrl := "https://ghproxy.com/" . json["assets"][1]["browser_download_url"]
         downloadUrl := "https://ghproxy.com/https://github.com/mouyase/DNFAutoFire/releases/download/" . version . "/DNFAutoFire." . version . ".zip"
