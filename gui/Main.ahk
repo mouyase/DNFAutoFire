@@ -154,6 +154,8 @@ Gui Main:Add, CheckBox, vZhanFa x298 y360 h20 w16
 Gui Main:Add, Link, gMainZhanFa x316 y363 h20, <a>战法自动炫纹</a>
 Gui Main:Add, CheckBox, vJianZong x298 y380 h20 w16
 Gui Main:Add, Link, gMainJianZong x316 y383 h20, <a>太宗帝剑延迟</a>
+Gui Main:Add, CheckBox, vGuanYu x298 y400 h20 w16
+Gui Main:Add, Link, gMainGuanYu x316 y403 h20, <a>关羽自动啪啪啪</a>
 
 ShowGuiMain(){
     Gui Main:Show, w940 h510, DAF连发工具 - DNF AutoFire
@@ -310,12 +312,14 @@ MainSaveEx(){
     global LvRen
     global ZhanFa
     global JianZong
+    global GuanYu
     Gui Main:Submit, NoHide
     presetName := PresetNameEdit
     SavePreset(presetName,"YuanDiAttackState", YuanDiAttack)
     SavePreset(presetName,"LvRenState", LvRen)
     SavePreset(presetName,"ZhanFaState", ZhanFa)
     SavePreset(presetName,"JianZongState", JianZong)
+    SavePreset(presetName,"GuanYuState", GuanYu)
 }
 
 ; 主界面额外读取
@@ -324,6 +328,7 @@ MainLoadEx(){
     global LvRen
     global ZhanFa
     global JianZong
+    global GuanYu
     YuanDiAttack := LoadPreset(GetNowSelectPreset(),"YuanDiAttackState", false)
     GuiControl Main:, YuanDiAttack, %YuanDiAttack%
     LvRen:= LoadPreset(GetNowSelectPreset(),"LvRenState", false)
@@ -332,6 +337,8 @@ MainLoadEx(){
     GuiControl Main:, ZhanFa, %ZhanFa%
     JianZong:= LoadPreset(GetNowSelectPreset(),"JianZongState", false)
     GuiControl Main:, JianZong, %JianZong%
+    GuanYu:= LoadPreset(GetNowSelectPreset(),"GuanYuState", false)
+    GuiControl Main:, GuanYu, %GuanYu%
 }
 
 ; 主界面选择旅人功能
@@ -352,6 +359,11 @@ MainJianZong(){
 ; 主界面选择原地平X功能
 MainYuanDiAttack(){
     ShowGuiYuanDiAttack()
+}
+
+; 主界面选择关羽自动啪啪啪功能
+MainGuanYu(){
+    ShowGuiGuanYu()
 }
 
 ; 主界面配置列表点击事件

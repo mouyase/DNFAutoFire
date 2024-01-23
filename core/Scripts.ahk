@@ -174,6 +174,7 @@ StartEx(){
     global LvRen
     global ZhanFa
     global JianZong
+    global GuanYu
     if(YuanDiAttack){
         skillKey := LoadPreset(GetNowSelectPreset(), "YuanDiAttackSkillKey")
         SetOriginalBlocking(skillKey)
@@ -189,6 +190,9 @@ StartEx(){
         skillKey := LoadPreset(GetNowSelectPreset(), "JianZongSkillKey")
         SetOriginalBlocking(skillKey)
         _AutoFireThreads.Push(new Thread("ExJianZong"))
+    }
+    If (GuanYu){
+        _AutoFireThreads.Push(new Thread("ExGuanYu"))
     }
 }
 

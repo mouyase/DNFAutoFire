@@ -52,6 +52,8 @@ global __Version := "0.1.2Fix3"
 #Include ./ex/ExJianZong.ahk
 #Include ./gui/ex/YuanDiAttack.ahk
 #Include ./ex/ExYuanDiAttack.ahk
+#Include ./gui/ex/GuanYu.ahk
+#Include ./ex/ExGuanYu.ahk
 
 ;@Ahk2Exe-IgnoreBegin
 #Include <Log>
