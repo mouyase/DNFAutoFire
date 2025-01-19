@@ -6,6 +6,7 @@ from config import Config
 from keyboard_ui import KeyboardLayout
 from config_ui import ConfigManager
 from auto_clicker import AutoClicker, ClickerState
+from vk_clicker import VirtualKeyClicker
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -71,14 +72,8 @@ class MainWindow(QMainWindow):
         if not active_keys:
             QMessageBox.warning(self, "警告", "请先选择要连发的按键")
             return
-        
-        if self.auto_clicker.state == ClickerState.STOPPED:
-            self.auto_clicker.configure_keys(active_keys)
-            self.auto_clicker.start()
-            QMessageBox.information(self, "成功", f"已启动连发：{', '.join(active_keys)}")
-        else:
-            self.auto_clicker.stop()
-            QMessageBox.information(self, "成功", "已停止连发")
+        clicker = VirtualKeyClicker()
+        clicker.start()
 
 def main():
     app = QApplication(sys.argv)

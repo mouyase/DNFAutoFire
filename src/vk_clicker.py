@@ -8,8 +8,16 @@ from dataclasses import dataclass
 from typing import Dict
 
 # 常量定义
-TARGET_WINDOWS = ["地下城与勇士", "DNF"]
+DNF_WINDOW_IDENTIFIERS = ["地下城与勇士", "DNF"]
 KEY_LOOP_INTERVAL = 0.001  # 1ms的循环间隔
+
+# 定义需要连发的按键及其虚拟键码
+MONITORED_KEYS = {
+    'j': {'name': 'J键', 'vk': 0xFF, 'scan': 0x24},  # 36
+    'p': {'name': 'P键', 'vk': 0xFF, 'scan': 0x19},  # 25
+    'l': {'name': 'L键', 'vk': 0xFF, 'scan': 0x26},  # 38
+    'h': {'name': 'H键', 'vk': 0xFF, 'scan': 0x23}   # 35
+}
 
 @dataclass
 class KeyState:
@@ -27,30 +35,28 @@ class KeyState:
 class VirtualKeyClicker:
     def __init__(self):
         self.running = True
-        self.key_states: Dict[str, KeyState] = {}
-        self._is_target_active = False
-
-    def configure_keys(self, keys_config: Dict[str, Dict]):
-        """配置需要连发的按键
-        例如: {
-            'j': {'name': 'J键', 'vk': 0x4A, 'scan': 0x24},
-            'k': {'name': 'K键', 'vk': 0x4B, 'scan': 0x25}
-        }
-        """
-        self.key_states = {
+        self.key_states: Dict[str, KeyState] = {
             key: KeyState(
                 name=info['name'],
                 vk=info['vk'],
                 scan=info['scan']
             ) 
-            for key, info in keys_config.items()
+            for key, info in MONITORED_KEYS.items()
         }
+        self._is_dnf_active = False
 
     def send_key_once(self, key_state: KeyState):
         """发送单次按键"""
         try:
-            win32api.keybd_event(key_state.vk, key_state.scan, 0, 0)
-            time.sleep(0.001)
+            # 发送按键按下
+            win32api.keybd_event(
+                key_state.vk,          # 虚拟键码
+                key_state.scan,        # 扫描码
+                0,                     # 标志位
+                0                      # 附加信息
+            )
+            time.sleep(0.001)  # 等待1ms
+            # 发送按键释放
             win32api.keybd_event(
                 key_state.vk,
                 key_state.scan,
@@ -63,6 +69,7 @@ class VirtualKeyClicker:
     def key_sender_thread(self, key: str):
         """单个按键的发送线程"""
         key_state = self.key_states[key]
+        
         while not key_state.should_stop.is_set():
             if key_state.is_down:
                 self.send_key_once(key_state)
@@ -71,25 +78,26 @@ class VirtualKeyClicker:
     def get_active_window_info(self):
         """获取当前激活窗口的信息"""
         try:
-            return win32gui.GetWindowText(win32gui.GetForegroundWindow())
+            window_title = win32gui.GetWindowText(win32gui.GetForegroundWindow())
+            return window_title
         except:
             return None
 
     def check_window_state(self):
-        """检查窗口状态并管理线程"""
+        """检查DNF窗口状态并管理线程"""
         while self.running:
             window_title = self.get_active_window_info()
-            is_target = window_title and any(
-                identifier in window_title for identifier in TARGET_WINDOWS
+            is_dnf = window_title and any(
+                identifier in window_title for identifier in DNF_WINDOW_IDENTIFIERS
             )
             
-            if is_target != self._is_target_active:
-                self._is_target_active = is_target
-                if is_target:
-                    print("目标窗口激活 - 启动按键线程")
+            if is_dnf != self._is_dnf_active:
+                self._is_dnf_active = is_dnf
+                if is_dnf:
+                    print("DNF窗口激活 - 启动按键线程")
                     self.start_all_key_threads()
                 else:
-                    print("目标窗口切换到后台 - 停止按键线程")
+                    print("DNF窗口切换到后台 - 停止按键线程")
                     self.stop_all_key_threads()
             
             time.sleep(0.1)
@@ -122,7 +130,7 @@ class VirtualKeyClicker:
             return
             
         key_state = self.key_states[key]
-        if self._is_target_active:
+        if self._is_dnf_active:
             if is_down and not key_state.is_down:
                 print(f"{key_state.name}被按下 - 开始发送")
                 key_state.is_down = True
@@ -137,9 +145,8 @@ class VirtualKeyClicker:
             keyboard.on_release_key(key, lambda e: self.handle_key_event(e.name, False))
 
     def start(self):
-        """启动连发器"""
-        print("开始监控按键...")
-        self.running = True
+        """启动程序"""
+        print("开始监控按键，按ESC退出...")
         
         # 启动窗口检查线程
         window_check_thread = threading.Thread(
@@ -155,22 +162,17 @@ class VirtualKeyClicker:
         # 等待ESC退出
         keyboard.wait('esc')
         print("检测到ESC，退出程序...")
-        
-        # 清理资源
+        self.cleanup(window_check_thread)
+
+    def cleanup(self, window_check_thread):
+        """清理资源"""
         self.running = False
-        self.stop_all_key_threads()
-        keyboard.unhook_all()
         window_check_thread.join(timeout=1.0)
+        self.stop_all_key_threads()
+
+def main():
+    clicker = VirtualKeyClicker()
+    clicker.start()
 
 if __name__ == "__main__":
-    # 创建连发器实例
-    clicker = VirtualKeyClicker()
-    
-    # 配置J键连发
-    keys_config = {
-        'j': {'name': 'J键', 'vk': 0x4A, 'scan': 0x24}
-    }
-    clicker.configure_keys(keys_config)
-    
-    # 启动连发器
-    clicker.start()
+    main() 
