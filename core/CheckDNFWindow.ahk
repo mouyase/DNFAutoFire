@@ -1,1 +1,0 @@
-﻿#If WinActive("ahk_group DNF")
