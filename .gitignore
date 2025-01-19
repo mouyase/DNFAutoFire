@@ -37,3 +37,6 @@ coverage.xml
 # 本地开发数据库
 *.db
 *.sqlite3 
+
+# 配置文件
+configs.json
