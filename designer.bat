@@ -1,0 +1,3 @@
+@echo off
+echo 正在启动Qt Designer...
+start pyside6-designer
