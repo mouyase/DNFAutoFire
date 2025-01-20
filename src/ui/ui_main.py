@@ -15,8 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGroupBox, QMainWindow, QPushButton,
-    QSizePolicy, QWidget)
+from PySide6.QtWidgets import (QApplication, QGroupBox, QLineEdit, QListWidget,
+    QListWidgetItem, QMainWindow, QPushButton, QSizePolicy,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -354,6 +355,30 @@ class Ui_MainWindow(object):
         self.key_kp_decimal = QPushButton(self.keyboardGroup)
         self.key_kp_decimal.setObjectName(u"key_kp_decimal")
         self.key_kp_decimal.setGeometry(QRect(840, 230, 36, 36))
+        self.configGroup = QGroupBox(self.centralwidget)
+        self.configGroup.setObjectName(u"configGroup")
+        self.configGroup.setGeometry(QRect(8, 290, 926, 160))
+        self.config_list = QListWidget(self.configGroup)
+        self.config_list.setObjectName(u"config_list")
+        self.config_list.setGeometry(QRect(10, 20, 200, 130))
+        self.config_name = QLineEdit(self.configGroup)
+        self.config_name.setObjectName(u"config_name")
+        self.config_name.setGeometry(QRect(220, 20, 200, 30))
+        self.load_config = QPushButton(self.configGroup)
+        self.load_config.setObjectName(u"load_config")
+        self.load_config.setGeometry(QRect(430, 20, 60, 30))
+        self.save_config = QPushButton(self.configGroup)
+        self.save_config.setObjectName(u"save_config")
+        self.save_config.setGeometry(QRect(430, 60, 60, 30))
+        self.delete_config = QPushButton(self.configGroup)
+        self.delete_config.setObjectName(u"delete_config")
+        self.delete_config.setGeometry(QRect(430, 100, 60, 30))
+        self.start_button = QPushButton(self.centralwidget)
+        self.start_button.setObjectName(u"start_button")
+        self.start_button.setGeometry(QRect(810, 460, 120, 40))
+        font2 = QFont()
+        font2.setPointSize(12)
+        self.start_button.setFont(font2)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -468,5 +493,11 @@ class Ui_MainWindow(object):
         self.key_kp_enter.setText(QCoreApplication.translate("MainWindow", u"Enter", None))
         self.key_kp_0.setText(QCoreApplication.translate("MainWindow", u"0", None))
         self.key_kp_decimal.setText(QCoreApplication.translate("MainWindow", u".", None))
+        self.configGroup.setTitle(QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u7ba1\u7406", None))
+        self.config_name.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u8bf7\u8f93\u5165\u914d\u7f6e\u540d\u79f0", None))
+        self.load_config.setText(QCoreApplication.translate("MainWindow", u"\u8bfb\u53d6", None))
+        self.save_config.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
+        self.delete_config.setText(QCoreApplication.translate("MainWindow", u"\u5220\u9664", None))
+        self.start_button.setText(QCoreApplication.translate("MainWindow", u"\u542f\u52a8", None))
     # retranslateUi
 

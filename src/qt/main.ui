@@ -1429,6 +1429,104 @@
      </property>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="configGroup">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>290</y>
+      <width>926</width>
+      <height>160</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>配置管理</string>
+    </property>
+    
+    <widget class="QListWidget" name="config_list">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>200</width>
+       <height>130</height>
+      </rect>
+     </property>
+    </widget>
+    
+    <widget class="QLineEdit" name="config_name">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>20</y>
+       <width>200</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>请输入配置名称</string>
+     </property>
+    </widget>
+    
+    <widget class="QPushButton" name="load_config">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>20</y>
+       <width>60</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>读取</string>
+     </property>
+    </widget>
+    
+    <widget class="QPushButton" name="save_config">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>60</y>
+       <width>60</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>保存</string>
+     </property>
+    </widget>
+    
+    <widget class="QPushButton" name="delete_config">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>100</y>
+       <width>60</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>删除</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="start_button">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>460</y>
+      <width>120</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>启动</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

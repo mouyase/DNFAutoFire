@@ -1,55 +1,76 @@
 import json
+from typing import Set, List, Optional
 from pathlib import Path
-from typing import Set, Dict, Any
-
 
 class Config:
-    """配置管理类"""
-    
-    def __init__(self) -> None:
-        # 配置文件保存在当前目录
-        self.config_file = Path('./configs.json')
+    def __init__(self):
+        # 配置文件路径（当前目录下的configs.json）
+        self.config_file = Path('configs.json')
         
-        # 默认配置
-        self.default_config: Dict[str, Any] = {
-            'enabled_keys': [],  # 启用的按键扫描码列表
-        }
+        # 初始化配置文件
+        if not self.config_file.exists():
+            self._save_config_data({
+                'enabled_keys': [],
+                'configs': {}
+            })
 
-    def load(self) -> Dict[str, Any]:
-        """加载完整配置"""
+    def _load_config_data(self) -> dict:
+        """加载配置文件"""
         try:
-            if self.config_file.exists():
-                with open(self.config_file, 'r', encoding='utf-8') as f:
-                    config = json.load(f)
-                # 确保所有默认配置项都存在
-                return {**self.default_config, **config}
-        except Exception as e:
-            print(f"加载配置文件失败: {e}")
-        
-        return self.default_config.copy()
+            with open(self.config_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {'enabled_keys': [], 'configs': {}}
 
-    def save(self, config: Dict[str, Any]) -> None:
-        """保存完整配置"""
+    def _save_config_data(self, data: dict) -> None:
+        """保存配置文件"""
         try:
             with open(self.config_file, 'w', encoding='utf-8') as f:
-                json.dump(config, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"保存配置文件失败: {e}")
+                json.dump(data, f, indent=4)
+        except Exception:
+            pass
 
     def load_enabled_keys(self) -> Set[int]:
-        """加载已启用的按键列表"""
-        config = self.load()
-        return set(config['enabled_keys'])
+        """加载已启用的按键"""
+        data = self._load_config_data()
+        return set(data.get('enabled_keys', []))
 
-    def save_enabled_keys(self, enabled_keys: Set[int]) -> None:
-        """保存已启用的按键列表"""
-        config = self.load()
-        config['enabled_keys'] = list(enabled_keys)
-        self.save(config)
+    def save_enabled_keys(self, keys: Set[int]) -> None:
+        """保存已启用的按键"""
+        data = self._load_config_data()
+        data['enabled_keys'] = list(keys)
+        self._save_config_data(data)
 
+    def get_config_list(self) -> List[str]:
+        """获取所有配置名称列表"""
+        data = self._load_config_data()
+        return sorted(data.get('configs', {}).keys())
 
-def get_config() -> Config:
-    """获取配置实例（单例模式）"""
-    if not hasattr(get_config, '_instance'):
-        get_config._instance = Config()
-    return get_config._instance 
+    def load_config(self, name: str) -> Optional[Set[int]]:
+        """加载指定名称的配置"""
+        data = self._load_config_data()
+        config = data.get('configs', {}).get(name)
+        return set(config) if config is not None else None
+
+    def save_config(self, name: str, keys: Set[int]) -> bool:
+        """保存配置"""
+        try:
+            data = self._load_config_data()
+            if 'configs' not in data:
+                data['configs'] = {}
+            data['configs'][name] = list(keys)
+            self._save_config_data(data)
+            return True
+        except Exception:
+            return False
+
+    def delete_config(self, name: str) -> bool:
+        """删除配置"""
+        try:
+            data = self._load_config_data()
+            if name in data.get('configs', {}):
+                del data['configs'][name]
+                self._save_config_data(data)
+            return True
+        except Exception:
+            return False 
