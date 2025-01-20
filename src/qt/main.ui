@@ -2,65 +2,197 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="enabled">
-   <bool>true</bool>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>940</width>
+    <height>510</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>DNF按键连发工具</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="keyboardGroup">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>281</width>
-      <height>80</height>
+      <x>8</x>
+      <y>8</y>
+      <width>926</width>
+      <height>276</height>
      </rect>
     </property>
     <property name="title">
-     <string>按键设置 - 红色为启用连发</string>
+     <string>按键设置 - [ 红色为启用连发 蓝色为关闭连发 ]</string>
     </property>
-    <widget class="QToolButton" name="key_esc">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
+    <widget class="QPushButton" name="key_esc">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>30</width>
-       <height>30</height>
+       <x>8</x>
+       <y>22</y>
+       <width>36</width>
+       <height>36</height>
       </rect>
-     </property>
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
-     <property name="acceptDrops">
-      <bool>false</bool>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LayoutDirection::LeftToRight</enum>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
      </property>
      <property name="text">
       <string>Esc</string>
      </property>
-     <property name="shortcut">
-      <string/>
+    </widget>
+    <widget class="QPushButton" name="key_f1">
+     <property name="geometry">
+      <rect>
+       <x>82</x>
+       <y>22</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
      </property>
-     <property name="autoRepeat">
-      <bool>false</bool>
+     <property name="text">
+      <string>F1</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f2">
+     <property name="geometry">
+      <rect>
+       <x>122</x>
+       <y>22</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F2</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f3">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>20</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F3</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f4">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>20</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F4</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f5">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>20</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F5</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f6">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>20</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F6</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f7">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>20</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F7</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f8">
+     <property name="geometry">
+      <rect>
+       <x>608</x>
+       <y>30</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F8</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f9">
+     <property name="geometry">
+      <rect>
+       <x>682</x>
+       <y>30</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F9</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f10">
+     <property name="geometry">
+      <rect>
+       <x>756</x>
+       <y>30</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F10</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f11">
+     <property name="geometry">
+      <rect>
+       <x>830</x>
+       <y>30</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F11</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="key_f12">
+     <property name="geometry">
+      <rect>
+       <x>904</x>
+       <y>30</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>F12</string>
      </property>
     </widget>
    </widget>
