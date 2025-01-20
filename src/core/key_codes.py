@@ -120,4 +120,19 @@ class KeyCodes:
         for key, value in vars(cls).items():
             if not key.startswith('_') and value == scan_code:
                 return key
-        return f"UNKNOWN_{hex(scan_code)}" 
+        return f"UNKNOWN_{hex(scan_code)}"
+
+    @classmethod
+    def get_scan_code(cls, key_name: str) -> int:
+        """
+        根据按键名称获取扫描码
+        Args:
+            key_name: 按键名称，例如 'A', 'F1', 'SPACE' 等
+
+        Returns:
+            int: 对应的扫描码，如果找不到则返回0
+        """
+        key_name = key_name.upper()
+        if hasattr(cls, key_name):
+            return getattr(cls, key_name)
+        return 0 
