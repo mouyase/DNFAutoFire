@@ -3,19 +3,33 @@ import { Button } from '@heroui/button'
 type KeyButtonProps = {
   label: string
   className?: string
+  isActive?: boolean
+  id?: string
 }
 
-const KeyButton = ({ label, className = '' }: KeyButtonProps) => {
+const KeyButton = ({
+  label,
+  className = '',
+  isActive = false,
+}: KeyButtonProps) => {
   return (
     <Button
-      className={`h-9 w-9 min-w-9 rounded-md ${className}`}
-      color='default'>
+      onPress={() => console.log('aaa')}
+      className={`h-9 w-9 min-w-9 rounded-[4px] ${className}`}
+      color={isActive ? 'success' : 'default'}>
       {label}
     </Button>
   )
 }
 
-export const KeyboardView = () => {
+type KeyboardViewProps = {
+  activeKeys: string[]
+  onActiveKeysChange: (keys: string[]) => void
+}
+
+export const KeyboardView = (props: KeyboardViewProps) => {
+  // const { activeKeys, onActiveKeysChange } = props
+
   return (
     <div className='flex flex-1 p-2 justify-between'>
       <div className='flex flex-col w-[600px]'>
@@ -56,7 +70,7 @@ export const KeyboardView = () => {
           <KeyButton label='0' />
           <KeyButton label='-' />
           <KeyButton label='=' />
-          <KeyButton label='Backspace' className='flex flex-1' />
+          <KeyButton label='Backspace' className='flex flex-1 text-xs' />
         </div>
         <div className='flex mt-1 gap-1'>
           <KeyButton label='Tab' className='flex flex-1' />
@@ -117,19 +131,19 @@ export const KeyboardView = () => {
       <div className='flex flex-col justify-between'>
         <div className='flex flex-col'>
           <div className='flex gap-1'>
-            <KeyButton label='PrtSc' className='text-xs' />
-            <KeyButton label='ScrLk' className='text-xs' />
-            <KeyButton label='Pause' className='text-xs' />
+            <KeyButton label='PrtSc' className='text-[10px]' />
+            <KeyButton label='ScrLk' className='text-[10px]' />
+            <KeyButton label='Pause' className='text-[10px]' />
           </div>
           <div className='flex mt-1 gap-1'>
-            <KeyButton label='Insert' className='text-xs' />
-            <KeyButton label='Home' className='text-xs' />
-            <KeyButton label='PgUp' className='text-xs' />
+            <KeyButton label='Insert' className='text-[10px]' />
+            <KeyButton label='Home' className='text-[10px]' />
+            <KeyButton label='PgUp' className='text-[10px]' />
           </div>
           <div className='flex mt-1 gap-1'>
-            <KeyButton label='Delete' className='text-xs' />
-            <KeyButton label='End' className='text-xs' />
-            <KeyButton label='PgDn' className='text-xs' />
+            <KeyButton label='Delete' className='text-[10px]' />
+            <KeyButton label='End' className='text-[10px]' />
+            <KeyButton label='PgDn' className='text-[10px]' />
           </div>
         </div>
         <div className='flex flex-col'>
@@ -182,3 +196,5 @@ export const KeyboardView = () => {
     </div>
   )
 }
+
+export default KeyboardView
