@@ -1,9 +1,9 @@
-import { KeyboardLayout } from "./components/KeyboardLayout";
+import { KeyboardView } from './components/KeyboardView'
 
 export default function App() {
   return (
-    <div className="flex justify-center">
-      <KeyboardLayout />
+    <div className='flex justify-center'>
+      <KeyboardView />
     </div>
-  );
+  )
 }
