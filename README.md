@@ -1,52 +1,7 @@
-# DNF按键连发工具
+# Tauri + React + Typescript
 
-## 简介
+This template should help get you started developing with Tauri, React and Typescript in Vite.
 
-这是一个为游戏地下城与勇士(DNF)开发的按键连发工具。主要功能包括:
+## Recommended IDE Setup
 
-- 支持多个按键同时连发
-- 自动检测游戏窗口状态
-- 支持全局热键控制
-- 可最小化到系统托盘
-- 配置文件支持导入导出
-
-## 主要功能
-
-### 1. 按键连发
-
-- 支持多个按键同时连发
-- 每个按键使用独立线程控制
-- 在游戏窗口激活时自动启动
-- 在窗口失去焦点时自动停止以节约性能
-
-### 2. 配置管理
-
-- 使用JSON格式保存配置文件
-- 支持配置的读取、保存和删除
-- 配置文件可手动修改
-- 支持导入导出配置
-
-### 3. 系统功能
-
-- 支持全局热键控制
-- 可最小化到系统托盘运行
-- 界面使用PySide6开发,现代美观
-
-## 使用说明
-
-1. 启动程序
-2. 在界面中设置需要连发的按键
-3. 设置全局热键
-4. 打开游戏即可自动运行
-
-## 开发说明
-
-### 环境要求
-
-- Python 3.8+
-- PySide6
-- Windows操作系统
-
-### 开发环境搭建
-
-1. 克隆代码:
+- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
