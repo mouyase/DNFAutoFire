@@ -13,7 +13,7 @@
     "windows": [
       {
         "title": "DNFAutoFire",
-        "width": 940,
+        "width": 900,
         "height": 500,
         "resizable": false
       }
