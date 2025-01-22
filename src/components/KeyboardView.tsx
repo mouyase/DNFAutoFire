@@ -13,8 +13,6 @@ const KeyButton = ({
   isActive = false,
   id = label.toLowerCase(),
 }: KeyButtonProps) => {
-  console.log(id)
-
   return (
     <Button
       onPress={() => console.log(id)}
