@@ -1,6 +1,5 @@
 mod core;
 
-
 #[tauri::command]
 async fn start_auto_fire() -> Result<(), String> {
     println!("start_auto_fire");

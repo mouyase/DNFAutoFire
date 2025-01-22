@@ -11,10 +11,13 @@ const KeyButton = ({
   label,
   className = '',
   isActive = false,
+  id = label.toLowerCase(),
 }: KeyButtonProps) => {
+  console.log(id)
+
   return (
     <Button
-      onPress={() => console.log('aaa')}
+      onPress={() => console.log(id)}
       className={`h-9 w-9 min-w-9 rounded-[4px] ${className}`}
       color={isActive ? 'success' : 'default'}>
       {label}
@@ -28,7 +31,7 @@ type KeyboardViewProps = {
 }
 
 export const KeyboardView = (props: KeyboardViewProps) => {
-  // const { activeKeys, onActiveKeysChange } = props
+  const { activeKeys, onActiveKeysChange } = props
 
   return (
     <div className='flex flex-1 p-2 justify-between'>
