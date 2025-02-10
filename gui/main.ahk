@@ -104,7 +104,7 @@ class MainGui {
         this.gui.Add("Text", "vEnter x524 y160 w82 h36 +0x200 +Border +Center", "Enter")
         
         ; ZXCV行
-        this.gui.Add("Text", "vShift x16 y200 w86 h36 +0x200 +Border +Center", "Shift")
+        this.gui.Add("Text", "vLShift x16 y200 w86 h36 +0x200 +Border +Center", "Shift")
         x := 106
         for key in ["Z", "X", "C", "V", "B", "N", "M"] {
             this.gui.Add("Text", "v" key " x" x " y200 w36 h36 +0x200 +Border +Center", key)
@@ -113,17 +113,17 @@ class MainGui {
         this.gui.Add("Text", "vComma x386 y200 w36 h36 +0x200 +Border +Center", ",")
         this.gui.Add("Text", "vPeriod x426 y200 w36 h36 +0x200 +Border +Center", ".")
         this.gui.Add("Text", "vSlash x466 y200 w36 h36 +0x200 +Border +Center", "/")
-        this.gui.Add("Text", "vRShift x506 y200 w100 h36 +0x200 +Border +Center", "RShift")
+        this.gui.Add("Text", "vRShift x506 y200 w100 h36 +0x200 +Border +Center", "Shift")
         
         ; 空格行
-        this.gui.Add("Text", "vCtrl x16 y240 w48 h36 +0x200 +Border +Center", "LCtrl")
+        this.gui.Add("Text", "vLCtrl x16 y240 w48 h36 +0x200 +Border +Center", "Ctrl")
         this.gui.Add("Text", "x68 y240 w48 h36 +0x200 +Border +Center +Disabled", "Win")
-        this.gui.Add("Text", "vAlt x120 y240 w48 h36 +0x200 +Border +Center", "LAlt")
+        this.gui.Add("Text", "vLAlt x120 y240 w48 h36 +0x200 +Border +Center", "Alt")
         this.gui.Add("Text", "vSpace x172 y240 w226 h36 +0x200 +Border +Center", "Space")
-        this.gui.Add("Text", "vRAlt x402 y240 w48 h36 +0x200 +Border +Center", "RAlt")
+        this.gui.Add("Text", "vRAlt x402 y240 w48 h36 +0x200 +Border +Center", "Alt")
         this.gui.Add("Text", "x454 y240 w48 h36 +0x200 +Border +Center +Disabled", "Fn")
         this.gui.Add("Text", "x506 y240 w48 h36 +0x200 +Border +Center +Disabled", "Menu")
-        this.gui.Add("Text", "vRCtrl x558 y240 w48 h36 +0x200 +Border +Center", "RCtrl")
+        this.gui.Add("Text", "vRCtrl x558 y240 w48 h36 +0x200 +Border +Center", "Ctrl")
     }
     
     static CreateEditKeys() {
