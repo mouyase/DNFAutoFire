@@ -1,0 +1,14 @@
+# Clippy 代码检查配置
+# 参考: https://rust-lang.github.io/rust-clippy/master/index.html
+
+# 允许的标识符命名
+allowed-idents-below-min-chars = ["i", "j", "k", "x", "y", "z", "vk", "sc"]
+
+# 单行函数体最大长度
+single-char-binding-names-threshold = 4
+
+# 过大类型阈值
+too-large-for-stack = 200
+
+# 认知复杂度阈值
+cognitive-complexity-threshold = 30

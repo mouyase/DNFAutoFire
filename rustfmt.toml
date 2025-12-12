@@ -1,0 +1,17 @@
+# Rust 代码格式化配置
+edition = "2021"
+max_width = 100
+tab_spaces = 4
+use_small_heuristics = "Default"
+newline_style = "Auto"
+
+# 导入排序
+imports_granularity = "Module"
+group_imports = "StdExternalCrate"
+reorder_imports = true
+
+# 格式化选项
+format_code_in_doc_comments = true
+format_strings = false
+wrap_comments = true
+comment_width = 80

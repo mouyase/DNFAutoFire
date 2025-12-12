@@ -1,0 +1,27 @@
+# Rust 编译产物
+/target
+**/*.rs.bk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志
+*.log
+logs/
+
+# 配置文件（用户私有）
+config.json
+presets/
+
+# 调试产物
+*.pdb
+*.dmp
