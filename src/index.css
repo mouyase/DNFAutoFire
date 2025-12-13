@@ -1,49 +1,52 @@
 @import "tailwindcss";
 
-/* 自定义颜色主题 */
 @theme {
-  --color-background: #1a1a2e;
-  --color-surface: #16213e;
-  --color-key: #0f3460;
-  --color-key-hover: #1a4d80;
-  --color-key-active: #e94560;
-  --color-accent: #00ff88;
-  --color-danger: #e94560;
-  --color-warning: #ffc107;
-  --color-text: #eeeeee;
-  --color-text-muted: #888888;
+  /* 现代配色 */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  /* 按键状态 */
+  --color-key-enabled: #ef4444;
+  --color-key-disabled: #3b82f6;
+
+  /* 文字 */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-link: #2563eb;
 }
 
 /* 基础样式 */
-body {
-  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  user-select: none;
-  min-height: 100vh;
+html,
+body,
+#root {
+  height: 100%;
 }
 
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+body {
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  user-select: none;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* 滚动条 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-key);
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-key-hover);
+  background: #94a3b8;
 }

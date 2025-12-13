@@ -1,61 +1,69 @@
 import { cn } from "@/lib/utils"
-import type { KeyWidth } from "@/types"
+import type { KeyConfig } from "@/types"
+import { KEY_SIZE, KEY_GAP } from "./constants"
 
 interface KeyProps {
-  /** 虚拟键码 */
-  vk: number
-  /** 显示文本 */
-  label: string
-  /** 是否激活 */
+  config: KeyConfig
   active?: boolean
-  /** 按键宽度 */
-  width?: KeyWidth
-  /** 点击回调 */
   onClick?: (vk: number) => void
 }
 
-/** 宽度类名映射 */
-const widthClasses: Record<KeyWidth, string> = {
-  normal: "min-w-10",
-  "wide-1-25": "min-w-[50px]",
-  "wide-1-5": "min-w-[60px]",
-  "wide-1-75": "min-w-[70px]",
-  "wide-2": "min-w-20",
-  "wide-2-25": "min-w-[90px]",
-  "wide-2-75": "min-w-[110px]",
-  space: "min-w-60",
-  func: "min-w-[42px] h-8 text-[11px]",
-  small: "min-w-[42px] h-8 text-[10px]",
-  arrow: "min-w-[42px] h-8 text-sm",
-}
-
 /**
- * 单个键盘按键组件
+ * 单个键盘按键组件 - 模拟物理键盘样式
+ * 激活状态模拟按键按下效果
  */
-export function Key({ vk, label, active = false, width = "normal", onClick }: KeyProps) {
+export function Key({ config, active = false, onClick }: KeyProps) {
+  const { vk, label, width = 1, height = 1, empty } = config
+
+  // 计算实际像素尺寸
+  const w = KEY_SIZE * width + KEY_GAP * Math.max(0, width - 1)
+  const h = KEY_SIZE * height + KEY_GAP * Math.max(0, height - 1)
+
+  // 空占位
+  if (empty) {
+    return <div style={{ width: w, height: h, flexShrink: 0 }} />
+  }
+
   return (
     <button
       type="button"
       onClick={() => onClick?.(vk)}
+      style={{ width: w, height: h, flexShrink: 0 }}
       className={cn(
         // 基础样式
-        "h-10 px-2",
-        "bg-key border border-white/10 rounded-md",
-        "text-text text-xs font-medium",
-        "flex items-center justify-center",
-        "cursor-pointer transition-all duration-150",
-        // 悬停效果
-        "hover:bg-key-hover hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30",
-        // 激活状态
-        active && [
-          "bg-key-active border-key-active text-white",
-          "shadow-[0_0_12px_rgba(233,69,96,0.5)]",
-          "hover:bg-[#ff5070]",
-        ],
-        // 宽度
-        widthClasses[width]
+        "relative flex items-center justify-center",
+        "rounded-md text-[11px] font-medium",
+        "cursor-pointer select-none",
+        "whitespace-pre-wrap leading-tight",
+        "transition-all duration-75",
+        // 物理键盘效果
+        active
+          ? [
+              // 激活状态 - 按下效果（内凹、深色）
+              "bg-gradient-to-b from-gray-200 to-gray-300",
+              "text-gray-600",
+              "border border-gray-400",
+              // 内凹阴影效果
+              "shadow-[inset_0_2px_4px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(0,0,0,0.1)]",
+              // 按下时向下偏移
+              "translate-y-[1px]",
+            ]
+          : [
+              // 默认状态 - 立体按键效果
+              "bg-gradient-to-b from-white to-gray-100",
+              "text-gray-700",
+              "border border-gray-300",
+              // 外凸阴影效果
+              "shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.1),0_2px_4px_rgba(0,0,0,0.05)]",
+              "hover:from-gray-50 hover:to-gray-150 hover:border-blue-400",
+              "active:translate-y-[1px] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)]",
+            ]
       )}
     >
+      {/* 按键顶面高光效果（未激活时显示） */}
+      {!active && (
+        <span className="absolute inset-x-1 top-0.5 h-[1px] rounded-full bg-white/60" />
+      )}
       {label}
     </button>
   )

@@ -1,29 +1,58 @@
-import { Keyboard } from "@/components/keyboard"
-import { Header, StatusBar } from "@/components/layout"
+import { useCallback } from "react"
+import { AppLayout } from "@/components/layout"
+import {
+  KeyboardPanel,
+  ConfigPanel,
+  FeaturesPanel,
+  ActionPanel,
+} from "@/components/panels"
 import { useAutofire } from "@/hooks/use-autofire"
-import { useAdmin } from "@/hooks/use-admin"
+
+const VERSION = "v0.1.0"
 
 /**
  * 应用根组件
+ * 使用插槽式布局，各区域插入独立的面板组件
  */
 function App() {
   const { isRunning, enabledKeys, toggleKey, clearKeys, toggle } = useAutofire()
-  const { isElevated, restartAsAdmin } = useAdmin()
+
+  // 包装异步函数为 void 返回
+  const handleKeyClick = useCallback((vk: number) => {
+    void toggleKey(vk)
+  }, [toggleKey])
+
+  const handleClearKeys = useCallback(() => {
+    void clearKeys()
+  }, [clearKeys])
+
+  const handleToggle = useCallback(() => {
+    void toggle()
+  }, [toggle])
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header
-        isElevated={isElevated}
-        isRunning={isRunning}
-        onToggle={toggle}
-        onRestartAsAdmin={restartAsAdmin}
-      />
-
-      <main className="flex-1 flex flex-col gap-5 p-5">
-        <Keyboard enabledKeys={enabledKeys} onKeyClick={toggleKey} />
-        <StatusBar isRunning={isRunning} enabledKeys={enabledKeys} onClear={clearKeys} />
-      </main>
-    </div>
+    <AppLayout
+      // 顶部：键盘设置面板
+      top={
+        <KeyboardPanel
+          version={VERSION}
+          enabledKeys={enabledKeys}
+          onKeyClick={handleKeyClick}
+          onClearKeys={handleClearKeys}
+        />
+      }
+      // 底部左侧：配置设置面板
+      bottomLeft={<ConfigPanel />}
+      // 底部中间：其他功能面板
+      bottomCenter={<FeaturesPanel />}
+      // 底部右侧：操作按钮面板
+      bottomRight={
+        <ActionPanel
+          isRunning={isRunning}
+          onToggle={handleToggle}
+        />
+      }
+    />
   )
 }
 

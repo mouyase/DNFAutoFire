@@ -1,206 +1,10 @@
-//! 键盘输入模块 - 直接调用 Win32 SendInput API
+//! 键盘输入模块
 //!
-//! 这个模块提供高性能的键盘输入模拟
-//!
-//! 关键技术发现：
-//! - 使用 vkFF + 真实扫描码 + 无 KEYEVENTF_SCANCODE 标志
-//! - 游戏能识别按键，聊天框不会收到输入
-//! - 这是经过多次测试验证的最佳方案
+//! Windows 平台: 直接调用 Win32 SendInput API
+//! 其他平台: Mock 实现，用于 UI 开发
 
-use windows::Win32::UI::Input::KeyboardAndMouse::{
-    SendInput, GetAsyncKeyState, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT,
-    KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, KEYBD_EVENT_FLAGS,
-    VIRTUAL_KEY, MapVirtualKeyW, MAPVK_VK_TO_VSC,
-};
-
-/// 虚拟键码到扫描码的映射
-/// DNF 等游戏通常需要扫描码而非虚拟键码
-pub fn vk_to_scan_code(vk: u16) -> u16 {
-    unsafe { MapVirtualKeyW(vk as u32, MAPVK_VK_TO_VSC) as u16 }
-}
-
-/// 发送按键按下事件
-/// 使用扫描码以确保游戏能正确识别
-#[inline]
-pub fn send_key_down(scan_code: u16) {
-    let input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(0), // 不使用虚拟键码
-                wScan: scan_code,
-                dwFlags: KEYEVENTF_SCANCODE,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 发送按键释放事件
-#[inline]
-pub fn send_key_up(scan_code: u16) {
-    let input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(0),
-                wScan: scan_code,
-                dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 发送完整的按键事件（按下+释放）
-/// 这是连发的核心函数，优化为一次 SendInput 调用
-#[inline]
-pub fn send_key_press(scan_code: u16) {
-    let inputs = [
-        // 按下
-        INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(0),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_SCANCODE,
-                    time: 0,
-                    dwExtraInfo: 0,
-                },
-            },
-        },
-        // 释放
-        INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(0),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
-                    time: 0,
-                    dwExtraInfo: 0,
-                },
-            },
-        },
-    ];
-
-    unsafe {
-        // 一次调用发送两个事件，比分开调用更快
-        SendInput(&inputs, std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 检测按键是否被物理按下
-/// 使用 GetAsyncKeyState 而非 GetKeyState，获取全局状态
-#[inline]
-pub fn is_key_pressed(vk: u16) -> bool {
-    unsafe {
-        // 最高位为1表示按键当前被按下
-        GetAsyncKeyState(vk as i32) < 0
-    }
-}
-
-/// 发送"游戏专用"按键 - 游戏能识别，聊天框不会收到
-///
-/// 技术原理：
-/// - 使用 vkFF（无效虚拟键码）+ 真实扫描码
-/// - 不设置 KEYEVENTF_SCANCODE 标志
-/// - 游戏通过扫描码识别按键，但输入法/聊天框因 vk 无效而忽略
-#[inline]
-pub fn send_key_game_only_down(scan_code: u16) {
-    let input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(0xFF),  // 无效 VK
-                wScan: scan_code,
-                dwFlags: KEYBD_EVENT_FLAGS(0),  // 无标志
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 发送"游戏专用"按键释放
-#[inline]
-pub fn send_key_game_only_up(scan_code: u16) {
-    let input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(0xFF),
-                wScan: scan_code,
-                dwFlags: KEYEVENTF_KEYUP,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 发送正常按键（聊天框可识别）- 用于首次按下
-#[inline]
-pub fn send_key_normal_down(vk: u16, scan_code: u16) {
-    let input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(vk),
-                wScan: scan_code,
-                dwFlags: KEYEVENTF_SCANCODE,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 发送正常按键释放
-#[inline]
-pub fn send_key_normal_up(vk: u16, scan_code: u16) {
-    let input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(vk),
-                wScan: scan_code,
-                dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-    }
-}
-
-/// 常用按键的虚拟键码
+/// 常用按键的虚拟键码（公开 API，供外部使用）
+#[allow(dead_code)]
 pub mod vk {
     pub const VK_BACK: u16 = 0x08;
     pub const VK_TAB: u16 = 0x09;
@@ -441,3 +245,246 @@ pub mod vk {
         }
     }
 }
+
+// ============================================================================
+// Windows 实现
+// ============================================================================
+
+#[cfg(windows)]
+#[allow(dead_code)]
+mod windows_impl {
+    use windows::Win32::UI::Input::KeyboardAndMouse::{
+        SendInput, GetAsyncKeyState, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT,
+        KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, KEYBD_EVENT_FLAGS,
+        VIRTUAL_KEY, MapVirtualKeyW, MAPVK_VK_TO_VSC,
+    };
+
+    /// 虚拟键码到扫描码的映射
+    pub fn vk_to_scan_code(vk: u16) -> u16 {
+        unsafe { MapVirtualKeyW(vk as u32, MAPVK_VK_TO_VSC) as u16 }
+    }
+
+    /// 发送按键按下事件（使用扫描码）
+    #[inline]
+    pub fn send_key_down(scan_code: u16) {
+        let input = INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: VIRTUAL_KEY(0),
+                    wScan: scan_code,
+                    dwFlags: KEYEVENTF_SCANCODE,
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        };
+        unsafe {
+            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+
+    /// 发送按键释放事件
+    #[inline]
+    pub fn send_key_up(scan_code: u16) {
+        let input = INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: VIRTUAL_KEY(0),
+                    wScan: scan_code,
+                    dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        };
+        unsafe {
+            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+
+    /// 发送完整按键事件（按下+释放）
+    #[inline]
+    pub fn send_key_press(scan_code: u16) {
+        let inputs = [
+            INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VIRTUAL_KEY(0),
+                        wScan: scan_code,
+                        dwFlags: KEYEVENTF_SCANCODE,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            },
+            INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VIRTUAL_KEY(0),
+                        wScan: scan_code,
+                        dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            },
+        ];
+        unsafe {
+            SendInput(&inputs, std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+
+    /// 检测按键是否被物理按下
+    #[inline]
+    pub fn is_key_pressed(vk: u16) -> bool {
+        unsafe { GetAsyncKeyState(vk as i32) < 0 }
+    }
+
+    /// 发送"游戏专用"按键按下 - 游戏能识别，聊天框不会收到
+    #[inline]
+    pub fn send_key_game_only_down(scan_code: u16) {
+        let input = INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: VIRTUAL_KEY(0xFF),
+                    wScan: scan_code,
+                    dwFlags: KEYBD_EVENT_FLAGS(0),
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        };
+        unsafe {
+            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+
+    /// 发送"游戏专用"按键释放
+    #[inline]
+    pub fn send_key_game_only_up(scan_code: u16) {
+        let input = INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: VIRTUAL_KEY(0xFF),
+                    wScan: scan_code,
+                    dwFlags: KEYEVENTF_KEYUP,
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        };
+        unsafe {
+            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+
+    /// 发送正常按键按下（聊天框可识别）
+    #[inline]
+    pub fn send_key_normal_down(vk: u16, scan_code: u16) {
+        let input = INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: VIRTUAL_KEY(vk),
+                    wScan: scan_code,
+                    dwFlags: KEYEVENTF_SCANCODE,
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        };
+        unsafe {
+            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+
+    /// 发送正常按键释放
+    #[inline]
+    pub fn send_key_normal_up(vk: u16, scan_code: u16) {
+        let input = INPUT {
+            r#type: INPUT_KEYBOARD,
+            Anonymous: INPUT_0 {
+                ki: KEYBDINPUT {
+                    wVk: VIRTUAL_KEY(vk),
+                    wScan: scan_code,
+                    dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                    time: 0,
+                    dwExtraInfo: 0,
+                },
+            },
+        };
+        unsafe {
+            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        }
+    }
+}
+
+// ============================================================================
+// Mock 实现（非 Windows 平台，用于 UI 开发）
+// ============================================================================
+
+#[cfg(not(windows))]
+mod mock_impl {
+    /// Mock: 虚拟键码到扫描码的映射
+    pub fn vk_to_scan_code(vk: u16) -> u16 {
+        // 返回简化的扫描码映射
+        vk
+    }
+
+    #[inline]
+    pub fn send_key_down(_scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+
+    #[inline]
+    pub fn send_key_up(_scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+
+    #[inline]
+    pub fn send_key_press(_scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+
+    #[inline]
+    pub fn is_key_pressed(_vk: u16) -> bool {
+        // Mock: 总是返回 false
+        false
+    }
+
+    #[inline]
+    pub fn send_key_game_only_down(_scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+
+    #[inline]
+    pub fn send_key_game_only_up(_scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+
+    #[inline]
+    pub fn send_key_normal_down(_vk: u16, _scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+
+    #[inline]
+    pub fn send_key_normal_up(_vk: u16, _scan_code: u16) {
+        // Mock: 不执行任何操作
+    }
+}
+
+// ============================================================================
+// 导出公共接口
+// ============================================================================
+
+#[cfg(windows)]
+pub use windows_impl::*;
+
+#[cfg(not(windows))]
+pub use mock_impl::*;

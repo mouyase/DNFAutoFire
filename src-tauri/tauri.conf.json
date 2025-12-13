@@ -4,16 +4,19 @@
   "version": "0.1.0",
   "identifier": "com.arthur.dnf-autofire-tauri",
   "build": {
+    "beforeDevCommand": "pnpm dev:web",
     "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build:web",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
         "title": "DNF 连发工具",
-        "width": 860,
-        "height": 640,
-        "resizable": true,
+        "width": 940,
+        "height": 500,
+        "resizable": false,
+        "maximizable": false,
         "center": true
       }
     ],

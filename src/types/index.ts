@@ -1,20 +1,4 @@
 /**
- * 按键宽度类型
- */
-export type KeyWidth =
-  | "normal"
-  | "wide-1-25"
-  | "wide-1-5"
-  | "wide-1-75"
-  | "wide-2"
-  | "wide-2-25"
-  | "wide-2-75"
-  | "space"
-  | "func"
-  | "small"
-  | "arrow"
-
-/**
  * 按键配置
  */
 export interface KeyConfig {
@@ -22,23 +6,26 @@ export interface KeyConfig {
   vk: number
   /** 显示文本 */
   label: string
-  /** 按键宽度 */
-  width?: KeyWidth
+  /** 按键宽度倍数 (默认 1) */
+  width?: number
+  /** 按键高度倍数 (默认 1) */
+  height?: number
+  /** 是否为空占位 */
+  empty?: boolean
+  /** 是否为小键盘回车 */
+  isNumpadEnter?: boolean
 }
 
 /**
- * 键盘行类型
+ * 配置项
  */
-export type RowType = "main" | "function" | "edit" | "arrow"
-
-/**
- * 键盘行配置
- */
-export interface RowConfig {
-  /** 按键列表 */
-  keys: (KeyConfig | "spacer" | "spacer-small")[]
-  /** 行类型 */
-  type?: RowType
+export interface Profile {
+  /** 配置 ID */
+  id: string
+  /** 配置名称 */
+  name: string
+  /** 启用的按键 VK 码列表 */
+  enabledKeys: number[]
 }
 
 /**

@@ -79,7 +79,34 @@
     {"名称": "start_autofire", "描述": "启动连发"},
     {"名称": "stop_autofire", "描述": "停止连发"},
     {"名称": "is_running", "描述": "获取运行状态"},
+    {"名称": "get_platform_info", "描述": "获取平台信息和mock模式状态"},
     {"名称": "is_elevated", "描述": "检查管理员权限"},
     {"名称": "restart_as_admin", "描述": "以管理员权限重启"}
-  ]
+  ],
+  "跨平台开发": {
+    "说明": "支持在 macOS/Linux 上进行 UI 开发，核心功能仅在 Windows 上可用",
+    "架构模式": {
+      "条件编译": "#[cfg(windows)] 和 #[cfg(not(windows))]",
+      "mock实现": "非 Windows 平台使用 mock 模块模拟核心功能"
+    },
+    "mock模块": {
+      "core/autofire.rs": {
+        "MockAutoFire": "模拟连发引擎，仅打印日志不实际发送按键"
+      },
+      "core/keyboard.rs": {
+        "mock_impl": "所有键盘函数为空操作"
+      },
+      "core/window.rs": {
+        "mock_impl": "is_dnf_active() 默认返回 true"
+      }
+    },
+    "开发流程": {
+      "mac开发": "运行 pnpm tauri dev，UI 完全可用，连发功能以 mock 模式运行",
+      "windows测试": "在 Windows 上运行以测试真实连发功能"
+    },
+    "前端判断": {
+      "命令": "get_platform_info",
+      "返回值": "{ platform: string, is_mock_mode: boolean }"
+    }
+  }
 }

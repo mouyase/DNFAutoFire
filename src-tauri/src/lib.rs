@@ -117,6 +117,32 @@ fn is_running(state: State<AppState>) -> bool {
     engine.is_running()
 }
 
+/// 获取平台信息（用于前端判断是否为 mock 模式）
+#[tauri::command]
+fn get_platform_info() -> PlatformInfo {
+    PlatformInfo {
+        platform: if cfg!(windows) {
+            "windows".to_string()
+        } else if cfg!(target_os = "macos") {
+            "macos".to_string()
+        } else if cfg!(target_os = "linux") {
+            "linux".to_string()
+        } else {
+            "unknown".to_string()
+        },
+        is_mock_mode: !cfg!(windows),
+    }
+}
+
+/// 平台信息
+#[derive(Debug, Clone, Serialize)]
+pub struct PlatformInfo {
+    /// 当前平台（windows/macos/linux）
+    pub platform: String,
+    /// 是否为 mock 模式（非 Windows 平台）
+    pub is_mock_mode: bool,
+}
+
 /// 检查是否以管理员权限运行
 #[tauri::command]
 fn is_elevated() -> bool {
@@ -205,6 +231,7 @@ pub fn run() {
             start_autofire,
             stop_autofire,
             is_running,
+            get_platform_info,
             is_elevated,
             restart_as_admin,
         ])

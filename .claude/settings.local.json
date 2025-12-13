@@ -19,7 +19,10 @@
       "Bash(pnpm config set:*)",
       "Bash(node -e:*)",
       "WebFetch(domain:pnpm.io)",
-      "Bash(pnpm dev)"
+      "Bash(pnpm dev)",
+      "Bash(cargo build:*)",
+      "Bash(cargo check:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }
