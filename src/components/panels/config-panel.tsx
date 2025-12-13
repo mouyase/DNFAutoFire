@@ -1,5 +1,5 @@
+import { useState } from "react"
 import { GroupBox } from "@/components/ui"
-import { Button } from "@/components/layout"
 
 interface ConfigPanelProps {
   configs?: string[]
@@ -7,65 +7,153 @@ interface ConfigPanelProps {
   onSelectConfig?: (name: string) => void
   onLoadConfig?: () => void
   onSaveConfig?: () => void
-  onCloneConfig?: () => void
   onDeleteConfig?: () => void
+  onCloneConfig?: () => void
+  onRenameConfig?: (newName: string) => void
 }
 
 /**
- * 配置设置面板
+ * 配置管理面板
+ * 左侧配置列表，右侧操作按钮
  */
 export function ConfigPanel({
   configs = ["默认", "临时", "测试"],
-  selectedConfig = "测试",
+  selectedConfig: initialSelected = "默认",
+  onSelectConfig,
+  onLoadConfig,
+  onSaveConfig,
+  onDeleteConfig,
+  onCloneConfig,
+  onRenameConfig,
 }: ConfigPanelProps) {
+  const [selected, setSelected] = useState(initialSelected)
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [newName, setNewName] = useState("")
+
+  const handleSelect = (name: string) => {
+    setSelected(name)
+    onSelectConfig?.(name)
+  }
+
+  const handleStartRename = () => {
+    setNewName(selected)
+    setIsRenaming(true)
+  }
+
+  const handleConfirmRename = () => {
+    if (newName.trim() && newName !== selected) {
+      onRenameConfig?.(newName.trim())
+      setSelected(newName.trim())
+    }
+    setIsRenaming(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleConfirmRename()
+    } else if (e.key === "Escape") {
+      setIsRenaming(false)
+    }
+  }
+
   return (
-    <GroupBox title="配置设置 - 【双击读取配置】" className="h-full">
-      <div className="flex gap-2 h-full">
+    <GroupBox title="配置管理" className="h-full">
+      <div className="flex gap-3 h-full">
         {/* 左侧：配置列表 */}
-        <div className="w-[50px] shrink-0 border border-gray-300 bg-white rounded overflow-auto">
+        <div className="w-16 shrink-0 border border-gray-300 rounded bg-white overflow-auto">
           {configs.map((config) => (
             <div
               key={config}
-              className={`px-1.5 py-0.5 text-xs cursor-pointer truncate ${
-                config === selectedConfig
+              onClick={() => handleSelect(config)}
+              onDoubleClick={onLoadConfig}
+              className={`
+                px-2 py-1 text-xs cursor-pointer truncate
+                ${config === selected
                   ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-50"
-              }`}
+                  : "hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                }
+              `}
             >
               {config}
             </div>
           ))}
         </div>
 
-        {/* 右侧：配置操作 */}
-        <div className="flex-1 flex flex-col gap-1.5 min-w-0">
-          {/* 配置名称 */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-text-secondary whitespace-nowrap">当前配置名称</span>
-            <input
-              type="text"
-              className="flex-1 h-6 px-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500 min-w-0"
-              defaultValue={selectedConfig}
-            />
-          </div>
+        {/* 右侧：操作区 */}
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          {/* 当前配置名 / 重命名输入 */}
+          {isRenaming ? (
+            <div className="flex gap-1">
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1 h-6 px-2 text-xs border border-blue-500 rounded focus:outline-none min-w-0"
+                placeholder="新名称"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handleConfirmRename}
+                className="h-6 px-2 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                确定
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsRenaming(false)}
+                className="h-6 px-2 text-xs text-gray-500 bg-gray-100 rounded hover:bg-gray-200"
+              >
+                取消
+              </button>
+            </div>
+          ) : (
+            <div className="h-6 px-2 flex items-center text-xs bg-gray-50 rounded border border-gray-200 truncate">
+              <span className="text-gray-400 mr-1">当前:</span>
+              <span className="font-medium">{selected}</span>
+            </div>
+          )}
 
-          {/* 配置按钮 */}
+          {/* 操作按钮 - 紧凑布局 */}
           <div className="grid grid-cols-2 gap-1">
-            <Button variant="secondary" size="sm" className="text-xs px-1">读取配置</Button>
-            <Button variant="secondary" size="sm" className="text-xs px-1">保存配置</Button>
-            <Button variant="secondary" size="sm" className="text-xs px-1">克隆配置</Button>
-            <Button variant="secondary" size="sm" className="text-xs px-1">删除配置</Button>
-          </div>
-
-          {/* 快速切换热键 */}
-          <div className="mt-auto">
-            <div className="text-xs text-text-secondary mb-1">快速切换热键</div>
-            <input
-              type="text"
-              className="w-full h-6 px-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-              defaultValue="Alt + `"
-              readOnly
-            />
+            <button
+              type="button"
+              onClick={onLoadConfig}
+              className="h-6 text-xs text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            >
+              读取
+            </button>
+            <button
+              type="button"
+              onClick={onSaveConfig}
+              className="h-6 text-xs text-white bg-blue-500 rounded hover:bg-blue-600 transition-colors"
+            >
+              保存
+            </button>
+            <button
+              type="button"
+              onClick={handleStartRename}
+              disabled={isRenaming}
+              className="h-6 text-xs text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              重命名
+            </button>
+            <button
+              type="button"
+              onClick={onCloneConfig}
+              className="h-6 text-xs text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            >
+              复制
+            </button>
+            <button
+              type="button"
+              onClick={onDeleteConfig}
+              disabled={configs.length <= 1}
+              className="col-span-2 h-6 text-xs text-red-500 border border-red-200 rounded hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              删除
+            </button>
           </div>
         </div>
       </div>

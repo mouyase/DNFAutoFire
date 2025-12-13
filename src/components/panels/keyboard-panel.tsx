@@ -1,6 +1,5 @@
 import { Keyboard } from "@/components/keyboard"
 import { GroupBox } from "@/components/ui"
-import { Button } from "@/components/layout"
 
 interface KeyboardPanelProps {
   enabledKeys: Set<number>
@@ -18,7 +17,7 @@ export function KeyboardPanel({
   onClearKeys,
 }: KeyboardPanelProps) {
   return (
-    <GroupBox title="按键设置 - 【红色为启用连发 蓝色为关闭连发】" className="inline-block">
+    <GroupBox title="按键设置" className="inline-block">
       <Keyboard
         enabledKeys={enabledKeys}
         onKeyClick={onKeyClick}
