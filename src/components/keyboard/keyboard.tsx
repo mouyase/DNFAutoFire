@@ -6,6 +6,7 @@ import { KEY_SIZE, KEY_GAP, FUNCTION_ROW_GAP } from "./constants"
 interface KeyboardProps {
   enabledKeys: Set<number>
   onKeyClick: (vk: number) => void
+  onClearKeys?: () => void
 }
 
 /** 渲染主键盘区 */
@@ -100,14 +101,31 @@ function EditKeys({
 function Numpad({
   enabledKeys,
   onKeyClick,
+  onClearKeys,
 }: {
   enabledKeys: Set<number>
   onKeyClick: (vk: number) => void
+  onClearKeys?: () => void
 }) {
+  // 计算小键盘总宽度：4个按键 + 3个间距
+  const numpadWidth = KEY_SIZE * 4 + KEY_GAP * 3
+
   return (
     <div className="flex flex-col">
-      {/* 第一行留空 + 额外间距，与功能键行对齐 */}
-      <div style={{ height: KEY_SIZE, marginBottom: FUNCTION_ROW_GAP }} />
+      {/* 第一行：清空按钮靠右对齐，与功能键行对齐 */}
+      <div
+        className="flex justify-end"
+        style={{ width: numpadWidth, height: KEY_SIZE, marginBottom: FUNCTION_ROW_GAP }}
+      >
+        <button
+          type="button"
+          onClick={onClearKeys}
+          style={{ width: KEY_SIZE, height: KEY_SIZE }}
+          className="flex items-center justify-center rounded-md text-[11px] font-medium cursor-pointer select-none transition-all duration-75 bg-gradient-to-b from-red-50 to-red-100 text-red-600 border border-red-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.1)] hover:border-red-400 hover:from-red-100 hover:to-red-200"
+        >
+          清空
+        </button>
+      </div>
 
       {/* 数字小键盘主体 */}
       <div
@@ -154,7 +172,7 @@ function Numpad({
 /**
  * 完整键盘组件 (104键布局)
  */
-export function Keyboard({ enabledKeys, onKeyClick }: KeyboardProps) {
+export function Keyboard({ enabledKeys, onKeyClick, onClearKeys }: KeyboardProps) {
   return (
     <div className="inline-flex items-start" style={{ gap: KEY_SIZE * 0.4 }}>
       {/* 主键盘区 */}
@@ -164,7 +182,7 @@ export function Keyboard({ enabledKeys, onKeyClick }: KeyboardProps) {
       <EditKeys enabledKeys={enabledKeys} onKeyClick={onKeyClick} />
 
       {/* 数字小键盘 */}
-      <Numpad enabledKeys={enabledKeys} onKeyClick={onKeyClick} />
+      <Numpad enabledKeys={enabledKeys} onKeyClick={onKeyClick} onClearKeys={onClearKeys} />
     </div>
   )
 }

@@ -27,15 +27,15 @@ export function AppLayout({
       <div className="shrink-0">{top}</div>
 
       {/* 底部区域 */}
-      <div className="flex gap-2.5 flex-1 min-h-0">
+      <div className="flex gap-2 flex-1 min-h-0">
         {/* 左侧 - 配置设置 */}
-        <div className="w-[280px] shrink-0">{bottomLeft}</div>
+        <div className="shrink-0" style={{ width: 280 }}>{bottomLeft}</div>
 
         {/* 中间 - 其他功能 */}
-        <div className="flex-1 min-w-0">{bottomCenter}</div>
+        <div className="shrink-0" style={{ width: 140 }}>{bottomCenter}</div>
 
         {/* 右侧 - 操作按钮 */}
-        <div className="w-[80px] shrink-0">{bottomRight}</div>
+        <div className="shrink-0" style={{ width: 76 }}>{bottomRight}</div>
       </div>
     </div>
   )

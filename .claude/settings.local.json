@@ -22,7 +22,15 @@
       "Bash(pnpm dev)",
       "Bash(cargo build:*)",
       "Bash(cargo check:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "mcp__chrome-devtools__list_pages",
+      "Bash(curl:*)",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__resize_page",
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__chrome-devtools__evaluate_script"
     ]
   }
 }

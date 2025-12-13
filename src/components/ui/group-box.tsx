@@ -3,6 +3,8 @@ import type { ReactNode } from "react"
 
 interface GroupBoxProps {
   title: string
+  /** 标题栏右侧额外内容 */
+  extra?: ReactNode
   children: ReactNode
   className?: string
 }
@@ -10,7 +12,7 @@ interface GroupBoxProps {
 /**
  * 分组框组件 (类似 Windows GroupBox)
  */
-export function GroupBox({ title, children, className }: GroupBoxProps) {
+export function GroupBox({ title, extra, children, className }: GroupBoxProps) {
   return (
     <fieldset
       className={cn(
@@ -19,9 +21,18 @@ export function GroupBox({ title, children, className }: GroupBoxProps) {
         className
       )}
     >
-      <legend className="px-2 text-xs text-text-secondary font-medium">
-        {title}
-      </legend>
+      {extra ? (
+        <legend className="px-2 text-xs text-text-secondary font-medium w-full">
+          <div className="flex items-center justify-between w-full pr-2">
+            <span>{title}</span>
+            {extra}
+          </div>
+        </legend>
+      ) : (
+        <legend className="px-2 text-xs text-text-secondary font-medium">
+          {title}
+        </legend>
+      )}
       {children}
     </fieldset>
   )

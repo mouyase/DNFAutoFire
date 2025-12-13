@@ -13,7 +13,7 @@
     "windows": [
       {
         "title": "DNF 连发工具",
-        "width": 940,
+        "width": 910,
         "height": 500,
         "resizable": false,
         "maximizable": false,

@@ -8,7 +8,6 @@ import {
 } from "@/components/panels"
 import { useAutofire } from "@/hooks/use-autofire"
 
-const VERSION = "v0.1.0"
 
 /**
  * 应用根组件
@@ -35,7 +34,6 @@ function App() {
       // 顶部：键盘设置面板
       top={
         <KeyboardPanel
-          version={VERSION}
           enabledKeys={enabledKeys}
           onKeyClick={handleKeyClick}
           onClearKeys={handleClearKeys}

@@ -9,6 +9,7 @@ interface ActionPanelProps {
 
 /**
  * 操作按钮面板
+ * 不使用 GroupBox，直接显示按钮，与左侧 GroupBox 的内容区域对齐
  */
 export function ActionPanel({
   isRunning,
@@ -17,7 +18,7 @@ export function ActionPanel({
   onCheckUpdate,
 }: ActionPanelProps) {
   return (
-    <div className="flex flex-col gap-2 h-full">
+    <div className="flex flex-col gap-2 h-full pt-4">
       <Button
         variant="secondary"
         size="md"
