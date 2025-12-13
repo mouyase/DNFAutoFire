@@ -16,7 +16,10 @@
       "Bash(cargo clean:*)",
       "Bash(pnpm tauri dev:*)",
       "Bash(pnpm add:*)",
-      "Bash(pnpm config set:*)"
+      "Bash(pnpm config set:*)",
+      "Bash(node -e:*)",
+      "WebFetch(domain:pnpm.io)",
+      "Bash(pnpm dev)"
     ]
   }
 }

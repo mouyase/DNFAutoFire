@@ -1,6 +1,9 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "react", "react-hooks"],
+  "plugins": [
+    "typescript",
+    "react"
+  ],
   "categories": {
     "correctness": "error",
     "nursery": "off"
@@ -18,5 +21,9 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"
   },
-  "ignorePatterns": ["dist", "node_modules", "src-tauri"]
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "src-tauri"
+  ]
 }
