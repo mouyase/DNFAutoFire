@@ -1,93 +1,134 @@
-# DNF AutoFire
+# DNF AutoFire (Tauri 版)
 
-高性能 DNF 游戏连发工具，使用 Rust 编写。
+高性能游戏连发工具，使用 Rust + Tauri + Web 技术栈开发。
 
 ## 特性
 
-- 高性能按键连发
-- 支持多键同时连发
-- 聊天框兼容（聊天时不会连发）
-- 低延迟、低资源占用
-- 简洁的 GUI 界面
+- **游戏专用按键发送**：游戏能识别，聊天框不会收到输入
+- **多键同时连发**：支持同时按住多个按键，依次循环发送
+- **低延迟**：33ms 周期（约 30 次/秒），使用高精度定时器
+- **窗口检测**：只在 DNF 游戏窗口激活时工作
+- **管理员权限**：自动检测并提示以管理员重启
+- **美观的 Web UI**：深色主题，完整键盘布局
 
-## 技术原理
+## 技术栈
 
-详见 [TECHNICAL_NOTES.md](./TECHNICAL_NOTES.md)
+- **后端**：Rust + Windows API
+- **前端**：HTML + CSS + JavaScript
+- **框架**：Tauri 2.x
 
-## 环境要求
+## 快速开始
 
-- Windows 10/11
-- Rust 1.70+（GNU 工具链）
-- 管理员权限运行
-
-## 安装 Rust
-
-```bash
-# 下载 rustup-init.exe 并运行
-# 选择 GNU 工具链（不需要 Visual Studio）
-rustup default stable-x86_64-pc-windows-gnu
-```
-
-## 编译
+### 运行
 
 ```bash
-# 开发版本
-cargo build
+# 开发模式
+npm run tauri dev
 
-# 发布版本（优化）
-cargo build --release
+# 构建
+npm run tauri build
 ```
 
-## 运行
+### 使用
 
-```bash
-# 以管理员身份运行
-cargo run --release
-```
-
-或直接运行编译后的 exe：
-```
-target\release\dnf-autofire.exe
-```
-
-## 开发
-
-```bash
-# 运行测试程序
-cargo run --bin test_multi2
-
-# 代码格式化
-cargo fmt
-
-# 代码检查
-cargo clippy
-```
+1. **以管理员身份运行**（必需）
+2. 点击键盘上的按键启用/禁用连发
+3. 点击「启动连发」按钮
+4. 切换到 DNF 游戏窗口
+5. 按住已启用的按键即可连发
 
 ## 项目结构
 
 ```
-dnf-autofire/
-├── src/
-│   ├── main.rs           # 主程序入口
-│   ├── core/             # 核心逻辑
-│   │   ├── mod.rs
-│   │   ├── autofire.rs   # 连发引擎
-│   │   ├── keyboard.rs   # 键盘输入
-│   │   └── window.rs     # 窗口检测
-│   ├── config/           # 配置管理
-│   │   └── mod.rs
-│   ├── gui/              # GUI 界面
-│   │   ├── mod.rs
-│   │   └── keyboard_layout.rs
-│   └── bin/              # 测试程序
-│       ├── test_final.rs
-│       └── test_multi2.rs
-├── Cargo.toml
-├── build.rs              # 构建脚本（管理员清单）
-├── TECHNICAL_NOTES.md    # 技术笔记
+├── src/                    # 前端
+│   ├── index.html         # 主页面
+│   ├── styles.css         # 样式
+│   └── main.js            # 逻辑
+│
+├── src-tauri/              # 后端
+│   ├── src/
+│   │   ├── lib.rs         # Tauri 命令
+│   │   └── core/          # 核心模块
+│   │       ├── autofire.rs  # 连发引擎
+│   │       ├── keyboard.rs  # 键盘输入
+│   │       └── window.rs    # 窗口检测
+│   └── Cargo.toml
+│
+├── KNOWLEDGE.md            # 技术知识库（必读）
 └── README.md
 ```
 
-## 许可证
+## 核心原理
+
+详见 [KNOWLEDGE.md](./KNOWLEDGE.md)
+
+### 游戏专用按键
+
+使用 `vkFF + 真实扫描码 + 无 KEYEVENTF_SCANCODE 标志` 的组合：
+
+```rust
+KEYBDINPUT {
+    wVk: VIRTUAL_KEY(0xFF),      // 无效 VK，聊天框忽略
+    wScan: scan_code,             // 真实扫描码，游戏识别
+    dwFlags: KEYBD_EVENT_FLAGS(0), // 无标志
+    ...
+}
+```
+
+### 多键连发
+
+1. 使用 `WH_KEYBOARD_LL` 钩子拦截物理按键
+2. 首次按下发送正常按键（聊天可用）
+3. 后续连发使用游戏专用按键
+4. 使用 `AtomicU64` 位掩码管理多键状态
+
+## 配置
+
+### 添加测试窗口
+
+编辑 `src-tauri/src/core/window.rs`：
+
+```rust
+const DNF_WINDOW_CLASSES: &[&str] = &[
+    "地下城与勇士",  // DNF
+    "Notepad",       // 记事本（测试）
+];
+```
+
+### 调整连发速度
+
+编辑 `src-tauri/src/core/autofire.rs`：
+
+```rust
+const KEY_DOWN_MS: u64 = 16;  // 按下时间
+const KEY_UP_MS: u64 = 17;    // 释放时间
+```
+
+## 常见问题
+
+### Q: 连发没有效果？
+
+1. 确保以管理员权限运行
+2. 确保 DNF 窗口在前台
+3. 确保已启用要连发的按键
+
+### Q: 如何测试？
+
+将 "Notepad" 添加到窗口类名列表，使用记事本测试。
+
+## 开发
+
+```bash
+# 安装依赖
+npm install
+
+# 开发模式（热重载）
+npm run tauri dev
+
+# 构建发布版
+npm run tauri build
+```
+
+## 许可
 
 MIT License

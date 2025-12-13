@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:oxc.rs)",
+      "WebSearch",
+      "Bash(pnpm install:*)",
+      "Bash(corepack enable)",
+      "Bash(corepack prepare:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm oxlint:*)",
+      "Bash(pnpm eslint:*)",
+      "Bash(pnpm format:check:*)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(cargo clean:*)",
+      "Bash(pnpm tauri dev:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm config set:*)"
+    ]
+  }
+}

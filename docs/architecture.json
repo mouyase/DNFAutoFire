@@ -1,0 +1,85 @@
+{
+  "$schema": "./architecture.schema.json",
+  "核心技术": {
+    "原理": "使用 vkFF + 真实扫描码 + 无 KEYEVENTF_SCANCODE 标志发送游戏专用按键",
+    "实现细节": {
+      "虚拟键码": "0xFF (无效VK码，输入法/聊天框忽略)",
+      "扫描码": "真实扫描码 (游戏通过扫描码识别按键)",
+      "标志": "不设置 KEYEVENTF_SCANCODE (系统不转换扫描码)"
+    },
+    "效果": {
+      "游戏": "能识别按键",
+      "聊天框": "不接收输入",
+      "输入法": "不接收输入"
+    }
+  },
+  "模块结构": {
+    "rust后端": {
+      "目录": "src-tauri/src/",
+      "模块": {
+        "lib.rs": "Tauri命令定义和AppState管理",
+        "core/autofire.rs": "连发引擎（键盘钩子+连发循环）",
+        "core/keyboard.rs": "键盘输入封装（SendInput）",
+        "core/window.rs": "DNF窗口检测"
+      }
+    },
+    "react前端": {
+      "目录": "src/",
+      "模块": {
+        "components/keyboard/": "键盘组件（keyboard, keyboard-row, key）",
+        "components/layout/": "布局组件（header, status-bar, button, badge）",
+        "hooks/": "自定义Hooks（use-autofire, use-admin）",
+        "lib/": "工具函数（tauri命令封装, VK码映射, 键盘布局配置）",
+        "types/": "TypeScript类型定义"
+      }
+    }
+  },
+  "关键机制": {
+    "键盘钩子": {
+      "类型": "WH_KEYBOARD_LL",
+      "行为": {
+        "首次按下": "发送正常按键（聊天兼容）",
+        "后续连发": "发送游戏专用按键"
+      }
+    },
+    "多键状态管理": {
+      "数据结构": "AtomicU64位掩码",
+      "作用": "追踪多个同时按下的键"
+    },
+    "连发循环": {
+      "按下时间ms": 16,
+      "释放时间ms": 17,
+      "周期ms": 33,
+      "频率": "约30次/秒"
+    },
+    "窗口检测": {
+      "方法": "GetForegroundWindow + GetClassNameW",
+      "目标窗口类名": "地下城与勇士"
+    }
+  },
+  "重要模式": {
+    "全局状态": {
+      "方法": "once_cell::sync::Lazy<RwLock<...>>",
+      "原因": "钩子回调是extern system函数，不能捕获闭包变量"
+    },
+    "避免无限循环": {
+      "方法": "检查LLKHF_INJECTED标志",
+      "原因": "避免处理自己注入的按键"
+    },
+    "钩子线程退出": {
+      "方法": "PostThreadMessageW(WM_QUIT)",
+      "原因": "GetMessageW会阻塞"
+    }
+  },
+  "tauri命令": [
+    {"名称": "get_enabled_keys", "描述": "获取已启用的按键列表"},
+    {"名称": "toggle_key", "描述": "切换按键状态", "参数": "vk: number"},
+    {"名称": "set_keys", "描述": "设置所有按键", "参数": "keys: number[]"},
+    {"名称": "clear_keys", "描述": "清空所有按键"},
+    {"名称": "start_autofire", "描述": "启动连发"},
+    {"名称": "stop_autofire", "描述": "停止连发"},
+    {"名称": "is_running", "描述": "获取运行状态"},
+    {"名称": "is_elevated", "描述": "检查管理员权限"},
+    {"名称": "restart_as_admin", "描述": "以管理员权限重启"}
+  ]
+}

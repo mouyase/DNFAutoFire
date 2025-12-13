@@ -1,0 +1,95 @@
+{
+  "$schema": "./project-config.schema.json",
+  "项目信息": {
+    "名称": "DNF AutoFire",
+    "版本": "0.1.0",
+    "描述": "高性能游戏连发工具",
+    "平台": "windows",
+    "技术栈": {
+      "前端": {
+        "框架": "react",
+        "版本": "19.x",
+        "编译器": "babel-plugin-react-compiler",
+        "构建工具": "vite@6.x",
+        "样式": "tailwindcss@4.x",
+        "ui组件库": "shadcn/ui"
+      },
+      "后端": {
+        "语言": "rust",
+        "框架": "tauri@2.x",
+        "依赖": ["windows-rs", "parking_lot", "once_cell"]
+      },
+      "工具链": {
+        "包管理器": "pnpm",
+        "格式化": "oxfmt",
+        "代码检查": ["oxlint", "eslint"],
+        "类型检查": "typescript@5.7"
+      }
+    }
+  },
+  "开发规范": {
+    "语言": {
+      "文档": "中文",
+      "注释": "中文",
+      "提交信息": "中文",
+      "变量名": "英文",
+      "函数名": "英文"
+    },
+    "文件命名": "kebab-case",
+    "工作流程": ["设计先行", "反复校验", "零警告"],
+    "代码原则": ["高内聚低耦合", "遵循官方最佳实践"]
+  },
+  "命令": {
+    "初始化": {
+      "启用pnpm": "corepack enable && corepack prepare pnpm@latest --activate",
+      "安装依赖": "pnpm install"
+    },
+    "开发": {
+      "完整开发模式": "pnpm tauri dev",
+      "仅前端": "pnpm dev"
+    },
+    "构建": {
+      "发布版": "pnpm tauri build"
+    },
+    "代码质量": {
+      "lint全部": "pnpm lint",
+      "仅oxlint": "pnpm oxlint",
+      "格式化": "pnpm format",
+      "格式检查": "pnpm format:check",
+      "类型检查": "pnpm typecheck",
+      "rust-clippy": "cd src-tauri && cargo clippy -- -D warnings",
+      "rust-fmt": "cd src-tauri && cargo fmt"
+    }
+  },
+  "配置文件": {
+    "oxfmt": {
+      "文件": ".oxfmtrc.jsonc",
+      "行宽": 100,
+      "范围": "src/"
+    },
+    "oxlint": {
+      "文件": "oxlint.json",
+      "类型感知": true,
+      "插件": ["typescript", "react", "react-hooks"]
+    },
+    "eslint": {
+      "文件": "eslint.config.js",
+      "格式": "flat-config"
+    },
+    "typescript": {
+      "文件": "tsconfig.json",
+      "路径别名": {
+        "@/*": "./src/*"
+      }
+    },
+    "tauri": {
+      "文件": "src-tauri/tauri.conf.json",
+      "开发端口": 1420
+    }
+  },
+  "运行要求": {
+    "操作系统": "windows",
+    "权限": "管理员",
+    "原因": "键盘钩子和SendInput需要管理员权限"
+  }
+}

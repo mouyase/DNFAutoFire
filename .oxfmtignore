@@ -1,0 +1,10 @@
+# 构建产物
+dist
+node_modules
+
+# Rust 后端
+src-tauri/target
+src-tauri/gen
+
+# 锁文件
+pnpm-lock.yaml

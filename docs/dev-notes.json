@@ -1,0 +1,97 @@
+{
+  "$schema": "./dev-notes.schema.json",
+  "踩坑记录": [
+    {
+      "问题": "parking_lot::RwLock::const_new 不存在",
+      "原因": "新版本移除了 const_new 方法",
+      "解决方案": "使用 once_cell::sync::Lazy 代替",
+      "示例": {
+        "错误": "static KEYS: RwLock<HashSet<u16>> = RwLock::const_new(HashSet::new());",
+        "正确": "static KEYS: Lazy<RwLock<HashSet<u16>>> = Lazy::new(|| RwLock::new(HashSet::new()));"
+      }
+    },
+    {
+      "问题": "钩子回调中无法访问外部状态",
+      "原因": "钩子回调是 extern system 函数，不能捕获闭包变量",
+      "解决方案": "使用全局静态变量传递状态"
+    },
+    {
+      "问题": "连发导致无限循环",
+      "原因": "处理了自己注入的按键",
+      "解决方案": "检查 LLKHF_INJECTED 和 LLKHF_LOWER_IL_INJECTED 标志"
+    },
+    {
+      "问题": "钩子线程无法正常退出",
+      "原因": "GetMessageW 阻塞",
+      "解决方案": "使用 PostThreadMessageW 发送 WM_QUIT 消息"
+    },
+    {
+      "问题": "tsgolint 不支持 baseUrl",
+      "原因": "typescript-go 移除了此选项",
+      "解决方案": "从 tsconfig.json 移除 baseUrl，仅保留 paths"
+    }
+  ],
+  "SendInput方案对比": [
+    {
+      "方案": "普通SendInput (VK + SC + SCANCODE标志)",
+      "结果": "游戏识别，聊天框也识别",
+      "问题": "聊天时会输入大量字符"
+    },
+    {
+      "方案": "仅扫描码 (VK=0 + SC + SCANCODE标志)",
+      "结果": "游戏识别，聊天框也识别",
+      "问题": "同上"
+    },
+    {
+      "方案": "仅虚拟键码 (VK + SC=0 + 无标志)",
+      "结果": "聊天框识别，游戏可能不识别",
+      "问题": "不可靠"
+    },
+    {
+      "方案": "vkFF方案 (VK=0xFF + SC + 无标志)",
+      "结果": "游戏识别，聊天框不识别",
+      "状态": "采用",
+      "原理": "vkFF是无效键码，输入法忽略；游戏通过SC识别"
+    }
+  ],
+  "键盘钩子方案对比": [
+    {
+      "方案": "GetAsyncKeyState轮询",
+      "问题": "无法阻止系统按键重复，导致游戏收到双重输入"
+    },
+    {
+      "方案": "Raw Input",
+      "问题": "复杂度高，仍无法阻止重复"
+    },
+    {
+      "方案": "WH_KEYBOARD_LL钩子",
+      "状态": "采用",
+      "优点": "可以拦截物理按键，返回LRESULT(1)阻止系统处理"
+    }
+  ],
+  "windows-rs必需features": [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Shell",
+    "Win32_System_Threading",
+    "Win32_System_SystemServices",
+    "Win32_System_LibraryLoader",
+    "Win32_Security",
+    "Win32_Media"
+  ],
+  "配置调整": {
+    "添加测试窗口": {
+      "文件": "src-tauri/src/core/window.rs",
+      "常量": "DNF_WINDOW_CLASSES",
+      "示例": ["地下城与勇士", "Notepad"]
+    },
+    "调整连发速度": {
+      "文件": "src-tauri/src/core/autofire.rs",
+      "常量": {
+        "KEY_DOWN_MS": 16,
+        "KEY_UP_MS": 17
+      }
+    }
+  }
+}
