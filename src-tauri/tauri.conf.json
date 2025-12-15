@@ -30,7 +30,12 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "targets": "all"
+    "targets": "all",
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
   },
   "identifier": "cn.yojigen.dnfautofire",
   "productName": "DNF AutoFire",
