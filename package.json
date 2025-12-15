@@ -58,7 +58,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.25",
     "globals": "^16.5.0",
-    "oxfmt": "^0.17.0",
+    "oxfmt": "^0.18.0",
     "oxlint": "^1.32.0",
     "oxlint-tsgolint": "^0.9.0",
     "postcss": "^8.5.6",
