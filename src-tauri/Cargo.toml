@@ -1,5 +1,5 @@
 [package]
-name = "dnf-autofire-tauri"
+name = "dnfautofire"
 version = "0.1.0"
 description = "DNF AutoFire Tool - 高性能连发工具"
 authors = ["you"]
@@ -34,4 +34,3 @@ windows = { version = "0.58", features = [
     "Win32_Security",
     "Win32_Media",
 ] }
-

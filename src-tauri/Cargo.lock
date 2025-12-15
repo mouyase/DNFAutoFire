@@ -742,7 +742,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dnf-autofire-tauri"
+name = "dnfautofire"
 version = "0.1.0"
 dependencies = [
  "once_cell",

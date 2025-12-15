@@ -3,7 +3,7 @@
   <assemblyIdentity
     version="1.0.0.0"
     processorArchitecture="*"
-    name="com.arthur.dnf-autofire-tauri"
+    name="cn.yojigen.dnfautofire"
     type="win32"
   />
   <description>DNF AutoFire - 高性能连发工具</description>
