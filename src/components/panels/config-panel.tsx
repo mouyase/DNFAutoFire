@@ -273,7 +273,7 @@ export function ConfigPanel({
             <Button variant="ghost" onClick={handleDialogClose}>
               取消
             </Button>
-            <Button variant="danger" onClick={() => void handleDeleteConfirm()}>
+            <Button variant="destructive" onClick={() => void handleDeleteConfirm()}>
               删除
             </Button>
           </DialogFooter>

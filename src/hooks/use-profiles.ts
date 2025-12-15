@@ -466,6 +466,26 @@ export function useProfiles() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /**
+   * 获取保存时的按键状态（用于重置功能）
+   */
+  const getSavedKeys = useCallback(() => {
+    return [...savedKeysRef.current]
+  }, [])
+
+  /**
+   * 重置未保存状态（配合 getSavedKeys 使用）
+   */
+  const resetUnsavedChanges = useCallback(() => {
+    if (!activeProfileId) return
+
+    // 恢复 profiles 中的按键为保存时的状态
+    setProfiles((prev) =>
+      prev.map((p) => (p.id === activeProfileId ? { ...p, enabledKeys: [...savedKeysRef.current] } : p))
+    )
+    setHasUnsavedChanges(false)
+  }, [activeProfileId])
+
   return {
     profiles,
     activeProfile,
@@ -480,6 +500,8 @@ export function useProfiles() {
     updateEnabledKeys,
     saveCurrentProfile,
     loadProfiles,
+    getSavedKeys,
+    resetUnsavedChanges,
   }
 }
 

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import type { KeyConfig } from "@/types"
 import { KEY_SIZE, KEY_GAP } from "./constants"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui"
 
 /** 不支持的按键 VK 码（系统修饰键） */
 const DISABLED_KEYS = new Set([
@@ -38,7 +39,7 @@ export function Key({ config, active = false, onClick }: KeyProps) {
     return <div style={{ width: w, height: h, flexShrink: 0 }} />
   }
 
-  return (
+  const button = (
     <button
       type="button"
       onClick={() => !isDisabled && onClick?.(vk)}
@@ -51,8 +52,6 @@ export function Key({ config, active = false, onClick }: KeyProps) {
         "select-none",
         "whitespace-pre-wrap leading-tight",
         "transition-all duration-75",
-        // 禁用状态需要 group 类来控制 tooltip
-        isDisabled && "group",
         // 禁用状态
         isDisabled
           ? [
@@ -94,22 +93,18 @@ export function Key({ config, active = false, onClick }: KeyProps) {
         <span className="absolute inset-x-1 top-0.5 h-[1px] rounded-full bg-white/60" />
       )}
       {label}
-      {/* 禁用按键的自定义 Tooltip */}
-      {isDisabled && (
-        <span
-          className={cn(
-            "absolute -top-8 left-1/2 -translate-x-1/2",
-            "px-2 py-1 rounded",
-            "bg-gray-800 text-white text-[10px] whitespace-nowrap",
-            "opacity-0 group-hover:opacity-100",
-            "transition-opacity duration-150",
-            "pointer-events-none",
-            "z-50"
-          )}
-        >
-          不支持
-        </span>
-      )}
     </button>
   )
+
+  // 禁用按键使用 Tooltip 显示提示
+  if (isDisabled) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent>该按键不支持连发</TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return button
 }

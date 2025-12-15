@@ -1,161 +1,99 @@
-import { useEffect, useRef, type ReactNode } from "react"
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-interface DialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  children: ReactNode
-}
+const Dialog = DialogPrimitive.Root
 
-/**
- * 对话框根组件
- */
-export function Dialog({ open, onOpenChange, children }: DialogProps) {
-  const overlayRef = useRef<HTMLDivElement>(null)
+const DialogTrigger = DialogPrimitive.Trigger
 
-  // ESC 键关闭
-  useEffect(() => {
-    if (!open) return
+const DialogPortal = DialogPrimitive.Portal
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onOpenChange(false)
-      }
-    }
+const DialogClose = DialogPrimitive.Close
 
-    document.addEventListener("keydown", handleKeyDown)
-    return () => document.removeEventListener("keydown", handleKeyDown)
-  }, [open, onOpenChange])
+const DialogOverlay = React.forwardRef<
+  React.ComponentRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      "fixed inset-0 z-50 bg-black/50",
+      "data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:duration-200",
+      "data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:duration-150",
+      className
+    )}
+    {...props}
+  />
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-  // 点击遮罩关闭
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === overlayRef.current) {
-      onOpenChange(false)
-    }
-  }
-
-  if (!open) return null
-
-  return (
-    <div
-      ref={overlayRef}
-      onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-in fade-in-0"
-    >
-      {children}
-    </div>
-  )
-}
-
-interface DialogContentProps {
-  children: ReactNode
-  className?: string
-}
-
-/**
- * 对话框内容
- */
-export function DialogContent({ children, className }: DialogContentProps) {
-  return (
-    <div
+const DialogContent = React.forwardRef<
+  React.ComponentRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
       className={cn(
-        "bg-white rounded-lg shadow-lg border border-gray-200",
-        "p-5 w-80 max-w-[90vw]",
-        "animate-in zoom-in-95 fade-in-0",
+        "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
+        "w-80 max-w-[90vw] rounded-lg border border-gray-200 bg-white p-5 shadow-lg",
+        "data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:zoom-in-95 data-[state=open]:duration-200",
+        "data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95 data-[state=closed]:duration-150",
         className
       )}
+      {...props}
     >
       {children}
-    </div>
-  )
-}
+      <DialogPrimitive.Close className="absolute right-3 top-3 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-gray-100 data-[state=open]:text-gray-500">
+        <X className="h-4 w-4" />
+        <span className="sr-only">关闭</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+DialogContent.displayName = DialogPrimitive.Content.displayName
 
-interface DialogHeaderProps {
-  children: ReactNode
-  className?: string
-}
+const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("flex flex-col space-y-1.5 text-left", className)} {...props} />
+)
+DialogHeader.displayName = "DialogHeader"
 
-/**
- * 对话框标题区域
- */
-export function DialogHeader({ children, className }: DialogHeaderProps) {
-  return <div className={cn("mb-4", className)}>{children}</div>
-}
+const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("flex justify-end gap-2 mt-5", className)} {...props} />
+)
+DialogFooter.displayName = "DialogFooter"
 
-interface DialogTitleProps {
-  children: ReactNode
-  className?: string
-}
+const DialogTitle = React.forwardRef<
+  React.ComponentRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn("text-base font-semibold leading-none tracking-tight text-gray-900", className)}
+    {...props}
+  />
+))
+DialogTitle.displayName = DialogPrimitive.Title.displayName
 
-/**
- * 对话框标题
- */
-export function DialogTitle({ children, className }: DialogTitleProps) {
-  return <h2 className={cn("text-base font-semibold text-gray-900", className)}>{children}</h2>
-}
+const DialogDescription = React.forwardRef<
+  React.ComponentRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description ref={ref} className={cn("text-sm text-gray-500", className)} {...props} />
+))
+DialogDescription.displayName = DialogPrimitive.Description.displayName
 
-interface DialogDescriptionProps {
-  children: ReactNode
-  className?: string
-}
-
-/**
- * 对话框描述
- */
-export function DialogDescription({ children, className }: DialogDescriptionProps) {
-  return <p className={cn("text-sm text-gray-500 mt-1", className)}>{children}</p>
-}
-
-interface DialogFooterProps {
-  children: ReactNode
-  className?: string
-}
-
-/**
- * 对话框底部按钮区域
- */
-export function DialogFooter({ children, className }: DialogFooterProps) {
-  return <div className={cn("flex justify-end gap-2 mt-5", className)}>{children}</div>
-}
-
-interface ButtonProps {
-  children: ReactNode
-  onClick?: () => void
-  variant?: "default" | "primary" | "danger" | "ghost"
-  disabled?: boolean
-  className?: string
-  type?: "button" | "submit"
-}
-
-/**
- * 通用按钮组件
- */
-export function Button({
-  children,
-  onClick,
-  variant = "default",
-  disabled,
-  className,
-  type = "button",
-}: ButtonProps) {
-  const baseStyles =
-    "h-8 px-4 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-
-  const variantStyles = {
-    default: "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200",
-    primary: "bg-blue-500 text-white hover:bg-blue-600",
-    danger: "bg-red-500 text-white hover:bg-red-600",
-    ghost: "text-gray-600 hover:bg-gray-100",
-  }
-
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(baseStyles, variantStyles[variant], className)}
-    >
-      {children}
-    </button>
-  )
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogTrigger,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
 }

@@ -28,6 +28,8 @@ function App() {
     selectProfile,
     updateEnabledKeys,
     saveCurrentProfile,
+    getSavedKeys,
+    resetUnsavedChanges,
   } = useProfiles()
 
   // 用于跟踪按键变化，避免不必要的更新
@@ -86,10 +88,10 @@ function App() {
 
   // 重置：放弃未保存的更改，恢复到上次保存的状态
   const handleResetProfile = useCallback(async () => {
-    if (activeProfile) {
-      await loadProfileKeys(activeProfile.enabledKeys)
-    }
-  }, [activeProfile, loadProfileKeys])
+    const savedKeys = getSavedKeys()
+    await loadProfileKeys(savedKeys)
+    resetUnsavedChanges()
+  }, [getSavedKeys, loadProfileKeys, resetUnsavedChanges])
 
   // 选择配置：切换并自动加载按键
   const handleSelectProfile = useCallback(

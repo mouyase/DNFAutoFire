@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client"
 import "./index.css"
 import App from "./app"
 import { isMockMode } from "./lib/tauri"
+import { TooltipProvider } from "./components/ui"
 
 // 浏览器模式下添加特殊样式类，模拟 Tauri 窗口尺寸
 const rootElement = document.getElementById("root")!
@@ -13,6 +14,8 @@ if (isMockMode()) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <TooltipProvider delayDuration={0}>
+      <App />
+    </TooltipProvider>
   </StrictMode>
 )
