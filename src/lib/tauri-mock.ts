@@ -87,9 +87,17 @@ export const mockCommands = {
 
 /**
  * 检测是否在 Tauri 环境中运行
+ * Tauri v2 使用 window.isTauri 或 window.__TAURI_INTERNALS__
+ * Tauri v1 使用 window.__TAURI__
  */
 export function isTauriEnvironment(): boolean {
-  return typeof window !== "undefined" && "__TAURI__" in window
+  if (typeof window === "undefined") return false
+  // Tauri v2
+  if ("isTauri" in window && (window as unknown as { isTauri: boolean }).isTauri) return true
+  if ("__TAURI_INTERNALS__" in window) return true
+  // Tauri v1 fallback
+  if ("__TAURI__" in window) return true
+  return false
 }
 
 /**

@@ -22,27 +22,29 @@ html,
 body,
 #root {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 /* 浏览器开发模式：固定尺寸容器，模拟 Tauri 窗口 */
-@media screen {
-  #root.browser-mode {
-    width: 910px;
-    height: 500px;
-    margin: 20px auto;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
+#root.browser-mode {
+  width: 910px;
+  height: 500px;
+  margin: 20px auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
 
-  body:has(#root.browser-mode) {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+body:has(#root.browser-mode) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
 }
 
 body {
