@@ -63,6 +63,39 @@ export const tauriCommands = {
 
   /** 以管理员权限重启 */
   restartAsAdmin: createCommand("restart_as_admin", mockCommands.restartAsAdmin),
+
+  /** 更新托盘菜单的连发状态 */
+  updateTrayStatus: createCommand<void, [boolean]>(
+    "update_tray_status",
+    async () => {},
+    (isRunning: boolean) => ({ isRunning })
+  ),
+
+  /** 隐藏主窗口到托盘 */
+  hideToTray: createCommand("hide_to_tray", async () => {}),
+
+  /** 显示主窗口 */
+  showMainWindow: createCommand("show_main_window", async () => {}),
+
+  /** 切换迷你窗口显示状态 */
+  toggleMiniWindow: createCommand("toggle_mini_window", async () => {}),
+
+  /** 更新快捷键配置 */
+  updateShortcuts: createCommand<void, [string, string]>(
+    "update_shortcuts",
+    async () => {},
+    (popupShortcut: string, toggleShortcut: string) => ({
+      popupShortcut,
+      toggleShortcut,
+    })
+  ),
+
+  /** 播放系统音效 */
+  playSound: createCommand<void, [string]>(
+    "play_sound",
+    async () => {},
+    (soundType: string) => ({ soundType })
+  ),
 }
 
 /**

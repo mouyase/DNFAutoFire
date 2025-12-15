@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { AppLayout } from "@/components/layout"
 import { KeyboardPanel, ConfigPanel, FeaturesPanel, ActionPanel } from "@/components/panels"
+import { SettingsDialog } from "@/components/settings-dialog"
 import { useAutofire } from "@/hooks/use-autofire"
 import { useProfiles } from "@/hooks/use-profiles"
-import { tauriCommands } from "@/lib/tauri"
+import { useSettings } from "@/contexts/settings-context"
+import { tauriCommands, isMockMode } from "@/lib/tauri"
+import { playStartSound, playStopSound } from "@/lib/sound"
+import { listen } from "@tauri-apps/api/event"
+import { getCurrentWindow } from "@tauri-apps/api/window"
 
 /**
  * 应用根组件
@@ -31,6 +36,8 @@ function App() {
     getSavedKeys,
     resetUnsavedChanges,
   } = useProfiles()
+  const { settings, updateSettings } = useSettings()
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // 用于跟踪按键变化，避免不必要的更新
   const prevEnabledKeysRef = useRef<string>("")
@@ -116,35 +123,145 @@ function App() {
     void loadProfileKeys(activeProfile.enabledKeys)
   }, [isLoading, activeProfile, loadProfileKeys])
 
+  // 监听托盘菜单的连发切换事件
+  useEffect(() => {
+    if (isMockMode()) return
+
+    const unlisten = listen("tray-toggle-autofire", () => {
+      void toggle()
+    })
+
+    return () => {
+      void unlisten.then((fn) => fn())
+    }
+  }, [toggle])
+
+  // 监听配置切换事件（从迷你窗口广播）
+  useEffect(() => {
+    if (isMockMode()) return
+
+    const unlisten = listen<{ profileId: string }>("profile-switched", (event) => {
+      const { profileId } = event.payload
+      if (profileId && profileId !== activeProfileId) {
+        void handleSelectProfile(profileId)
+      }
+    })
+
+    return () => {
+      void unlisten.then((fn) => fn())
+    }
+  }, [activeProfileId, handleSelectProfile])
+
+  // 连发状态变化时更新托盘菜单
+  useEffect(() => {
+    if (isMockMode()) return
+    void tauriCommands.updateTrayStatus(isRunning)
+  }, [isRunning])
+
+  // 连发状态变化时播放音效
+  const prevIsRunningRef = useRef<boolean | null>(null)
+  useEffect(() => {
+    // 跳过初始化阶段（避免刚加载就播放音效）
+    if (prevIsRunningRef.current === null) {
+      prevIsRunningRef.current = isRunning
+      return
+    }
+
+    // 状态发生变化时播放音效
+    if (prevIsRunningRef.current !== isRunning && settings.behavior.playSoundOnToggle) {
+      if (isRunning) {
+        playStartSound()
+      } else {
+        playStopSound()
+      }
+    }
+    prevIsRunningRef.current = isRunning
+  }, [isRunning, settings.behavior.playSoundOnToggle])
+
+  // 关闭窗口时最小化到托盘（始终生效，不可修改）
+  useEffect(() => {
+    if (isMockMode()) return
+
+    const setupCloseHandler = async () => {
+      const window = getCurrentWindow()
+      const unlisten = await window.onCloseRequested(async (event) => {
+        event.preventDefault()
+        await window.hide()
+      })
+      return unlisten
+    }
+
+    const unlistenPromise = setupCloseHandler()
+
+    return () => {
+      void unlistenPromise.then((fn) => fn())
+    }
+  }, [])
+
+  // 打开设置弹窗
+  const handleOpenSettings = useCallback(() => {
+    setSettingsOpen(true)
+  }, [])
+
+  // 保存设置
+  const handleSaveSettings = useCallback(
+    (newSettings: typeof settings) => {
+      void updateSettings(newSettings)
+      // 同步快捷键到后端
+      if (!isMockMode()) {
+        void tauriCommands.updateShortcuts(
+          newSettings.shortcut.popupWindow,
+          newSettings.shortcut.toggleAutofire
+        )
+      }
+    },
+    [updateSettings]
+  )
+
   return (
-    <AppLayout
-      top={
-        <KeyboardPanel
-          enabledKeys={enabledKeys}
-          onKeyClick={handleKeyClick}
-          onClearKeys={handleClearKeys}
-          activeProfileName={activeProfile?.name}
-          hasUnsavedChanges={hasUnsavedChanges}
-        />
-      }
-      bottomLeft={
-        <ConfigPanel
-          profiles={profiles}
-          activeProfileId={activeProfileId}
-          hasUnsavedChanges={hasUnsavedChanges}
-          isLoading={isLoading}
-          onSelectProfile={handleSelectProfile}
-          onResetProfile={handleResetProfile}
-          onSaveProfile={saveCurrentProfile}
-          onDeleteProfile={deleteProfile}
-          onCloneProfile={cloneProfile}
-          onRenameProfile={renameProfile}
-          onCreateProfile={createProfile}
-        />
-      }
-      bottomCenter={<FeaturesPanel />}
-      bottomRight={<ActionPanel isRunning={isRunning} onToggle={handleToggle} />}
-    />
+    <>
+      <AppLayout
+        top={
+          <KeyboardPanel
+            enabledKeys={enabledKeys}
+            onKeyClick={handleKeyClick}
+            onClearKeys={handleClearKeys}
+            activeProfileName={activeProfile?.name}
+            hasUnsavedChanges={hasUnsavedChanges}
+          />
+        }
+        bottomLeft={
+          <ConfigPanel
+            profiles={profiles}
+            activeProfileId={activeProfileId}
+            hasUnsavedChanges={hasUnsavedChanges}
+            isLoading={isLoading}
+            onSelectProfile={handleSelectProfile}
+            onResetProfile={handleResetProfile}
+            onSaveProfile={saveCurrentProfile}
+            onDeleteProfile={deleteProfile}
+            onCloneProfile={cloneProfile}
+            onRenameProfile={renameProfile}
+            onCreateProfile={createProfile}
+          />
+        }
+        bottomCenter={<FeaturesPanel />}
+        bottomRight={
+          <ActionPanel
+            isRunning={isRunning}
+            onToggle={handleToggle}
+            onSettings={handleOpenSettings}
+          />
+        }
+      />
+
+      <SettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        settings={settings}
+        onSave={handleSaveSettings}
+      />
+    </>
   )
 }
 

@@ -6,12 +6,27 @@
     },
     "windows": [
       {
+        "label": "main",
         "center": true,
         "height": 500,
         "maximizable": false,
         "resizable": false,
         "title": "DNF 连发工具",
         "width": 910
+      },
+      {
+        "label": "mini",
+        "url": "mini.html",
+        "center": true,
+        "height": 400,
+        "width": 320,
+        "title": "切换配置",
+        "decorations": false,
+        "alwaysOnTop": true,
+        "visible": false,
+        "resizable": false,
+        "skipTaskbar": true,
+        "transparent": false
       }
     ]
   },

@@ -2,12 +2,14 @@
 
 mod core;
 mod engine;
+mod hotkey;
+mod tray;
 
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::sync::Arc;
-use tauri::State;
+use tauri::{Manager, State, WindowEvent};
 
 use core::autofire::AutoFireEngine;
 
@@ -225,11 +227,99 @@ fn restart_as_admin() -> bool {
     }
 }
 
+/// 更新托盘菜单中的连发状态
+#[tauri::command]
+fn update_tray_status(is_running: bool, app_handle: tauri::AppHandle) {
+    tray::update_autofire_menu(&app_handle, is_running);
+}
+
+/// 隐藏主窗口到托盘
+#[tauri::command]
+fn hide_to_tray(app_handle: tauri::AppHandle) {
+    tray::hide_main_window(&app_handle);
+}
+
+/// 显示主窗口
+#[tauri::command]
+fn show_main_window(app_handle: tauri::AppHandle) {
+    tray::show_main_window(&app_handle);
+}
+
+/// 切换迷你窗口显示状态
+#[tauri::command]
+fn toggle_mini_window(app_handle: tauri::AppHandle) {
+    tray::toggle_mini_window(&app_handle);
+}
+
+/// 更新快捷键配置
+#[tauri::command]
+fn update_shortcuts(popup_shortcut: String, toggle_shortcut: String) {
+    hotkey::update_hotkey_config(&popup_shortcut, &toggle_shortcut);
+}
+
+/// 播放系统音效
+#[tauri::command]
+fn play_sound(sound_type: String) {
+    #[cfg(windows)]
+    {
+        use windows::core::PCWSTR;
+        use windows::Win32::Media::Audio::{PlaySoundW, SND_ALIAS, SND_ASYNC};
+
+        let sound_name = match sound_type.as_str() {
+            "start" => "SystemAsterisk\0",   // 星号提示音
+            "stop" => "SystemExclamation\0", // 感叹号提示音
+            _ => return,
+        };
+
+        let wide: Vec<u16> = sound_name.encode_utf16().collect();
+
+        unsafe {
+            let _ = PlaySoundW(PCWSTR(wide.as_ptr()), None, SND_ALIAS | SND_ASYNC);
+        }
+
+        println!("[音效] 播放: {}", sound_type);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            // 创建系统托盘
+            tray::create_tray(app.handle())?;
+
+            // 启动快捷键钩子（使用键盘钩子，不拦截按键）
+            #[cfg(desktop)]
+            {
+                hotkey::start_hotkey_hook(app.handle());
+            }
+
+            // 拦截主窗口关闭事件，改为隐藏到托盘
+            if let Some(main_window) = app.get_webview_window("main") {
+                let app_handle = app.handle().clone();
+                main_window.on_window_event(move |event| {
+                    if let WindowEvent::CloseRequested { api, .. } = event {
+                        api.prevent_close();
+                        tray::hide_main_window(&app_handle);
+                    }
+                });
+            }
+
+            // 拦截迷你窗口失焦事件，自动隐藏
+            if let Some(mini_window) = app.get_webview_window("mini") {
+                mini_window.on_window_event(move |event| {
+                    if let WindowEvent::Focused(false) = event {
+                        // 暂时注释掉自动隐藏，让用户可以用 Esc 关闭
+                        // let _ = mini_window.hide();
+                    }
+                });
+            }
+
+            println!("[Tauri] 应用初始化完成");
+            Ok(())
+        })
         .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![
             get_enabled_keys,
@@ -242,6 +332,12 @@ pub fn run() {
             get_platform_info,
             is_elevated,
             restart_as_admin,
+            update_tray_status,
+            hide_to_tray,
+            show_main_window,
+            toggle_mini_window,
+            update_shortcuts,
+            play_sound,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

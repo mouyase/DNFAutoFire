@@ -1,6 +1,7 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import path from "path"
+import { resolve } from "path"
 
 const host = process.env.TAURI_DEV_HOST
 
@@ -17,6 +18,16 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+
+  // 多入口配置（主窗口 + 迷你窗口）
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        mini: resolve(__dirname, "mini.html"),
+      },
     },
   },
 
