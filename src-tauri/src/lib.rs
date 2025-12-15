@@ -1,11 +1,12 @@
 //! DNF AutoFire Tauri 后端
 
 mod core;
+mod engine;
 
-use std::collections::HashSet;
-use std::sync::Arc;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
+use std::sync::Arc;
 use tauri::State;
 
 use core::autofire::AutoFireEngine;
@@ -55,7 +56,11 @@ fn toggle_key(vk: u16, state: State<AppState>) -> bool {
     let engine = state.engine.lock();
     engine.set_keys(keys.iter().copied().collect());
 
-    println!("[Tauri] 按键 {:#X} 状态: {}", vk, if enabled { "启用" } else { "禁用" });
+    println!(
+        "[Tauri] 按键 {:#X} 状态: {}",
+        vk,
+        if enabled { "启用" } else { "禁用" }
+    );
     enabled
 }
 
@@ -149,7 +154,9 @@ fn is_elevated() -> bool {
     #[cfg(windows)]
     {
         use windows::Win32::Foundation::HANDLE;
-        use windows::Win32::Security::{GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY};
+        use windows::Win32::Security::{
+            GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY,
+        };
         use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
 
         unsafe {
@@ -221,6 +228,7 @@ fn restart_as_admin() -> bool {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![

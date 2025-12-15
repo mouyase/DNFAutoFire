@@ -79,13 +79,22 @@ export function useAutofire() {
     }
   }, [isRunning, start, stop])
 
-  // 初始化时获取状态
+  // 初始化和定时刷新状态
   useEffect(() => {
-    void refresh()
-  }, [refresh])
+    // 初始化获取状态
+    const init = async () => {
+      try {
+        const running = await tauriCommands.isRunning()
+        const keys = await tauriCommands.getEnabledKeys()
+        setIsRunning(running)
+        setEnabledKeys(new Set(keys))
+      } catch (error) {
+        console.error("初始化状态失败:", error)
+      }
+    }
+    void init()
 
-  // 定时刷新状态
-  useEffect(() => {
+    // 定时刷新
     const interval = setInterval(refresh, 500)
     return () => clearInterval(interval)
   }, [refresh])

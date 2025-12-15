@@ -1,25 +1,30 @@
 //! 连发核心逻辑
 //!
+//! 基于 Trait 抽象的连发引擎，支持跨平台测试
+//!
 //! Windows 平台: 使用低级键盘钩子 + 多线程实现无冲突连发
 //! 其他平台: Mock 实现，用于 UI 开发测试
-//!
-//! 技术要点（Windows）：
-//! 1. WH_KEYBOARD_LL 钩子拦截物理按键，阻止系统重复
-//! 2. 首次按下发送正常按键（聊天框可识别）
-//! 3. 后续连发使用 vkFF + sc 方式（仅游戏识别）
-//! 4. 多键同时按下时，依次循环发送每个按键
 
+use parking_lot::RwLock;
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
 
-use parking_lot::RwLock;
+// 导入用于未来集成的 Trait 和默认实现
+#[allow(unused_imports)]
+use super::keyboard::DefaultKeyboardDriver;
+#[allow(unused_imports)]
+use super::traits::{KeyboardDriver, WindowDetector};
+#[allow(unused_imports)]
+use super::window::DefaultWindowDetector;
 
 // ============================================================================
 // 公共接口 - AutoFireEngine
 // ============================================================================
 
 /// 连发引擎
+///
+/// 管理连发状态和按键配置
 pub struct AutoFireEngine {
     /// 是否启用连发
     enabled: Arc<AtomicBool>,
@@ -32,6 +37,15 @@ pub struct AutoFireEngine {
     platform: windows_impl::WindowsAutoFire,
     #[cfg(not(windows))]
     platform: mock_impl::MockAutoFire,
+}
+
+impl std::fmt::Debug for AutoFireEngine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("AutoFireEngine")
+            .field("enabled", &self.enabled.load(Ordering::SeqCst))
+            .field("configured_keys", &*self.configured_keys.read())
+            .finish()
+    }
 }
 
 #[allow(dead_code)]
@@ -155,11 +169,9 @@ mod windows_impl {
     use std::thread::{self, JoinHandle};
     use std::time::Duration;
 
-    use crate::core::keyboard::{
-        send_key_game_only_down, send_key_game_only_up, send_key_normal_down, send_key_normal_up,
-        vk_to_scan_code,
-    };
-    use crate::core::window::is_dnf_active;
+    use crate::core::keyboard::DefaultKeyboardDriver;
+    use crate::core::traits::KeyboardDriver;
+    use crate::core::window::DefaultWindowDetector;
 
     /// 连发时间参数（毫秒）
     const KEY_DOWN_MS: u64 = 16;
@@ -274,7 +286,7 @@ mod windows_impl {
         use windows::Win32::System::LibraryLoader::GetModuleHandleW;
         use windows::Win32::System::Threading::GetCurrentThreadId;
         use windows::Win32::UI::WindowsAndMessaging::{
-            GetMessageW, SetWindowsHookExW, UnhookWindowsHookEx, WH_KEYBOARD_LL, MSG,
+            GetMessageW, SetWindowsHookExW, UnhookWindowsHookEx, MSG, WH_KEYBOARD_LL,
         };
 
         // 保存线程 ID
@@ -386,20 +398,20 @@ mod windows_impl {
                         let pressed_keys = HOOK_PRESSED_KEYS.read();
                         if let Some(ref keys) = *pressed_keys {
                             let key_bit = vk_to_bit(vk);
+                            let keyboard = DefaultKeyboardDriver::new();
+                            let sc = keyboard.vk_to_scan_code(vk);
 
                             if is_keydown {
                                 let old = keys.fetch_or(key_bit, Ordering::SeqCst);
                                 if old & key_bit == 0 {
                                     println!("[Hook] 按键按下: vk={:#X}", vk);
-                                    let sc = vk_to_scan_code(vk);
-                                    send_key_normal_down(vk, sc);
+                                    keyboard.send_key_down(vk, sc);
                                 }
                                 return windows::Win32::Foundation::LRESULT(1);
                             } else if is_keyup {
                                 println!("[Hook] 按键释放: vk={:#X}", vk);
                                 keys.fetch_and(!key_bit, Ordering::SeqCst);
-                                let sc = vk_to_scan_code(vk);
-                                send_key_normal_up(vk, sc);
+                                keyboard.send_key_up(vk, sc);
                                 return windows::Win32::Foundation::LRESULT(1);
                             }
                         }
@@ -422,6 +434,8 @@ mod windows_impl {
 
         set_thread_priority_high();
 
+        let keyboard = DefaultKeyboardDriver::new();
+        let window = DefaultWindowDetector::new();
         let mut keys_with_sc: Vec<(u16, u16, u64)> = Vec::new();
 
         loop {
@@ -434,7 +448,7 @@ mod windows_impl {
                 continue;
             }
 
-            if !is_dnf_active() {
+            if !window.is_target_active() {
                 static LAST_LOG: std::sync::atomic::AtomicU64 =
                     std::sync::atomic::AtomicU64::new(0);
                 let now = std::time::SystemTime::now()
@@ -444,7 +458,7 @@ mod windows_impl {
                 let last = LAST_LOG.load(Ordering::Relaxed);
                 if now - last >= 3 {
                     LAST_LOG.store(now, Ordering::Relaxed);
-                    let class = crate::core::window::get_foreground_class_name();
+                    let class = window.get_foreground_class_name();
                     println!("[AutoFire] 当前窗口: '{}' (非目标窗口)", class);
                 }
                 thread::sleep(Duration::from_millis(50));
@@ -457,7 +471,7 @@ mod windows_impl {
                 if keys_with_sc.len() != configured.len() {
                     keys_with_sc.clear();
                     for &vk in configured.iter() {
-                        let sc = vk_to_scan_code(vk);
+                        let sc = keyboard.vk_to_scan_code(vk);
                         let bit = vk_to_bit(vk);
                         keys_with_sc.push((vk, sc, bit));
                     }
@@ -467,17 +481,15 @@ mod windows_impl {
             let pressed = pressed_keys.load(Ordering::SeqCst);
 
             if pressed != 0 {
-                for &(vk, sc, bit) in &keys_with_sc {
+                for &(_vk, sc, bit) in &keys_with_sc {
                     if pressed & bit != 0 {
                         if stop_signal.load(Ordering::SeqCst) {
                             break;
                         }
 
-                        println!("[AutoFire] 发送按键 vk={:#X} sc={:#X}", vk, sc);
-
-                        send_key_game_only_down(sc);
+                        keyboard.send_game_key_down(sc);
                         thread::sleep(Duration::from_millis(KEY_DOWN_MS));
-                        send_key_game_only_up(sc);
+                        keyboard.send_game_key_up(sc);
                         thread::sleep(Duration::from_millis(KEY_UP_MS));
                     }
                 }
@@ -514,7 +526,7 @@ mod windows_impl {
 }
 
 // ============================================================================
-// Mock 实现（非 Windows 平台，用于 UI 开发）
+// Mock 实现（非 Windows 平台，用于 UI 开发和测试）
 // ============================================================================
 
 #[cfg(not(windows))]
@@ -560,10 +572,7 @@ mod mock_impl {
                     // 每秒打印一次状态
                     let keys = configured_keys.read();
                     if !keys.is_empty() {
-                        println!(
-                            "[AutoFire Mock] 监控中，已配置 {} 个按键",
-                            keys.len()
-                        );
+                        println!("[AutoFire Mock] 监控中，已配置 {} 个按键", keys.len());
                     }
                     thread::sleep(Duration::from_secs(1));
                 }
@@ -581,5 +590,71 @@ mod mock_impl {
                 let _ = handle.join();
             }
         }
+    }
+}
+
+// ============================================================================
+// 单元测试
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_engine_creation() {
+        let engine = AutoFireEngine::new();
+        assert!(!engine.is_running());
+        assert!(engine.get_enabled_keys().is_empty());
+    }
+
+    #[test]
+    fn test_engine_key_management() {
+        let engine = AutoFireEngine::new();
+
+        // 添加按键
+        engine.add_key(0x4A);
+        assert!(engine.is_key_enabled(0x4A));
+        assert_eq!(engine.get_enabled_keys().len(), 1);
+
+        // 切换按键
+        let enabled = engine.toggle_key(0x4A);
+        assert!(!enabled);
+        assert!(!engine.is_key_enabled(0x4A));
+
+        // 设置多个按键
+        engine.set_keys(vec![0x4A, 0x4B, 0x4C]);
+        assert_eq!(engine.get_enabled_keys().len(), 3);
+
+        // 移除按键
+        engine.remove_key(0x4A);
+        assert!(!engine.is_key_enabled(0x4A));
+        assert_eq!(engine.get_enabled_keys().len(), 2);
+    }
+
+    #[test]
+    fn test_engine_start_stop() {
+        let mut engine = AutoFireEngine::new();
+
+        assert!(!engine.is_running());
+
+        engine.start();
+        assert!(engine.is_running());
+
+        engine.stop();
+        assert!(!engine.is_running());
+    }
+
+    #[test]
+    fn test_engine_toggle() {
+        let mut engine = AutoFireEngine::new();
+
+        let running = engine.toggle();
+        assert!(running);
+        assert!(engine.is_running());
+
+        let running = engine.toggle();
+        assert!(!running);
+        assert!(!engine.is_running());
     }
 }

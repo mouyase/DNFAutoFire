@@ -61,9 +61,7 @@ export function Key({ config, active = false, onClick }: KeyProps) {
       )}
     >
       {/* 按键顶面高光效果（未激活时显示） */}
-      {!active && (
-        <span className="absolute inset-x-1 top-0.5 h-[1px] rounded-full bg-white/60" />
-      )}
+      {!active && <span className="absolute inset-x-1 top-0.5 h-[1px] rounded-full bg-white/60" />}
       {label}
     </button>
   )

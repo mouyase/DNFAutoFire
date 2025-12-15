@@ -18,9 +18,15 @@
       "目录": "src-tauri/src/",
       "模块": {
         "lib.rs": "Tauri命令定义和AppState管理",
+        "core/mod.rs": "核心模块入口，重新导出公共类型",
+        "core/traits.rs": "Trait抽象接口定义（KeyboardDriver, WindowDetector等）",
         "core/autofire.rs": "连发引擎（键盘钩子+连发循环）",
-        "core/keyboard.rs": "键盘输入封装（SendInput）",
-        "core/window.rs": "DNF窗口检测"
+        "core/keyboard.rs": "键盘输入封装（SendInput + Mock实现）",
+        "core/window.rs": "DNF窗口检测（Windows API + Mock实现）",
+        "engine/mod.rs": "执行引擎模块入口",
+        "engine/action.rs": "动作定义（KeyAction, TriggerRule）",
+        "engine/executor.rs": "动作执行器（依赖注入模式）",
+        "engine/profile.rs": "配置档案管理（Profile, ProfileManager）"
       }
     },
     "react前端": {
@@ -32,6 +38,88 @@
         "lib/": "工具函数（tauri命令封装, VK码映射, 键盘布局配置）",
         "types/": "TypeScript类型定义"
       }
+    }
+  },
+  "Trait抽象层": {
+    "KeyboardDriver": {
+      "职责": "键盘输入驱动抽象",
+      "方法": [
+        "vk_to_scan_code(vk) -> scan_code",
+        "send_key_down(vk, scan_code)",
+        "send_key_up(vk, scan_code)",
+        "send_key_press(vk)",
+        "send_game_key_down(scan_code)",
+        "send_game_key_up(scan_code)",
+        "is_key_pressed(vk) -> bool"
+      ],
+      "实现": {
+        "Windows": "DefaultKeyboardDriver (SendInput API)",
+        "Mock": "MockKeyboardDriver (事件记录)"
+      }
+    },
+    "WindowDetector": {
+      "职责": "窗口检测器抽象",
+      "方法": [
+        "is_target_active() -> bool",
+        "get_foreground_class_name() -> String"
+      ],
+      "实现": {
+        "Windows": "DefaultWindowDetector (GetForegroundWindow)",
+        "Mock": "MockWindowDetector, AlwaysActiveDetector, NeverActiveDetector"
+      }
+    },
+    "KeyboardHook": {
+      "职责": "键盘钩子管理抽象",
+      "方法": [
+        "install(callback) -> Result",
+        "uninstall() -> Result",
+        "is_installed() -> bool"
+      ]
+    }
+  },
+  "Engine模块": {
+    "KeyAction": {
+      "描述": "单个按键动作定义",
+      "变体": [
+        "Press { vk } - 普通按键",
+        "GamePress { vk } - 游戏专用按键",
+        "Hold { vk } - 按住不放",
+        "Release { vk } - 释放按键",
+        "Delay { ms } - 延迟"
+      ]
+    },
+    "TriggerRule": {
+      "描述": "触发规则定义",
+      "字段": {
+        "id": "唯一标识",
+        "trigger_keys": "触发按键列表",
+        "actions": "动作序列",
+        "repeat": "是否循环",
+        "interval_ms": "循环间隔",
+        "enabled": "是否启用"
+      },
+      "预设方法": [
+        "simple_repeat(vk, interval)",
+        "delayed_repeat(vk, delay, interval)",
+        "combo_repeat(trigger, combo_keys, interval)"
+      ]
+    },
+    "ActionExecutor": {
+      "描述": "动作执行器（泛型，支持依赖注入）",
+      "方法": [
+        "execute_action(action)",
+        "execute_sequence(actions, should_continue)",
+        "execute_rule_once(rule, should_continue)",
+        "execute_rule_loop(rule, should_continue)"
+      ]
+    },
+    "Profile": {
+      "描述": "用户配置档案",
+      "字段": ["id", "name", "rules", "created_at", "updated_at"]
+    },
+    "ProfileManager": {
+      "描述": "配置档案管理器",
+      "功能": ["创建/删除配置", "切换活动配置", "序列化/反序列化"]
     }
   },
   "关键机制": {
@@ -58,6 +146,11 @@
     }
   },
   "重要模式": {
+    "依赖注入": {
+      "方法": "泛型 + Trait 约束",
+      "示例": "ActionExecutor<K: KeyboardDriver, W: WindowDetector>",
+      "优势": "生产用真实实现，测试用Mock实现"
+    },
     "全局状态": {
       "方法": "once_cell::sync::Lazy<RwLock<...>>",
       "原因": "钩子回调是extern system函数，不能捕获闭包变量"
@@ -87,17 +180,18 @@
     "说明": "支持在 macOS/Linux 上进行 UI 开发，核心功能仅在 Windows 上可用",
     "架构模式": {
       "条件编译": "#[cfg(windows)] 和 #[cfg(not(windows))]",
+      "Trait抽象": "通过 Trait 定义平台无关接口",
       "mock实现": "非 Windows 平台使用 mock 模块模拟核心功能"
     },
     "mock模块": {
-      "core/autofire.rs": {
-        "MockAutoFire": "模拟连发引擎，仅打印日志不实际发送按键"
+      "core/keyboard.rs::mock": {
+        "MockKeyboardDriver": "记录所有键盘事件，用于测试验证",
+        "RecordedKeyEvent": "记录的事件类型枚举"
       },
-      "core/keyboard.rs": {
-        "mock_impl": "所有键盘函数为空操作"
-      },
-      "core/window.rs": {
-        "mock_impl": "is_dnf_active() 默认返回 true"
+      "core/window.rs::mock": {
+        "MockWindowDetector": "可配置的窗口状态模拟",
+        "AlwaysActiveDetector": "永远返回活动状态",
+        "NeverActiveDetector": "永远返回非活动状态"
       }
     },
     "开发流程": {
@@ -107,6 +201,25 @@
     "前端判断": {
       "命令": "get_platform_info",
       "返回值": "{ platform: string, is_mock_mode: boolean }"
+    }
+  },
+  "测试覆盖": {
+    "单元测试数量": 35,
+    "测试模块": {
+      "core/autofire": ["engine_creation", "engine_start_stop", "engine_toggle", "engine_key_management"],
+      "core/keyboard::mock": ["records_events", "game_keys", "key_pressed", "clear_events", "send_key_press_helper"],
+      "core/window::mock": ["default_active", "set_active", "set_class_name", "with_state", "always_active", "never_active"],
+      "engine/action": ["simple_repeat_rule", "delayed_repeat_rule", "combo_repeat_rule", "action_serialization", "rule_serialization"],
+      "engine/executor": ["execute_press_action", "execute_game_press_action", "execute_sequence_*", "execute_simple_rule", "execution_context"],
+      "engine/profile": ["profile_creation", "add_remove_rule", "find_rules_for_key", "profile_manager_*", "serialization"]
+    }
+  },
+  "设计文档": {
+    "位置": "docs/design/",
+    "文件": {
+      "architecture-design.md": "架构设计文档",
+      "trait-interfaces.md": "抽象接口文档",
+      "flow-diagrams.md": "流程文档（含 Mermaid 流程图）"
     }
   }
 }

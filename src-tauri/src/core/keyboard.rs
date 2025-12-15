@@ -1,9 +1,11 @@
 //! 键盘输入模块
 //!
 //! Windows 平台: 直接调用 Win32 SendInput API
-//! 其他平台: Mock 实现，用于 UI 开发
+//! 其他平台: Mock 实现，用于 UI 开发和测试
 
-/// 常用按键的虚拟键码（公开 API，供外部使用）
+use super::traits::KeyboardDriver;
+
+/// 常用按键的虚拟键码
 #[allow(dead_code)]
 pub mod vk {
     pub const VK_BACK: u16 = 0x08;
@@ -17,7 +19,7 @@ pub mod vk {
     pub const VK_ESCAPE: u16 = 0x1B;
     pub const VK_SPACE: u16 = 0x20;
     pub const VK_PRIOR: u16 = 0x21; // Page Up
-    pub const VK_NEXT: u16 = 0x22;  // Page Down
+    pub const VK_NEXT: u16 = 0x22; // Page Down
     pub const VK_END: u16 = 0x23;
     pub const VK_HOME: u16 = 0x24;
     pub const VK_LEFT: u16 = 0x25;
@@ -120,130 +122,17 @@ pub mod vk {
     pub const VK_APPS: u16 = 0x5D;
 
     // OEM 键（符号键）
-    pub const VK_OEM_1: u16 = 0xBA;      // ;:
-    pub const VK_OEM_PLUS: u16 = 0xBB;   // =+
-    pub const VK_OEM_COMMA: u16 = 0xBC;  // ,<
-    pub const VK_OEM_MINUS: u16 = 0xBD;  // -_
+    pub const VK_OEM_1: u16 = 0xBA; // ;:
+    pub const VK_OEM_PLUS: u16 = 0xBB; // =+
+    pub const VK_OEM_COMMA: u16 = 0xBC; // ,<
+    pub const VK_OEM_MINUS: u16 = 0xBD; // -_
     pub const VK_OEM_PERIOD: u16 = 0xBE; // .>
-    pub const VK_OEM_2: u16 = 0xBF;      // /?
-    pub const VK_OEM_3: u16 = 0xC0;      // `~
-    pub const VK_OEM_4: u16 = 0xDB;      // [{
-    pub const VK_OEM_5: u16 = 0xDC;      // \|
-    pub const VK_OEM_6: u16 = 0xDD;      // ]}
-    pub const VK_OEM_7: u16 = 0xDE;      // '"
-
-    /// 根据按键名获取虚拟键码
-    pub fn from_name(name: &str) -> Option<u16> {
-        match name.to_uppercase().as_str() {
-            "A" => Some(VK_A),
-            "B" => Some(VK_B),
-            "C" => Some(VK_C),
-            "D" => Some(VK_D),
-            "E" => Some(VK_E),
-            "F" => Some(VK_F),
-            "G" => Some(VK_G),
-            "H" => Some(VK_H),
-            "I" => Some(VK_I),
-            "J" => Some(VK_J),
-            "K" => Some(VK_K),
-            "L" => Some(VK_L),
-            "M" => Some(VK_M),
-            "N" => Some(VK_N),
-            "O" => Some(VK_O),
-            "P" => Some(VK_P),
-            "Q" => Some(VK_Q),
-            "R" => Some(VK_R),
-            "S" => Some(VK_S),
-            "T" => Some(VK_T),
-            "U" => Some(VK_U),
-            "V" => Some(VK_V),
-            "W" => Some(VK_W),
-            "X" => Some(VK_X),
-            "Y" => Some(VK_Y),
-            "Z" => Some(VK_Z),
-            "0" => Some(VK_0),
-            "1" => Some(VK_1),
-            "2" => Some(VK_2),
-            "3" => Some(VK_3),
-            "4" => Some(VK_4),
-            "5" => Some(VK_5),
-            "6" => Some(VK_6),
-            "7" => Some(VK_7),
-            "8" => Some(VK_8),
-            "9" => Some(VK_9),
-            "F1" => Some(VK_F1),
-            "F2" => Some(VK_F2),
-            "F3" => Some(VK_F3),
-            "F4" => Some(VK_F4),
-            "F5" => Some(VK_F5),
-            "F6" => Some(VK_F6),
-            "F7" => Some(VK_F7),
-            "F8" => Some(VK_F8),
-            "F9" => Some(VK_F9),
-            "F10" => Some(VK_F10),
-            "F11" => Some(VK_F11),
-            "F12" => Some(VK_F12),
-            "SPACE" | " " => Some(VK_SPACE),
-            "TAB" => Some(VK_TAB),
-            "ENTER" | "RETURN" => Some(VK_RETURN),
-            "ESC" | "ESCAPE" => Some(VK_ESCAPE),
-            "BACKSPACE" | "BACK" => Some(VK_BACK),
-            "SHIFT" => Some(VK_SHIFT),
-            "CTRL" | "CONTROL" => Some(VK_CONTROL),
-            "ALT" | "MENU" => Some(VK_MENU),
-            "LEFT" => Some(VK_LEFT),
-            "UP" => Some(VK_UP),
-            "RIGHT" => Some(VK_RIGHT),
-            "DOWN" => Some(VK_DOWN),
-            "NUMPAD0" | "NUM0" => Some(VK_NUMPAD0),
-            "NUMPAD1" | "NUM1" => Some(VK_NUMPAD1),
-            "NUMPAD2" | "NUM2" => Some(VK_NUMPAD2),
-            "NUMPAD3" | "NUM3" => Some(VK_NUMPAD3),
-            "NUMPAD4" | "NUM4" => Some(VK_NUMPAD4),
-            "NUMPAD5" | "NUM5" => Some(VK_NUMPAD5),
-            "NUMPAD6" | "NUM6" => Some(VK_NUMPAD6),
-            "NUMPAD7" | "NUM7" => Some(VK_NUMPAD7),
-            "NUMPAD8" | "NUM8" => Some(VK_NUMPAD8),
-            "NUMPAD9" | "NUM9" => Some(VK_NUMPAD9),
-            _ => None,
-        }
-    }
-
-    /// 获取按键的显示名称
-    pub fn to_name(vk: u16) -> &'static str {
-        match vk {
-            VK_A => "A", VK_B => "B", VK_C => "C", VK_D => "D",
-            VK_E => "E", VK_F => "F", VK_G => "G", VK_H => "H",
-            VK_I => "I", VK_J => "J", VK_K => "K", VK_L => "L",
-            VK_M => "M", VK_N => "N", VK_O => "O", VK_P => "P",
-            VK_Q => "Q", VK_R => "R", VK_S => "S", VK_T => "T",
-            VK_U => "U", VK_V => "V", VK_W => "W", VK_X => "X",
-            VK_Y => "Y", VK_Z => "Z",
-            VK_0 => "0", VK_1 => "1", VK_2 => "2", VK_3 => "3",
-            VK_4 => "4", VK_5 => "5", VK_6 => "6", VK_7 => "7",
-            VK_8 => "8", VK_9 => "9",
-            VK_F1 => "F1", VK_F2 => "F2", VK_F3 => "F3", VK_F4 => "F4",
-            VK_F5 => "F5", VK_F6 => "F6", VK_F7 => "F7", VK_F8 => "F8",
-            VK_F9 => "F9", VK_F10 => "F10", VK_F11 => "F11", VK_F12 => "F12",
-            VK_SPACE => "Space",
-            VK_TAB => "Tab",
-            VK_RETURN => "Enter",
-            VK_ESCAPE => "Esc",
-            VK_BACK => "Back",
-            VK_SHIFT => "Shift",
-            VK_CONTROL => "Ctrl",
-            VK_MENU => "Alt",
-            VK_LEFT => "Left",
-            VK_UP => "Up",
-            VK_RIGHT => "Right",
-            VK_DOWN => "Down",
-            VK_NUMPAD0 => "Num0", VK_NUMPAD1 => "Num1", VK_NUMPAD2 => "Num2",
-            VK_NUMPAD3 => "Num3", VK_NUMPAD4 => "Num4", VK_NUMPAD5 => "Num5",
-            VK_NUMPAD6 => "Num6", VK_NUMPAD7 => "Num7", VK_NUMPAD8 => "Num8",
-            VK_NUMPAD9 => "Num9",
-            _ => "?",
-        }
-    }
+    pub const VK_OEM_2: u16 = 0xBF; // /?
+    pub const VK_OEM_3: u16 = 0xC0; // `~
+    pub const VK_OEM_4: u16 = 0xDB; // [{
+    pub const VK_OEM_5: u16 = 0xDC; // \|
+    pub const VK_OEM_6: u16 = 0xDD; // ]}
+    pub const VK_OEM_7: u16 = 0xDE; // '"
 }
 
 // ============================================================================
@@ -251,240 +140,311 @@ pub mod vk {
 // ============================================================================
 
 #[cfg(windows)]
-#[allow(dead_code)]
 mod windows_impl {
+    use super::*;
+    use std::fmt::Debug;
     use windows::Win32::UI::Input::KeyboardAndMouse::{
-        SendInput, GetAsyncKeyState, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT,
-        KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, KEYBD_EVENT_FLAGS,
-        VIRTUAL_KEY, MapVirtualKeyW, MAPVK_VK_TO_VSC,
+        GetAsyncKeyState, MapVirtualKeyW, SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT,
+        KEYBD_EVENT_FLAGS, KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, MAPVK_VK_TO_VSC, VIRTUAL_KEY,
     };
 
-    /// 虚拟键码到扫描码的映射
-    pub fn vk_to_scan_code(vk: u16) -> u16 {
-        unsafe { MapVirtualKeyW(vk as u32, MAPVK_VK_TO_VSC) as u16 }
-    }
+    /// Windows 键盘驱动实现
+    #[derive(Debug, Default)]
+    pub struct WindowsKeyboardDriver;
 
-    /// 发送按键按下事件（使用扫描码）
-    #[inline]
-    pub fn send_key_down(scan_code: u16) {
-        let input = INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(0),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_SCANCODE,
-                    time: 0,
-                    dwExtraInfo: 0,
-                },
-            },
-        };
-        unsafe {
-            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+    impl WindowsKeyboardDriver {
+        pub fn new() -> Self {
+            Self
         }
     }
 
-    /// 发送按键释放事件
-    #[inline]
-    pub fn send_key_up(scan_code: u16) {
-        let input = INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(0),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
-                    time: 0,
-                    dwExtraInfo: 0,
-                },
-            },
-        };
-        unsafe {
-            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+    impl KeyboardDriver for WindowsKeyboardDriver {
+        fn vk_to_scan_code(&self, vk: u16) -> u16 {
+            unsafe { MapVirtualKeyW(vk as u32, MAPVK_VK_TO_VSC) as u16 }
         }
-    }
 
-    /// 发送完整按键事件（按下+释放）
-    #[inline]
-    pub fn send_key_press(scan_code: u16) {
-        let inputs = [
-            INPUT {
+        fn send_key_down(&self, vk: u16, scan_code: u16) {
+            let input = INPUT {
                 r#type: INPUT_KEYBOARD,
                 Anonymous: INPUT_0 {
                     ki: KEYBDINPUT {
-                        wVk: VIRTUAL_KEY(0),
+                        wVk: VIRTUAL_KEY(vk),
                         wScan: scan_code,
                         dwFlags: KEYEVENTF_SCANCODE,
                         time: 0,
                         dwExtraInfo: 0,
                     },
                 },
-            },
-            INPUT {
+            };
+            unsafe {
+                SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+            }
+        }
+
+        fn send_key_up(&self, vk: u16, scan_code: u16) {
+            let input = INPUT {
                 r#type: INPUT_KEYBOARD,
                 Anonymous: INPUT_0 {
                     ki: KEYBDINPUT {
-                        wVk: VIRTUAL_KEY(0),
+                        wVk: VIRTUAL_KEY(vk),
                         wScan: scan_code,
                         dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
                         time: 0,
                         dwExtraInfo: 0,
                     },
                 },
-            },
-        ];
-        unsafe {
-            SendInput(&inputs, std::mem::size_of::<INPUT>() as i32);
+            };
+            unsafe {
+                SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+            }
         }
-    }
 
-    /// 检测按键是否被物理按下
-    #[inline]
-    pub fn is_key_pressed(vk: u16) -> bool {
-        unsafe { GetAsyncKeyState(vk as i32) < 0 }
-    }
-
-    /// 发送"游戏专用"按键按下 - 游戏能识别，聊天框不会收到
-    #[inline]
-    pub fn send_key_game_only_down(scan_code: u16) {
-        let input = INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(0xFF),
-                    wScan: scan_code,
-                    dwFlags: KEYBD_EVENT_FLAGS(0),
-                    time: 0,
-                    dwExtraInfo: 0,
+        fn send_game_key_down(&self, scan_code: u16) {
+            // 使用 vk=0xFF，游戏能识别，聊天框不识别
+            let input = INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VIRTUAL_KEY(0xFF),
+                        wScan: scan_code,
+                        dwFlags: KEYBD_EVENT_FLAGS(0),
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
                 },
-            },
-        };
-        unsafe {
-            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+            };
+            unsafe {
+                SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+            }
         }
-    }
 
-    /// 发送"游戏专用"按键释放
-    #[inline]
-    pub fn send_key_game_only_up(scan_code: u16) {
-        let input = INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(0xFF),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_KEYUP,
-                    time: 0,
-                    dwExtraInfo: 0,
+        fn send_game_key_up(&self, scan_code: u16) {
+            let input = INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VIRTUAL_KEY(0xFF),
+                        wScan: scan_code,
+                        dwFlags: KEYEVENTF_KEYUP,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
                 },
-            },
-        };
-        unsafe {
-            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+            };
+            unsafe {
+                SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+            }
         }
-    }
 
-    /// 发送正常按键按下（聊天框可识别）
-    #[inline]
-    pub fn send_key_normal_down(vk: u16, scan_code: u16) {
-        let input = INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(vk),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_SCANCODE,
-                    time: 0,
-                    dwExtraInfo: 0,
-                },
-            },
-        };
-        unsafe {
-            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
-        }
-    }
-
-    /// 发送正常按键释放
-    #[inline]
-    pub fn send_key_normal_up(vk: u16, scan_code: u16) {
-        let input = INPUT {
-            r#type: INPUT_KEYBOARD,
-            Anonymous: INPUT_0 {
-                ki: KEYBDINPUT {
-                    wVk: VIRTUAL_KEY(vk),
-                    wScan: scan_code,
-                    dwFlags: KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
-                    time: 0,
-                    dwExtraInfo: 0,
-                },
-            },
-        };
-        unsafe {
-            SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
+        fn is_key_pressed(&self, vk: u16) -> bool {
+            unsafe { GetAsyncKeyState(vk as i32) < 0 }
         }
     }
 }
 
 // ============================================================================
-// Mock 实现（非 Windows 平台，用于 UI 开发）
+// Mock 实现（用于非 Windows 平台和测试）
 // ============================================================================
 
-#[cfg(not(windows))]
-mod mock_impl {
-    /// Mock: 虚拟键码到扫描码的映射
-    pub fn vk_to_scan_code(vk: u16) -> u16 {
-        // 返回简化的扫描码映射
-        vk
+#[allow(dead_code)]
+pub mod mock {
+    use super::*;
+    use parking_lot::Mutex;
+    use std::fmt::Debug;
+    use std::sync::Arc;
+
+    /// 记录的键盘事件
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum RecordedKeyEvent {
+        KeyDown { vk: u16, scan_code: u16 },
+        KeyUp { vk: u16, scan_code: u16 },
+        GameKeyDown { scan_code: u16 },
+        GameKeyUp { scan_code: u16 },
     }
 
-    #[inline]
-    pub fn send_key_down(_scan_code: u16) {
-        // Mock: 不执行任何操作
+    /// Mock 键盘驱动，用于测试
+    ///
+    /// 记录所有发送的按键事件，方便验证
+    #[derive(Debug, Default, Clone)]
+    pub struct MockKeyboardDriver {
+        /// 记录的事件列表
+        events: Arc<Mutex<Vec<RecordedKeyEvent>>>,
+        /// 模拟的按键状态
+        pressed_keys: Arc<Mutex<std::collections::HashSet<u16>>>,
     }
 
-    #[inline]
-    pub fn send_key_up(_scan_code: u16) {
-        // Mock: 不执行任何操作
+    impl MockKeyboardDriver {
+        pub fn new() -> Self {
+            Self {
+                events: Arc::new(Mutex::new(Vec::new())),
+                pressed_keys: Arc::new(Mutex::new(std::collections::HashSet::new())),
+            }
+        }
+
+        /// 获取所有记录的事件
+        pub fn get_events(&self) -> Vec<RecordedKeyEvent> {
+            self.events.lock().clone()
+        }
+
+        /// 清空记录的事件
+        pub fn clear_events(&self) {
+            self.events.lock().clear();
+        }
+
+        /// 模拟按键被按下（用于测试 is_key_pressed）
+        pub fn simulate_key_press(&self, vk: u16) {
+            self.pressed_keys.lock().insert(vk);
+        }
+
+        /// 模拟按键被释放
+        pub fn simulate_key_release(&self, vk: u16) {
+            self.pressed_keys.lock().remove(&vk);
+        }
     }
 
-    #[inline]
-    pub fn send_key_press(_scan_code: u16) {
-        // Mock: 不执行任何操作
-    }
+    impl KeyboardDriver for MockKeyboardDriver {
+        fn vk_to_scan_code(&self, vk: u16) -> u16 {
+            // 简化映射：直接返回 vk 作为 scan_code
+            vk
+        }
 
-    #[inline]
-    pub fn is_key_pressed(_vk: u16) -> bool {
-        // Mock: 总是返回 false
-        false
-    }
+        fn send_key_down(&self, vk: u16, scan_code: u16) {
+            self.events
+                .lock()
+                .push(RecordedKeyEvent::KeyDown { vk, scan_code });
+        }
 
-    #[inline]
-    pub fn send_key_game_only_down(_scan_code: u16) {
-        // Mock: 不执行任何操作
-    }
+        fn send_key_up(&self, vk: u16, scan_code: u16) {
+            self.events
+                .lock()
+                .push(RecordedKeyEvent::KeyUp { vk, scan_code });
+        }
 
-    #[inline]
-    pub fn send_key_game_only_up(_scan_code: u16) {
-        // Mock: 不执行任何操作
-    }
+        fn send_game_key_down(&self, scan_code: u16) {
+            self.events
+                .lock()
+                .push(RecordedKeyEvent::GameKeyDown { scan_code });
+        }
 
-    #[inline]
-    pub fn send_key_normal_down(_vk: u16, _scan_code: u16) {
-        // Mock: 不执行任何操作
-    }
+        fn send_game_key_up(&self, scan_code: u16) {
+            self.events
+                .lock()
+                .push(RecordedKeyEvent::GameKeyUp { scan_code });
+        }
 
-    #[inline]
-    pub fn send_key_normal_up(_vk: u16, _scan_code: u16) {
-        // Mock: 不执行任何操作
+        fn is_key_pressed(&self, vk: u16) -> bool {
+            self.pressed_keys.lock().contains(&vk)
+        }
     }
 }
 
 // ============================================================================
-// 导出公共接口
+// 导出
 // ============================================================================
 
 #[cfg(windows)]
-pub use windows_impl::*;
+pub use windows_impl::WindowsKeyboardDriver;
 
+// 非 Windows 平台使用 Mock 作为默认实现
 #[cfg(not(windows))]
-pub use mock_impl::*;
+pub use mock::MockKeyboardDriver as DefaultKeyboardDriver;
+
+#[cfg(windows)]
+pub use windows_impl::WindowsKeyboardDriver as DefaultKeyboardDriver;
+
+// ============================================================================
+// 单元测试
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::mock::*;
+    use super::*;
+
+    #[test]
+    fn test_mock_keyboard_records_events() {
+        let keyboard = MockKeyboardDriver::new();
+
+        keyboard.send_key_down(vk::VK_A, 0x1E);
+        keyboard.send_key_up(vk::VK_A, 0x1E);
+
+        let events = keyboard.get_events();
+        assert_eq!(events.len(), 2);
+        assert_eq!(
+            events[0],
+            RecordedKeyEvent::KeyDown {
+                vk: vk::VK_A,
+                scan_code: 0x1E
+            }
+        );
+        assert_eq!(
+            events[1],
+            RecordedKeyEvent::KeyUp {
+                vk: vk::VK_A,
+                scan_code: 0x1E
+            }
+        );
+    }
+
+    #[test]
+    fn test_mock_keyboard_game_keys() {
+        let keyboard = MockKeyboardDriver::new();
+
+        keyboard.send_game_key_down(0x1E);
+        keyboard.send_game_key_up(0x1E);
+
+        let events = keyboard.get_events();
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0], RecordedKeyEvent::GameKeyDown { scan_code: 0x1E });
+        assert_eq!(events[1], RecordedKeyEvent::GameKeyUp { scan_code: 0x1E });
+    }
+
+    #[test]
+    fn test_mock_keyboard_key_pressed() {
+        let keyboard = MockKeyboardDriver::new();
+
+        assert!(!keyboard.is_key_pressed(vk::VK_A));
+
+        keyboard.simulate_key_press(vk::VK_A);
+        assert!(keyboard.is_key_pressed(vk::VK_A));
+
+        keyboard.simulate_key_release(vk::VK_A);
+        assert!(!keyboard.is_key_pressed(vk::VK_A));
+    }
+
+    #[test]
+    fn test_send_key_press_helper() {
+        let keyboard = MockKeyboardDriver::new();
+
+        keyboard.send_key_press(vk::VK_J);
+
+        let events = keyboard.get_events();
+        assert_eq!(events.len(), 2);
+        // vk_to_scan_code 在 mock 中返回 vk 本身
+        assert_eq!(
+            events[0],
+            RecordedKeyEvent::KeyDown {
+                vk: vk::VK_J,
+                scan_code: vk::VK_J
+            }
+        );
+        assert_eq!(
+            events[1],
+            RecordedKeyEvent::KeyUp {
+                vk: vk::VK_J,
+                scan_code: vk::VK_J
+            }
+        );
+    }
+
+    #[test]
+    fn test_clear_events() {
+        let keyboard = MockKeyboardDriver::new();
+
+        keyboard.send_key_press(vk::VK_A);
+        assert_eq!(keyboard.get_events().len(), 2);
+
+        keyboard.clear_events();
+        assert_eq!(keyboard.get_events().len(), 0);
+    }
+}

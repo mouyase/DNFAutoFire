@@ -2,9 +2,26 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
-    "opener:default"
+    "opener:default",
+    "fs:default",
+    {
+      "identifier": "fs:allow-appdata-read-recursive",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:allow-appdata-write-recursive",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    "fs:allow-exists",
+    "fs:allow-create",
+    "fs:allow-remove",
+    "fs:allow-mkdir",
+    "fs:allow-read",
+    "fs:allow-write"
   ]
 }

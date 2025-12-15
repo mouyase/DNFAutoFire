@@ -15,12 +15,7 @@ interface AppLayoutProps {
  * 应用主布局组件
  * 提供插槽式的布局结构，各区域可插入不同组件
  */
-export function AppLayout({
-  top,
-  bottomLeft,
-  bottomCenter,
-  bottomRight,
-}: AppLayoutProps) {
+export function AppLayout({ top, bottomLeft, bottomCenter, bottomRight }: AppLayoutProps) {
   return (
     <div className="h-full flex flex-col bg-bg p-2.5 gap-2.5 overflow-hidden">
       {/* 顶部区域 */}
@@ -29,13 +24,13 @@ export function AppLayout({
       {/* 底部区域 */}
       <div className="flex gap-2 flex-1 min-h-0">
         {/* 左侧 - 配置管理 */}
-        <div className="w-[200px] shrink-0">{bottomLeft}</div>
+        <div className="w-60 shrink-0">{bottomLeft}</div>
 
         {/* 中间 - 扩展功能 */}
         <div className="flex-1 min-w-0">{bottomCenter}</div>
 
         {/* 右侧 - 控制面板 */}
-        <div className="w-[80px] shrink-0">{bottomRight}</div>
+        <div className="w-24 shrink-0">{bottomRight}</div>
       </div>
     </div>
   )

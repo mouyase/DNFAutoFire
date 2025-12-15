@@ -7,9 +7,7 @@ import { GroupBox } from "@/components/ui"
 export function FeaturesPanel() {
   return (
     <GroupBox title="扩展功能" className="h-full">
-      <div className="flex items-center justify-center h-full text-xs text-gray-400">
-        敬请期待
-      </div>
+      <div className="flex items-center justify-center h-full text-xs text-gray-400">敬请期待</div>
     </GroupBox>
   )
 }
