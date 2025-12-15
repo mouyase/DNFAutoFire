@@ -18,6 +18,7 @@ export function GroupBox({ title, extra, children, className }: GroupBoxProps) {
       className={cn(
         "border border-border rounded-md",
         "bg-surface p-3 pt-2",
+        "flex flex-col min-h-0",
         className
       )}
     >
@@ -29,11 +30,9 @@ export function GroupBox({ title, extra, children, className }: GroupBoxProps) {
           </div>
         </legend>
       ) : (
-        <legend className="px-2 text-xs text-text-secondary font-medium">
-          {title}
-        </legend>
+        <legend className="px-2 text-xs text-text-secondary font-medium">{title}</legend>
       )}
-      {children}
+      <div className="flex-1 min-h-0">{children}</div>
     </fieldset>
   )
 }
