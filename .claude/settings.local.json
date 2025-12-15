@@ -33,7 +33,13 @@
       "mcp__chrome-devtools__evaluate_script",
       "Bash(pnpm tauri build:*)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "WebFetch(domain:github.com)",
+      "mcp__fetch__fetch",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
