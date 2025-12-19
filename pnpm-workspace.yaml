@@ -1,3 +1,0 @@
-nodeLinker: hoisted
-onlyBuiltDependencies:
-  - esbuild
