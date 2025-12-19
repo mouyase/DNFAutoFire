@@ -1,0 +1,7 @@
+# Clippy 配置文件
+
+# 认知复杂度阈值
+cognitive-complexity-threshold = 30
+
+# 避免破坏性 lint
+avoid-breaking-exported-api = true

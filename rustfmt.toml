@@ -1,0 +1,16 @@
+# Rust 格式化配置（仅使用稳定特性）
+edition = "2021"
+
+# 代码风格
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+
+# 函数和方法
+fn_params_layout = "Tall"
+
+# 使用字段初始化简写
+use_field_init_shorthand = true
+
+# 使用 try 简写
+use_try_shorthand = true

@@ -1,0 +1,7 @@
+// 应用程序资源文件
+// 用于嵌入清单文件到可执行文件
+
+#include <winuser.h>
+
+// 嵌入清单文件 (资源类型 24 = RT_MANIFEST)
+1 24 "app-manifest.xml"

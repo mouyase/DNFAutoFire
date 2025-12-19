@@ -1,0 +1,64 @@
+# cargo-make 配置文件
+# 安装: cargo install cargo-make
+# 使用: cargo make <task>
+
+[tasks.format]
+description = "格式化所有代码"
+command = "cargo"
+args = ["fmt", "--all"]
+
+[tasks.format-check]
+description = "检查代码格式"
+command = "cargo"
+args = ["fmt", "--all", "--", "--check"]
+
+[tasks.clippy]
+description = "运行 Clippy 检查"
+command = "cargo"
+args = ["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
+
+[tasks.test]
+description = "运行所有测试"
+command = "cargo"
+args = ["test", "--all"]
+
+[tasks.build]
+description = "编译项目（Debug）"
+command = "cargo"
+args = ["build"]
+
+[tasks.build-release]
+description = "编译项目（Release）"
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.check]
+description = "完整代码质量检查"
+dependencies = [
+    "format-check",
+    "clippy",
+    "test",
+    "build-release"
+]
+
+[tasks.fix]
+description = "自动修复格式和 Clippy 问题"
+script = [
+    "cargo fmt --all",
+    "cargo clippy --all-targets --all-features --fix --allow-dirty --allow-staged"
+]
+
+[tasks.clean]
+description = "清理构建产物"
+command = "cargo"
+args = ["clean"]
+
+[tasks.dev]
+description = "开发模式（格式化 + Clippy + 编译 + 运行）"
+dependencies = ["format", "clippy"]
+command = "cargo"
+args = ["run"]
+
+[tasks.pre-commit]
+description = "提交前检查（格式化 + Clippy + 测试）"
+dependencies = ["format", "clippy", "test"]

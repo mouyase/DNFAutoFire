@@ -1,0 +1,43 @@
+# EditorConfig - 统一代码编辑器配置
+# https://editorconfig.org
+
+root = true
+
+# 所有文件
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Rust 文件
+[*.rs]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# TOML 文件
+[*.toml]
+indent_style = space
+indent_size = 4
+
+# Markdown 文件
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# JSON 文件
+[*.json]
+indent_style = space
+indent_size = 2
+
+# PowerShell 脚本
+[*.ps1]
+indent_style = space
+indent_size = 4
+
+# XML 文件
+[*.xml]
+indent_style = space
+indent_size = 2

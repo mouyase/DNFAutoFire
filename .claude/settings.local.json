@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(jj:*)",
-      "Bash(git add:*)"
+      "Bash(git:*)",
+      "Bash(where:*)"
     ]
   }
 }

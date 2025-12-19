@@ -1,0 +1,288 @@
+{
+  "$schema": "踩坑记录文档",
+  "project": "DNF AutoFire",
+  "description": "记录项目开发过程中遇到的问题及解决方案",
+  "pitfalls": [
+    {
+      "id": 1,
+      "date": "2025-12-21",
+      "datetime": "2025-12-21T03:14:43+08:00",
+      "category": "连发逻辑",
+      "title": "连发功能无法在 DNF 游戏中生效",
+      "severity": "critical",
+      "symptoms": [
+        "窗口检测正常，能识别 DNF 游戏窗口",
+        "键盘钩子安装成功，能检测到按键",
+        "但在游戏中按住 J/L 键没有连发效果"
+      ],
+      "root_cause": {
+        "summary": "使用了错误的按键发送方法",
+        "details": [
+          "当前实现使用 `send_key_down(vk, sc)` 发送按键",
+          "该方法使用真实 VK 码 + KEYEVENTF_SCANCODE 标志",
+          "会同时触发游戏和聊天框，导致游戏识别异常",
+          "History 正确实现使用 `send_game_key_down(sc)` 方法",
+          "该方法使用 VK=0xFF + 无标志，仅游戏识别"
+        ],
+        "affected_files": [
+          "src/core/autofire.rs:426-429"
+        ]
+      },
+      "investigation_process": [
+        "运行 detect-window.exe 确认窗口类名正确（\"地下城与勇士\"）",
+        "添加调试日志确认窗口检测功能正常",
+        "启动 feature-dev skill 对比 history 和当前实现",
+        "3 个 code-explorer agents 并行分析差异",
+        "定位到关键差异：autofire loop 使用的方法不同"
+      ],
+      "solution": {
+        "summary": "修改连发循环使用游戏模式按键发送方法",
+        "changes": [
+          {
+            "file": "src/core/autofire.rs",
+            "line": "426-429",
+            "before": "keyboard.send_key_down(vk, sc); keyboard.send_key_up(vk, sc);",
+            "after": "keyboard.send_game_key_down(sc); keyboard.send_game_key_up(sc);",
+            "reason": "VK=0xFF 方式只有游戏识别，聊天框不识别"
+          },
+          {
+            "file": "src/core/keyboard.rs",
+            "line": "67, 70",
+            "before": "#[allow(dead_code)] fn send_game_key_down/up",
+            "after": "fn send_game_key_down/up (移除 dead_code 属性)",
+            "reason": "方法现在被使用，不再是 dead code"
+          },
+          {
+            "file": "src/core/autofire.rs",
+            "line": "419",
+            "before": "for &(vk, sc, bit) in &keys_with_sc",
+            "after": "for &(_vk, sc, bit) in &keys_with_sc",
+            "reason": "vk 不再使用，修复 Clippy 警告"
+          }
+        ],
+        "verification": [
+          "cargo fmt - 代码格式化通过",
+          "cargo clippy -- -D warnings - 零警告编译通过"
+        ]
+      },
+      "lessons_learned": [
+        "迁移代码时必须仔细对比核心逻辑，而不是仅仅重构架构",
+        "Windows SendInput API 的不同参数组合会产生不同效果",
+        "VK=0xFF + dwFlags=0 是游戏专用按键的标准做法",
+        "使用 code-explorer agents 并行分析能快速定位问题"
+      ],
+      "references": [
+        "history/src-tauri/src/core/autofire.rs:490-493",
+        "history/src-tauri/src/core/keyboard.rs:166-237"
+      ]
+    },
+    {
+      "id": 2,
+      "date": "2025-12-21",
+      "datetime": "2025-12-21T03:14:43+08:00",
+      "category": "权限管理",
+      "title": "GNU 工具链下无法自动请求管理员权限",
+      "severity": "high",
+      "symptoms": [
+        "程序运行时未弹出 UAC 提示框",
+        "键盘钩子安装失败（需要管理员权限）",
+        "exe 图标没有盾牌标志"
+      ],
+      "root_cause": {
+        "summary": "winres crate 对 GNU 工具链支持不完善",
+        "details": [
+          "项目使用 x86_64-pc-windows-gnu 工具链",
+          "配置了 app-manifest.xml 和 build.rs",
+          "使用 winres crate 编译资源",
+          "但 winres 主要针对 MSVC 工具链优化",
+          "GNU 工具链下清单文件未正确嵌入到 exe"
+        ],
+        "affected_files": [
+          "build.rs",
+          "app-manifest.xml",
+          "Cargo.toml"
+        ]
+      },
+      "attempted_solutions": [
+        {
+          "attempt": 1,
+          "approach": "使用 winres crate",
+          "result": "failed",
+          "reason": "winres 在 GNU 工具链下不工作"
+        },
+        {
+          "attempt": 2,
+          "approach": "运行时自动提权（ShellExecuteW + runas）",
+          "result": "works_but_ugly",
+          "reason": "会导致两个窗口闪烁，用户体验不佳",
+          "implementation": "检测权限 -> ShellExecuteW runas -> 重启程序"
+        },
+        {
+          "attempt": 3,
+          "approach": "使用 embed-resource crate + .rc 文件",
+          "result": "success",
+          "reason": "embed-resource 对 GNU 工具链有良好支持"
+        }
+      ],
+      "solution": {
+        "summary": "使用 embed-resource + .rc 资源文件",
+        "implementation": [
+          {
+            "step": 1,
+            "action": "替换 build dependency",
+            "details": "Cargo.toml: winres = \"0.1\" -> embed-resource = \"2.5\""
+          },
+          {
+            "step": 2,
+            "action": "创建 .rc 资源文件",
+            "file": "app.rc",
+            "content": "#include <winuser.h>\n1 24 \"app-manifest.xml\""
+          },
+          {
+            "step": 3,
+            "action": "修改 build.rs",
+            "details": "embed_resource::compile(\"app.rc\", embed_resource::NONE);"
+          },
+          {
+            "step": 4,
+            "action": "保留 app-manifest.xml",
+            "reason": "被 app.rc 引用，包含 requireAdministrator 声明"
+          }
+        ],
+        "file_dependency_chain": [
+          "build.rs (编译)",
+          "-> app.rc (资源定义)",
+          "-> app-manifest.xml (清单内容)",
+          "-> dnf-autofire.exe (嵌入结果)"
+        ],
+        "verification": [
+          "exe 图标显示盾牌标志",
+          "双击 exe 自动弹出 UAC 提示框",
+          "无需运行时提权代码"
+        ]
+      },
+      "lessons_learned": [
+        "winres 主要为 MSVC 工具链设计，GNU 下不可靠",
+        "embed-resource 是跨工具链的更好选择",
+        ".rc 文件是 Windows 资源标准格式",
+        "windres (GNU binutils) 可以正确编译 .rc 文件",
+        "清单文件必须通过资源嵌入，不能运行时处理",
+        "运行时提权方案虽然可行，但用户体验差"
+      ],
+      "toolchain_notes": {
+        "gnu": {
+          "resource_compiler": "windres (GNU binutils)",
+          "recommended_crate": "embed-resource",
+          "manifest_embedding": "via .rc file"
+        },
+        "msvc": {
+          "resource_compiler": "rc.exe (Microsoft)",
+          "recommended_crate": "winres or embed-resource",
+          "manifest_embedding": "via .rc file or direct"
+        }
+      },
+      "references": [
+        "https://github.com/nabijaczleweli/rust-embed-resource",
+        "https://docs.microsoft.com/en-us/windows/win32/sbscs/application-manifests"
+      ]
+    },
+    {
+      "id": 3,
+      "date": "2025-12-21",
+      "datetime": "2025-12-21T03:14:43+08:00",
+      "category": "开发工具",
+      "title": "Claude Code Skills 格式错误",
+      "severity": "low",
+      "symptoms": [
+        "创建的 skills 无法被 Claude Code 识别",
+        "skills 列表中不显示自定义技能"
+      ],
+      "root_cause": {
+        "summary": "使用了错误的 skills 文件格式",
+        "details": [
+          "初次尝试：创建 format.md, lint.md 等平面文件",
+          "正确格式：每个 skill 需要独立目录 + SKILL.md 文件",
+          "SKILL.md 必须包含 YAML frontmatter"
+        ]
+      },
+      "solution": {
+        "summary": "使用正确的 skills 目录结构和 YAML frontmatter",
+        "correct_structure": {
+          ".claude/skills/": {
+            "format/": {
+              "SKILL.md": "---\nname: 格式化 Rust 代码\ndescription: ...\n---\n内容"
+            },
+            "lint/": {
+              "SKILL.md": "YAML frontmatter + 详细说明"
+            },
+            "fix/": {
+              "SKILL.md": "自动修复 Clippy 警告"
+            },
+            "check/": {
+              "SKILL.md": "完整代码质量检查"
+            }
+          }
+        },
+        "yaml_frontmatter_example": "---\nname: skill名称\ndescription: 简短描述\n---"
+      },
+      "lessons_learned": [
+        "Claude Code 的 skills 有标准格式要求",
+        "必须使用目录结构，不能是平面文件",
+        "YAML frontmatter 是必需的",
+        "遇到不确定的格式时应先查阅文档"
+      ]
+    }
+  ],
+  "best_practices": [
+    {
+      "category": "代码迁移",
+      "practice": "核心逻辑必须逐行对比",
+      "rationale": "架构重构时容易忽略关键细节",
+      "example": "连发逻辑中的按键发送方法差异"
+    },
+    {
+      "category": "工具链选择",
+      "practice": "了解 crate 对不同工具链的支持情况",
+      "rationale": "同一功能在不同工具链下实现方式可能不同",
+      "example": "winres vs embed-resource 在 GNU/MSVC 下的表现"
+    },
+    {
+      "category": "Windows 开发",
+      "practice": "资源嵌入应在编译时完成，不在运行时",
+      "rationale": "运行时方案会影响用户体验",
+      "example": "清单文件嵌入 vs 运行时 ShellExecuteW 提权"
+    },
+    {
+      "category": "调试方法",
+      "practice": "使用专用工具辅助诊断",
+      "rationale": "可以隔离问题，快速验证假设",
+      "example": "detect-window.exe 用于验证窗口检测逻辑"
+    },
+    {
+      "category": "代码质量",
+      "practice": "每次修改后立即运行 fmt + clippy",
+      "rationale": "及早发现问题，避免积累",
+      "tools": ["cargo fmt", "cargo clippy -- -D warnings"]
+    }
+  ],
+  "technical_notes": {
+    "windows_sendInput": {
+      "normal_mode": {
+        "vk": "真实虚拟键码 (如 0x4A for J)",
+        "dwFlags": "KEYEVENTF_SCANCODE",
+        "effect": "游戏和聊天框都识别"
+      },
+      "game_mode": {
+        "vk": "0xFF (特殊值)",
+        "dwFlags": "0 (无标志)",
+        "effect": "仅游戏识别，聊天框忽略"
+      }
+    },
+    "gnu_toolchain_resources": {
+      "compiler": "windres (GNU binutils)",
+      "input_format": ".rc file",
+      "manifest_embedding": "1 24 \"app-manifest.xml\"",
+      "recommended_crate": "embed-resource"
+    }
+  }
+}
