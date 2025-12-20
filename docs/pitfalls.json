@@ -231,6 +231,66 @@
         "YAML frontmatter 是必需的",
         "遇到不确定的格式时应先查阅文档"
       ]
+    },
+    {
+      "id": 4,
+      "date": "2025-12-21",
+      "datetime": "2025-12-21T04:10:00+08:00",
+      "category": "GUI 开发",
+      "title": "Native Windows GUI (NWG) 架构实现",
+      "severity": "info",
+      "summary": "成功搭建 NWG GUI 完整架构，为原生 Windows 界面打下基础",
+      "implementation": {
+        "completed": [
+          "完整 104 键键盘布局定义系统（731 行代码）",
+          "JSON 配置持久化机制（218 行代码）",
+          "主窗口和应用状态管理（614 行代码）",
+          "完整虚拟键码常量定义（104 键）",
+          "配置 CRUD 操作：列表/加载/保存/删除/重命名/克隆",
+          "UI 布局：键盘视图 + 配置面板 + 控制面板",
+          "事件处理函数框架（待绑定）"
+        ],
+        "modules": [
+          "src/gui/mod.rs - GUI 模块导出",
+          "src/gui/keyboard_layout.rs - 键盘布局定义",
+          "src/gui/config.rs - 配置管理",
+          "src/gui/app.rs - 主窗口应用"
+        ],
+        "dependencies": [
+          "native-windows-gui = \"1.0\" (features: extern-canvas)",
+          "serde = \"1.0\" (features: derive)",
+          "serde_json = \"1.0\""
+        ]
+      },
+      "pending_work": {
+        "critical": "NWG 事件绑定机制未实现",
+        "details": [
+          "所有 UI 组件已创建，但事件未绑定到处理函数",
+          "需要选择事件绑定方案（推荐 nwg-derive）",
+          "需要绑定 104 个按键点击事件",
+          "需要绑定配置管理操作事件",
+          "需要实现文本输入对话框（prompt_text）"
+        ],
+        "recommended_solution": "使用 nwg-derive 宏简化事件绑定"
+      },
+      "lessons_learned": [
+        "NWG 需要显式的事件绑定机制，不能自动关联",
+        "架构设计先行可以让代码结构清晰，后续补充功能更容易",
+        "使用 #[allow(dead_code)] 可以暂时抑制未使用代码警告",
+        "完整的键盘布局定义需要精确的坐标计算",
+        "配置持久化选择 JSON 格式便于调试和手动编辑"
+      ],
+      "quality_metrics": {
+        "cargo_fmt": "通过",
+        "cargo_clippy": "零警告",
+        "code_lines": 1563,
+        "modules": 3,
+        "test_status": "待事件绑定后测试"
+      },
+      "references": [
+        "docs/nwg-gui-spec.json - 完整规范文档",
+        "https://github.com/gabdube/native-windows-gui - NWG 官方仓库"
+      ]
     }
   ],
   "best_practices": [

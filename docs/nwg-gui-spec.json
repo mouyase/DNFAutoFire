@@ -1,0 +1,609 @@
+{
+  "metadata": {
+    "title": "NWG GUI 实现规范",
+    "version": "1.0.0",
+    "date": "2025-12-21",
+    "status": "架构完成，待事件绑定",
+    "author": "Claude Code",
+    "description": "DNF AutoFire Native Windows GUI 完整实现规范和架构文档"
+  },
+  "architecture": {
+    "overview": "使用 Native Windows GUI (NWG) 实现原生 Windows 界面，包含104键键盘可视化和多配置管理",
+    "design_pattern": "实用平衡方案 - MVP 分阶段实现",
+    "modules": [
+      {
+        "name": "src/gui/mod.rs",
+        "purpose": "GUI 模块入口，导出公共接口",
+        "exports": ["App", "AppState"],
+        "lines": 7
+      },
+      {
+        "name": "src/gui/keyboard_layout.rs",
+        "purpose": "104键键盘布局定义系统",
+        "key_functions": [
+          "get_keyboard_layout() -> Vec<KeyDef>",
+          "get_keyboard_bounds() -> (i32, i32)"
+        ],
+        "constants": {
+          "KEY_SIZE": 40,
+          "KEY_GAP": 4,
+          "KEY_SPACING": 44,
+          "START_X": 10,
+          "START_Y": 10
+        },
+        "lines": 731
+      },
+      {
+        "name": "src/gui/config.rs",
+        "purpose": "配置管理和 JSON 持久化",
+        "structures": [
+          {
+            "name": "Profile",
+            "fields": {
+              "name": "String",
+              "enabled_keys": "Vec<u16>"
+            },
+            "serde_rename": {
+              "enabled_keys": "enabledKeys"
+            }
+          },
+          {
+            "name": "ConfigManager",
+            "fields": {
+              "config_dir": "PathBuf",
+              "current_profile": "Option<String>"
+            }
+          }
+        ],
+        "api_methods": [
+          "new() -> ConfigManager",
+          "list_profiles() -> Vec<String>",
+          "load_profile(name: &str) -> Result<Profile, String>",
+          "save_profile(profile: &Profile) -> Result<(), String>",
+          "delete_profile(name: &str) -> Result<(), String>",
+          "rename_profile(old: &str, new: &str) -> Result<(), String>",
+          "clone_profile(src: &str, dst: &str) -> Result<(), String>",
+          "profile_exists(name: &str) -> bool",
+          "current_profile() -> Option<&str>",
+          "set_current_profile(name: String)"
+        ],
+        "config_location": "configs/ 目录（相对于可执行文件）",
+        "format": "JSON",
+        "lines": 218
+      },
+      {
+        "name": "src/gui/app.rs",
+        "purpose": "主窗口应用和状态管理",
+        "structures": [
+          {
+            "name": "AppState",
+            "purpose": "应用程序状态管理",
+            "fields": {
+              "config_manager": "ConfigManager",
+              "enabled_keys": "HashSet<u16>",
+              "engine": "Option<AutoFireEngine>",
+              "is_running": "bool",
+              "has_unsaved_changes": "bool"
+            },
+            "methods": [
+              "new() -> AppState",
+              "toggle_key(vk: u16)",
+              "is_key_enabled(vk: u16) -> bool",
+              "load_profile(name: &str) -> Result<(), String>",
+              "save_current_profile() -> Result<(), String>",
+              "start_engine() -> Result<(), String>",
+              "stop_engine()"
+            ]
+          },
+          {
+            "name": "App",
+            "purpose": "NWG 主窗口",
+            "ui_components": {
+              "window": "nwg::Window - 主窗口",
+              "key_buttons": "Vec<(u16, nwg::Button)> - 104个按键按钮",
+              "profile_combo": "nwg::ComboBox<String> - 配置下拉列表",
+              "save_button": "nwg::Button - 保存按钮",
+              "reset_button": "nwg::Button - 重置按钮",
+              "new_button": "nwg::Button - 新建配置按钮",
+              "clone_button": "nwg::Button - 克隆配置按钮",
+              "rename_button": "nwg::Button - 重命名按钮",
+              "delete_button": "nwg::Button - 删除配置按钮",
+              "toggle_button": "nwg::Button - 启动/停止按钮",
+              "status_label": "nwg::Label - 状态标签"
+            },
+            "event_handlers": [
+              "init() - 初始化数据",
+              "refresh_profile_list() - 刷新配置列表",
+              "on_profile_changed() - 配置切换处理",
+              "on_save() - 保存按钮处理",
+              "on_reset() - 重置按钮处理",
+              "on_new_profile() - 新建配置处理",
+              "on_clone_profile() - 克隆配置处理",
+              "on_rename_profile() - 重命名处理",
+              "on_delete_profile() - 删除配置处理",
+              "on_toggle_engine() - 启动/停止处理",
+              "on_key_button_click(vk: u16) - 按键点击处理",
+              "update_key_buttons() - 更新按键显示",
+              "update_status() - 更新状态标签",
+              "prompt_text() - 文本输入对话框（待实现）"
+            ]
+          }
+        ],
+        "window_size": {
+          "width": "max(keyboard_width, 910)",
+          "height": "keyboard_height + 200"
+        },
+        "lines": 614
+      }
+    ],
+    "total_lines": 1570
+  },
+  "keyboard_layout": {
+    "total_keys": 104,
+    "regions": [
+      {
+        "name": "功能键区",
+        "keys": ["ESC", "F1-F12"],
+        "count": 13,
+        "layout": "ESC + 间隔 + F1-F4 + 间隔 + F5-F8 + 间隔 + F9-F12"
+      },
+      {
+        "name": "主键盘区",
+        "rows": [
+          {
+            "name": "数字行",
+            "keys": ["`~", "1-9", "0", "-_", "=+", "Backspace"],
+            "count": 14
+          },
+          {
+            "name": "QWERTY第一行",
+            "keys": ["Tab", "Q-P", "[{", "]}", "\\|"],
+            "count": 14
+          },
+          {
+            "name": "QWERTY第二行",
+            "keys": ["CapsLock", "A-L", ";:", "'\"", "Enter"],
+            "count": 13
+          },
+          {
+            "name": "QWERTY第三行",
+            "keys": ["LShift", "Z-M", ",<", ".>", "/?", "RShift"],
+            "count": 12
+          },
+          {
+            "name": "底部行",
+            "keys": ["LCtrl", "LWin", "LAlt", "Space", "RAlt", "RWin", "Menu", "RCtrl"],
+            "count": 8
+          }
+        ],
+        "total_count": 61
+      },
+      {
+        "name": "编辑键区",
+        "keys": {
+          "系统键": ["PrtSc", "ScrLk", "Pause"],
+          "编辑键上": ["Insert", "Home", "PgUp"],
+          "编辑键下": ["Delete", "End", "PgDn"],
+          "方向键": ["↑", "←", "↓", "→"]
+        },
+        "count": 13
+      },
+      {
+        "name": "小键盘区",
+        "rows": [
+          ["NumLock", "/", "*", "-"],
+          ["7", "8", "9", "+ (2倍高)"],
+          ["4", "5", "6"],
+          ["1", "2", "3", "Enter (2倍高)"],
+          ["0 (2倍宽)", "."]
+        ],
+        "count": 17
+      }
+    ],
+    "special_key_sizes": {
+      "Tab": "1.5倍宽",
+      "CapsLock": "1.75倍宽",
+      "LShift": "2.25倍宽",
+      "RShift": "2.75倍宽",
+      "Backspace": "2倍宽",
+      "Enter": "2.25倍宽",
+      "Space": "6.25倍宽",
+      "Ctrl/Win/Alt/Menu": "1.25倍宽",
+      "小键盘 +": "2倍高",
+      "小键盘 Enter": "2倍高",
+      "小键盘 0": "2倍宽"
+    }
+  },
+  "dependencies": {
+    "native-windows-gui": {
+      "version": "1.0",
+      "features": ["extern-canvas"],
+      "purpose": "原生 Windows GUI 框架"
+    },
+    "serde": {
+      "version": "1.0",
+      "features": ["derive"],
+      "purpose": "序列化/反序列化框架"
+    },
+    "serde_json": {
+      "version": "1.0",
+      "purpose": "JSON 格式支持"
+    },
+    "parking_lot": {
+      "version": "0.12",
+      "purpose": "高性能锁（已有）"
+    },
+    "once_cell": {
+      "version": "1.19",
+      "purpose": "懒加载静态变量（已有）"
+    },
+    "windows": {
+      "version": "0.59",
+      "purpose": "Windows API 绑定（已有）"
+    }
+  },
+  "virtual_key_codes": {
+    "total_count": 104,
+    "categories": {
+      "字母键": {
+        "range": "VK_A (0x41) - VK_Z (0x5A)",
+        "count": 26
+      },
+      "数字键": {
+        "range": "VK_0 (0x30) - VK_9 (0x39)",
+        "count": 10
+      },
+      "功能键": {
+        "range": "VK_F1 (0x70) - VK_F12 (0x7B)",
+        "count": 12
+      },
+      "控制键": {
+        "keys": [
+          "VK_ESCAPE (0x1B)",
+          "VK_TAB (0x09)",
+          "VK_CAPITAL (0x14)",
+          "VK_LSHIFT (0xA0)",
+          "VK_RSHIFT (0xA1)",
+          "VK_LCONTROL (0xA2)",
+          "VK_RCONTROL (0xA3)",
+          "VK_LMENU (0xA4)",
+          "VK_RMENU (0xA5)",
+          "VK_LWIN (0x5B)",
+          "VK_RWIN (0x5C)",
+          "VK_APPS (0x5D)"
+        ],
+        "count": 12
+      },
+      "编辑键": {
+        "keys": [
+          "VK_BACK (0x08)",
+          "VK_RETURN (0x0D)",
+          "VK_SPACE (0x20)",
+          "VK_INSERT (0x2D)",
+          "VK_DELETE (0x2E)",
+          "VK_HOME (0x24)",
+          "VK_END (0x23)",
+          "VK_PRIOR (0x21)",
+          "VK_NEXT (0x22)"
+        ],
+        "count": 9
+      },
+      "方向键": {
+        "keys": [
+          "VK_LEFT (0x25)",
+          "VK_UP (0x26)",
+          "VK_RIGHT (0x27)",
+          "VK_DOWN (0x28)"
+        ],
+        "count": 4
+      },
+      "系统键": {
+        "keys": [
+          "VK_SNAPSHOT (0x2C)",
+          "VK_SCROLL (0x91)",
+          "VK_PAUSE (0x13)"
+        ],
+        "count": 3
+      },
+      "小键盘": {
+        "keys": [
+          "VK_NUMLOCK (0x90)",
+          "VK_NUMPAD0-9 (0x60-0x69)",
+          "VK_MULTIPLY (0x6A)",
+          "VK_ADD (0x6B)",
+          "VK_SUBTRACT (0x6D)",
+          "VK_DECIMAL (0x6E)",
+          "VK_DIVIDE (0x6F)"
+        ],
+        "count": 17
+      },
+      "OEM符号键": {
+        "keys": [
+          "VK_OEM_1 (0xBA) - ;:",
+          "VK_OEM_PLUS (0xBB) - =+",
+          "VK_OEM_COMMA (0xBC) - ,<",
+          "VK_OEM_MINUS (0xBD) - -_",
+          "VK_OEM_PERIOD (0xBE) - .>",
+          "VK_OEM_2 (0xBF) - /?",
+          "VK_OEM_3 (0xC0) - `~",
+          "VK_OEM_4 (0xDB) - [{",
+          "VK_OEM_5 (0xDC) - \\|",
+          "VK_OEM_6 (0xDD) - ]}",
+          "VK_OEM_7 (0xDE) - '\""
+        ],
+        "count": 11
+      }
+    }
+  },
+  "configuration_system": {
+    "storage": {
+      "location": "configs/ 目录（相对于可执行文件）",
+      "format": "JSON",
+      "naming": "{配置名称}.json"
+    },
+    "profile_structure": {
+      "name": "配置名称 (String)",
+      "enabledKeys": "启用的按键 VK 码列表 (Array<Number>)"
+    },
+    "example": {
+      "filename": "configs/默认配置.json",
+      "content": {
+        "name": "默认配置",
+        "enabledKeys": [74, 76]
+      },
+      "note": "74=J键(0x4A), 76=L键(0x4C)"
+    },
+    "operations": {
+      "列出所有配置": "扫描 configs/ 目录下所有 .json 文件",
+      "加载配置": "读取 JSON 文件并反序列化为 Profile",
+      "保存配置": "序列化 Profile 为 JSON 并写入文件",
+      "删除配置": "删除对应的 .json 文件",
+      "重命名配置": "加载 -> 修改 name 字段 -> 保存新文件 -> 删除旧文件",
+      "克隆配置": "加载 -> 修改 name 字段 -> 保存新文件",
+      "默认配置": "如果目录为空，自动创建 '默认配置.json'"
+    }
+  },
+  "event_system": {
+    "status": "待实现",
+    "requirement": "NWG 需要显式的事件绑定机制",
+    "recommended_approach": "使用 nwg-derive 宏",
+    "alternative_approaches": [
+      "手动使用 nwg::bind_event_handler",
+      "使用 dispatch_thread_events_with_callback"
+    ],
+    "events_to_bind": {
+      "按键按钮点击": {
+        "count": 104,
+        "handler": "on_key_button_click(vk: u16)",
+        "action": "切换按键启用状态"
+      },
+      "配置下拉列表变更": {
+        "handler": "on_profile_changed()",
+        "action": "加载选中的配置"
+      },
+      "保存按钮": {
+        "handler": "on_save()",
+        "action": "保存当前配置到文件"
+      },
+      "重置按钮": {
+        "handler": "on_reset()",
+        "action": "重新加载当前配置，放弃未保存更改"
+      },
+      "新建配置按钮": {
+        "handler": "on_new_profile()",
+        "action": "弹出输入框，创建新配置"
+      },
+      "克隆配置按钮": {
+        "handler": "on_clone_profile()",
+        "action": "复制当前配置为新配置"
+      },
+      "重命名按钮": {
+        "handler": "on_rename_profile()",
+        "action": "重命名当前配置"
+      },
+      "删除配置按钮": {
+        "handler": "on_delete_profile()",
+        "action": "删除当前配置（需确认）"
+      },
+      "启动/停止按钮": {
+        "handler": "on_toggle_engine()",
+        "action": "启动或停止连发引擎"
+      }
+    },
+    "nwg_derive_example": {
+      "code": "use nwg::NativeUi;\n\n#[derive(Default, NwgUi)]\npub struct App {\n    #[nwg_control(size: (300, 300), title: \"Example\")]\n    window: nwg::Window,\n\n    #[nwg_control(parent: window, text: \"Click me\")]\n    #[nwg_events(OnButtonClick: [App::on_button_click])]\n    button: nwg::Button,\n}\n\nimpl App {\n    fn on_button_click(&self) {\n        nwg::modal_info_message(&self.window, \"Clicked\", \"Button was clicked!\");\n    }\n}"
+    }
+  },
+  "ui_specifications": {
+    "window": {
+      "title": "DNF AutoFire - 连发工具",
+      "width": "max(keyboard_width, 910)",
+      "height": "keyboard_height + 200",
+      "font": "Microsoft YaHei UI (微软雅黑)",
+      "position": "(100, 100)"
+    },
+    "keyboard_area": {
+      "start_position": "(10, 10)",
+      "key_size": "40 × 40 像素",
+      "key_gap": "4 像素",
+      "key_spacing": "44 像素"
+    },
+    "control_panel": {
+      "position": "键盘下方 + 10px 间隙",
+      "height": "约 200px",
+      "sections": [
+        {
+          "name": "配置管理区",
+          "row": 1,
+          "components": [
+            "配置标签 (60×25)",
+            "配置下拉列表 (200×25)",
+            "保存按钮 (70×30)",
+            "重置按钮 (70×30)"
+          ]
+        },
+        {
+          "name": "配置操作区",
+          "row": 2,
+          "components": [
+            "新建配置按钮 (90×30)",
+            "克隆配置按钮 (90×30)",
+            "重命名按钮 (80×30)",
+            "删除配置按钮 (90×30)"
+          ]
+        },
+        {
+          "name": "引擎控制区",
+          "row": 3,
+          "components": [
+            "启动/停止按钮 (200×60)",
+            "状态标签 (300×25)"
+          ]
+        }
+      ]
+    },
+    "visual_feedback": {
+      "enabled_key": "按钮文本添加 ✓ 标记",
+      "running_state": "启动/停止按钮文本切换",
+      "unsaved_changes": "状态标签显示 '(未保存)'",
+      "button_colors": {
+        "start": "绿色（待实现）",
+        "stop": "红色（待实现）"
+      }
+    }
+  },
+  "integration": {
+    "core_engine": {
+      "module": "crate::core::AutoFireEngine",
+      "unchanged": true,
+      "note": "完全复用现有引擎，无需修改"
+    },
+    "api_usage": {
+      "set_keys": "engine.set_keys(vec![vk1, vk2, ...])",
+      "start": "engine.start()",
+      "stop": "engine.stop()"
+    },
+    "permissions": {
+      "requirement": "管理员权限",
+      "method": "embed-resource 嵌入清单文件",
+      "manifest": "app-manifest.xml",
+      "check": "is_elevated() 函数检查",
+      "auto_prompt": "UAC 自动提示"
+    }
+  },
+  "quality_metrics": {
+    "compilation": {
+      "cargo_fmt": "✓ 通过",
+      "cargo_clippy": "✓ 零警告",
+      "warnings": 0,
+      "errors": 0
+    },
+    "code_statistics": {
+      "total_lines": 1570,
+      "new_files": 4,
+      "modified_files": 4
+    },
+    "test_status": "待事件绑定后测试"
+  },
+  "pending_tasks": {
+    "critical": [
+      {
+        "task": "实现 NWG 事件绑定",
+        "priority": "高",
+        "blockers": [
+          "所有 UI 组件已创建但未绑定事件",
+          "所有事件处理函数已编写但未调用"
+        ],
+        "steps": [
+          "1. 添加 nwg-derive 依赖（可选，推荐）",
+          "2. 研究 NWG 事件绑定文档",
+          "3. 选择事件绑定方案",
+          "4. 绑定 104 个按键点击事件",
+          "5. 绑定配置管理操作事件",
+          "6. 绑定引擎控制事件"
+        ]
+      },
+      {
+        "task": "实现文本输入对话框",
+        "priority": "中",
+        "current": "prompt_text() 返回占位符",
+        "required_for": [
+          "新建配置输入名称",
+          "重命名配置输入新名称",
+          "克隆配置输入新名称"
+        ],
+        "solution": "创建独立的 NWG 对话框窗口"
+      }
+    ],
+    "enhancements": [
+      {
+        "task": "按键视觉状态优化",
+        "items": [
+          "已启用按键高亮显示",
+          "按钮颜色区分",
+          "禁用状态样式"
+        ]
+      },
+      {
+        "task": "错误处理增强",
+        "items": [
+          "更友好的错误提示",
+          "配置文件损坏恢复",
+          "异常情况处理"
+        ]
+      },
+      {
+        "task": "窗口尺寸微调",
+        "current": "keyboard_height + 200",
+        "note": "根据实际 UI 效果调整"
+      }
+    ]
+  },
+  "development_guidelines": {
+    "compilation": {
+      "debug_mode": "cargo build",
+      "release_mode": "cargo build --release（仅测试/发布时使用）",
+      "preferred": "debug 模式"
+    },
+    "code_style": {
+      "format": "cargo fmt",
+      "lint": "cargo clippy -- -D warnings",
+      "standard": "零警告要求"
+    },
+    "testing_workflow": [
+      "1. 实现功能",
+      "2. cargo fmt 格式化",
+      "3. cargo clippy 检查",
+      "4. 修复所有警告",
+      "5. cargo build 编译测试",
+      "6. 运行程序测试功能"
+    ]
+  },
+  "references": {
+    "documentation": [
+      "docs/nwg-implementation.md - 详细实现文档（Markdown 版本）",
+      "docs/pitfalls.json - 开发踩坑记录",
+      "docs/architecture.json - 项目架构文档",
+      "docs/project-config.json - 项目配置文档"
+    ],
+    "external": [
+      "https://github.com/gabdube/native-windows-gui - NWG 官方仓库",
+      "https://docs.rs/native-windows-gui - NWG API 文档"
+    ]
+  },
+  "changelog": [
+    {
+      "date": "2025-12-21",
+      "version": "1.0.0",
+      "changes": [
+        "创建 NWG GUI 架构基础",
+        "实现 104 键键盘布局定义",
+        "实现配置管理和 JSON 持久化",
+        "实现主窗口和应用状态管理",
+        "扩展完整的虚拟键码常量",
+        "编写所有事件处理函数框架"
+      ],
+      "status": "架构完成，待事件绑定"
+    }
+  ]
+}

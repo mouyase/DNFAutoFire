@@ -1,12 +1,18 @@
 mod core;
+mod gui;
 
-use core::{vk, AutoFireEngine};
-use std::io::{self, Write};
+use gui::{App, AppState};
+use native_windows_gui as nwg;
+use std::cell::RefCell;
+use std::io;
+use std::rc::Rc;
 
 #[cfg(windows)]
 fn is_elevated() -> bool {
     use windows::Win32::Foundation::HANDLE;
-    use windows::Win32::Security::{GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY};
+    use windows::Win32::Security::{
+        GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY,
+    };
     use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
 
     unsafe {
@@ -30,10 +36,6 @@ fn is_elevated() -> bool {
 }
 
 fn main() {
-    println!("=======================================");
-    println!("  DNF AutoFire v0.1.0 - 连发测试程序  ");
-    println!("=======================================\n");
-
     // 检查管理员权限（清单文件应该自动提示 UAC）
     #[cfg(windows)]
     {
@@ -48,50 +50,23 @@ fn main() {
             io::stdin().read_line(&mut input).unwrap();
             std::process::exit(1);
         }
-        println!("✓ 管理员权限验证通过\n");
     }
 
-    println!("功能说明：");
-    println!("- 当你在记事本中按住 J 或 L 键时，程序会自动连发");
-    println!("- 只在记事本窗口激活时工作");
-    println!("- 按键间隔：约 33ms（每秒 30 次）\n");
+    // 初始化 NWG
+    nwg::init().expect("无法初始化 Native Windows GUI");
 
-    // 创建连发引擎
-    let mut engine = AutoFireEngine::new();
+    // 设置字体
+    nwg::Font::set_global_family("Microsoft YaHei UI").expect("无法设置字体");
 
-    // 配置连发按键：J 和 L
-    engine.set_keys(vec![vk::VK_J, vk::VK_L]);
+    // 创建应用程序状态
+    let state = Rc::new(RefCell::new(AppState::new()));
 
-    println!("已配置连发按键：J, L\n");
-    println!("请先打开记事本，然后按 Enter 启动连发引擎...");
+    // 构建 UI
+    let app = App::build_ui(state.clone()).expect("无法构建 UI");
 
-    // 等待用户按 Enter
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).unwrap();
+    // 初始化数据
+    app.init();
 
-    // 启动连发引擎
-    engine.start();
-
-    println!("\n连发引擎已启动！");
-    println!("==============================");
-    println!("现在你可以：");
-    println!("1. 切换到记事本窗口");
-    println!("2. 按住 J 或 L 键测试连发效果");
-    println!("3. 按 Enter 停止程序\n");
-    println!("提示：");
-    println!("- 按住 J 键 → 持续输入 'jjjjj...'");
-    println!("- 按住 L 键 → 持续输入 'lllll...'");
-    println!("==============================\n");
-
-    // 等待用户按 Enter 停止
-    print!("按 Enter 停止连发引擎...");
-    io::stdout().flush().unwrap();
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).unwrap();
-
-    // 停止连发引擎
-    engine.stop();
-
-    println!("\n连发引擎已停止。");
-    println!("感谢使用！");
+    // 运行消息循环
+    nwg::dispatch_thread_events();
 }
