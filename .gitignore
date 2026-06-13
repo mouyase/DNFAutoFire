@@ -7,16 +7,42 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
 *.local
+
+# Rust / Tauri build outputs
+target/
+**/target/
+src-tauri/gen/schemas/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Test / coverage outputs
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Windows crash/debug artifacts
+*.pdb
+*.ilk
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
